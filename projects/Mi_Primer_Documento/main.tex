@@ -6,8 +6,9 @@
 \usepackage{hyperref}
 \usepackage{booktabs}
 
-% Paleta de colores de NaTex
+% Paleta de colores caracteristica de NaTex
 \definecolor{foxorange}{RGB}{255, 107, 53}
+\definecolor{sectiongray}{RGB}{60, 60, 70}
 
 \hypersetup{
     colorlinks=true,
@@ -16,12 +17,12 @@
 }
 
 \title{
-    \vspace{-1cm}
-    \includegraphics[width=4.5cm]{logo_natex.png}\\[0.5cm]
-    {\Huge \bfseries \color{foxorange} Guia Rapida de NaTex Studio}\\[0.2cm]
-    {\large \textbf{Version 0.1 - Editor Cientifico y Colaborativo}}
+    \vspace{-1.2cm}
+    \includegraphics[width=4.2cm]{logo_natex.png}\\[0.4cm]
+    {\Huge \bfseries \color{foxorange} Bienvenido a NaTex Studio}\\[0.2cm]
+    {\large \textbf{Version 0.1 -- Guia Rapida y Funcionalidades}}
 }
-\author{\textbf{NaTex Team} \\ Tu nuevo entorno de LaTeX sin complicaciones}
+\author{\textbf{NaTex Team} \\ Tu nuevo editor cientifico y colaborativo}
 \date{\today}
 
 \begin{document}
@@ -29,66 +30,58 @@
 \maketitle
 
 \begin{abstract}
-\textbf{Bienvenido a NaTex Studio v0.1!} Este documento sirve tanto de bienvenida como de instructivo practico interactivo. NaTex fue disenado para estudiantes, profesores e investigadores que desean la potencia total de LaTeX combinada con la inmediatez de la previsualizacion local, dictado de clases por voz, colaboracion en tiempo real y asistencia por Inteligencia Artificial.
+\textbf{NaTex Studio} es un entorno integral de edicion LaTeX disenado para ofrecer maxima fluidez, rapidez y comodidad sin las complicaciones habituales de instalacion. A continuacion se detallan todas las capacidades que incluye tu instalacion, organizadas entre aquellas que funcionan de forma totalmente autonoma y local, y aquellas potenciadas por Inteligencia Artificial.
 \end{abstract}
 
-\section{Atajos de Teclado Esenciales}
-El flujo de trabajo en NaTex esta optimizado para la velocidad. Memoriza estos atajos clave:
+\section{Atajos de Teclado Fundamentales}
+Para trabajar a maxima velocidad, utiliza estos atajos integrados:
 
 \begin{table}[h]
 \centering
 \begin{tabular}{@{}llp{8.5cm}@{}}
 \toprule
 \textbf{Atajo} & \textbf{Accion} & \textbf{Descripcion} \\ \midrule
-\texttt{Ctrl + S} & \textbf{Compilar} & Genera y recarga instantaneamente el visor PDF a la derecha. \\
+\texttt{Ctrl + S} & \textbf{Compilar} & Genera y actualiza al instante el visor PDF a la derecha. \\
 \texttt{Alt + M} & \textbf{Formulas} & Abre el Constructor y Teclado Matematico Cientifico. \\
-\texttt{Tab} & \textbf{Indentar} & Inserta 4 espacios en el cursor para ordenar el codigo. \\
-\texttt{Ctrl + Enter} & \textbf{Compilar Rapido} & Alternativa rapida para compilar sin despegar las manos del teclado. \\
+\texttt{Tab} & \textbf{Indentar} & Inserta 4 espacios limpios en la posicion del cursor. \\
+\texttt{Ctrl + Enter} & \textbf{Compilacion rapida} & Alternativa comoda para compilar sin despegar las manos del teclado. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Constructor de Ecuaciones (Alt + M)}
-Olvidate de buscar comandos raros de memoria. Presiona \textbf{Alt + M} (o clic en el boton \textit{Formulas}) para usar el panel visual interactivo con vista previa en vivo KaTeX.
+\section{Funciones Disponibles sin la API de Gemini (100\% Locales)}
+Estas herramientas estan siempre listas para usar, no requieren ninguna clave ni conexion especial y operan de forma completamente autonoma:
 
-Ejemplo de formula cuantica insertada con el asistente:
-\begin{equation}
-    i\hbar \frac{\partial}{\partial t}|\psi(t)\rangle = \hat{\mathbf{H}}|\psi(t)\rangle
-\end{equation}
-
-Ejemplo de calculo multivariable:
-\begin{equation}
-    \oint_{C} \vec{B} \cdot d\vec{r} = \mu_0 I_{\text{enc}} + \mu_0 \varepsilon_0 \frac{\partial \Phi_E}{\partial t}
-\end{equation}
-
-\section{Dictafono de Clases para Movil}
-Estas en clase o en una reunion? 
-\begin{enumerate}
-    \item Haz clic en el boton \textbf{"Clase"} en la barra superior (o en Inicio).
-    \item Escanea el codigo QR con tu celular (no requiere instalar ninguna aplicacion).
-    \item Presiona \textbf{Grabar} mientras el profesor explica.
-    \item NaTex procesara el audio con \textbf{Google Gemini} y creara un apunte LaTeX estructurado con formulas matematicas, teoremas y resumen ejecutivo listo para compilar.
-\end{enumerate}
-
-\section{Galeria y Gestion de Figuras}
-Para insertar imagenes en tus documentos:
 \begin{itemize}
-    \item Arrastra cualquier archivo (.png, .jpg, .svg) a la barra lateral izquierda o usa el menu \textbf{Insertar $\rightarrow$ Galeria de Imagenes}.
-    \item Haz clic en el boton \textbf{Copiar LaTeX} para copiar el snippet \texttt{\textbackslash begin\{figure\}} y pegalo donde quieras.
-    \item Puedes renombrar archivos directamente y NaTex actualizara tu codigo de forma automatica.
+    \item \textbf{Compilacion local instantanea (Tectonic):} Compila documentos a PDF de alta calidad en decimas de segundo. No necesitas instalar gigabytes de TeX Live ni configurar variables de entorno.
+    \item \textbf{Constructor y Teclado Matematico Cientifico (Alt + M):} Panel visual interactivo con previsualizacion KaTeX en tiempo real. Permite insertar algebra, calculo diferencial e integral, matrices, logica, vectores, letras griegas y fisica cuantica (notacion bra-ket):
+    \begin{equation}
+        i\hbar \frac{\partial}{\partial t}|\psi(t)\rangle = \hat{\mathbf{H}}|\psi(t)\rangle, \qquad \oint_C \vec{B} \cdot d\vec{r} = \mu_0 I_{\text{enc}}
+    \end{equation}
+    \item \textbf{Galeria de Imagenes y Recursos:} Puedes arrastrar imagenes a la barra lateral, copiar el bloque \texttt{\textbackslash begin\{figure\}} listo para pegar y renombrar archivos con actualizacion sincronizada automatica en el codigo.
+    \item \textbf{Colaboracion en Vivo (Tunel Cloudflare):} Permite compartir un enlace directo o codigo QR para que un companero edite y compile contigo en tiempo real desde cualquier lugar del mundo.
+    \item \textbf{Sincronizacion bidireccional (SyncTeX):} El boton \textit{"Ir a PDF"} ubica la posicion exacta de tu codigo directamente en la pagina correspondiente del visor.
+    \item \textbf{Plantillas preconstruidas:} Modelos listos para Informes Tecnicos, Papers Cientificos y Posters de Congresos en dos columnas.
+    \item \textbf{Personalizacion e Idiomas:} Selector de Modo Oscuro, Modo Claro, paleta de colores de acento y soporte bilingue (Espanol e Ingles).
 \end{itemize}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.32\textwidth]{logo_natex.png}
+    \includegraphics[width=0.3\textwidth]{logo_natex.png}
     \caption{Logotipo oficial de NaTex Studio.}
-    \label{fig:logo}
+    \label{fig:logo_natex}
 \end{figure}
 
-\section{Colaboracion en Tiempo Real}
-Haz clic en el menu \textbf{Colaborar $\rightarrow$ Compartir con un amigo}. NaTex generara un tunel seguro con un enlace y codigo QR. Tu companero podra entrar desde cualquier lugar del mundo para editar el documento y compilar en vivo contigo sin configuraciones de red complejas.
+\section{Funciones Disponibles con la API de Gemini (Inteligencia Artificial)}
+Al contar con la clave de Gemini activa, se desbloquean las siguientes caracteristicas avanzadas:
 
-\section{Empieza a crear!}
-Puedes borrar este texto o modificarlo como quieras para empezar tu propio documento. Disfruta redactando con NaTex!
+\begin{itemize}
+    \item \textbf{Dictafono de Clases para Celular:} Escaneas el codigo QR desde tu movil para grabar la explicacion de la clase. El audio se procesa para generar de inmediato un apunte LaTeX completo y ordenado con formulas, teoremas y resumen ejecutivo.
+    \item \textbf{Diagnostico Inteligente de Errores de Compilacion:} Ante cualquier falla en el codigo LaTeX, el boton \textit{"Preguntar a Gemini por que fallo"} analiza el registro de errores y te entrega la explicacion clara y la solucion exacta lista para aplicar.
+    \item \textbf{Asistente de Redaccion y Generacion de Tablas:} Genera tablas complejas, traduce texto a notacion matematica o redacta secciones tecnicas a partir de instrucciones en lenguaje cotidiano.
+\end{itemize}
+
+\section{Empieza a escribir}
+Puedes modificar o borrar este contenido cuando desees para comenzar tu propio proyecto. Que disfrutes redactando en NaTex!
 
 \end{document}

@@ -17,6 +17,7 @@ projects/Mi_Primer_Documento/*.synctex.gz
 # Empaquetado y Releases
 build/
 dist/
+dist_installer/
 *.spec
 *.zip
 

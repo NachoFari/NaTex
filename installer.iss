@@ -1,5 +1,5 @@
-﻿#define MyAppName "NaTex Studio"
-#define MyAppVersion "0.1"
+#define MyAppName "NaTex Studio"
+#define MyAppVersion "0.2"
 #define MyAppPublisher "NaTex Team"
 #define MyAppURL "https://github.com/NachoFari/NaTex"
 #define MyAppExeName "NaTex.exe"
@@ -15,7 +15,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={userappdata}\{#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir=dist_installer
-OutputBaseFilename=NaTex-Setup-v0.1
+OutputBaseFilename=NaTex-Setup-v0.2
 SetupIconFile=natex.ico
 Compression=lzma2/max
 SolidCompression=yes

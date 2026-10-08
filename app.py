@@ -408,7 +408,7 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         if path == '/api/system/check_update':
-            CURRENT_VERSION = "0.1"
+            CURRENT_VERSION = "0.2"
             is_git = os.path.exists(os.path.join(BASE_DIR, '.git'))
             try:
                 ctx = ssl._create_unverified_context()
@@ -431,12 +431,12 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
 
                     self.send_json({
                         'success': True,
-                        'current_version': 'v0.1',
-                        'latest_version': rel_data.get('tag_name', 'v0.1'),
+                        'current_version': 'v0.2',
+                        'latest_version': rel_data.get('tag_name', 'v0.2'),
                         'has_update': has_update,
                         'release_name': rel_data.get('name', ''),
                         'release_notes': rel_data.get('body', ''),
-                        'download_url': 'https://github.com/NachoFari/NaTex/releases/latest/download/NaTex-Setup-v0.1.exe',
+                        'download_url': 'https://github.com/NachoFari/NaTex/releases/latest/download/NaTex-Setup-v0.2.exe',
                         'releases_page': 'https://github.com/NachoFari/NaTex/releases',
                         'is_git_repo': is_git
                     })
@@ -445,7 +445,7 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json({
                     'success': False,
                     'error': f'No se pudo conectar con GitHub: {str(e)}',
-                    'current_version': 'v0.1',
+                    'current_version': 'v0.2',
                     'is_git_repo': is_git
                 })
                 return

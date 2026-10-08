@@ -559,7 +559,7 @@ function initUpdateChecker() {
                 resultBox.innerHTML = `
                     <div style="color:#10B981; display:flex; align-items:center; gap:6px;">
                         <span>✅</span>
-                        <span>${isEn ? 'You have the latest version (v0.1).' : '¡Tienes la versión más reciente (v0.1)!'}</span>
+                        <span>${isEn ? 'You have the latest version (v0.2).' : '¡Tienes la versión más reciente (v0.2)!'}</span>
                     </div>
                 `;
             }

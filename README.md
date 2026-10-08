@@ -1,10 +1,10 @@
-﻿<div align="center">
+<div align="center">
 
 # 🦊 NaTex Studio
 
 **El entorno de edición LaTeX rápido, visual, libre y colaborativo.**
 
-[![Descargar Instalador](https://img.shields.io/badge/📥_Descargar-NaTex--Setup--v0.1.exe-2ea44f?style=for-the-badge&logo=windows)](https://github.com/NachoFari/NaTex/releases/download/v0.1/NaTex-Setup-v0.1.exe)
+[![Descargar Instalador](https://img.shields.io/badge/📥_Descargar-NaTex--Setup--v0.1.exe-2ea44f?style=for-the-badge&logo=windows)](https://github.com/NachoFari/NaTex/releases/latest/download/NaTex-Setup-v0.1.exe)
 
 [![Version](https://img.shields.io/badge/version-v0.1-orange.svg)](https://github.com/NachoFari/NaTex/releases)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
@@ -20,7 +20,7 @@
 ## 📥 Descarga e Instalación
 
 ### 👉 Forma más cómoda: Instalador de Windows (.exe)
-1. Descarga el instalador oficial: **[NaTex-Setup-v0.1.exe](https://github.com/NachoFari/NaTex/releases/download/v0.1/NaTex-Setup-v0.1.exe)**
+1. Descarga el instalador oficial: **[NaTex-Setup-v0.1.exe](https://github.com/NachoFari/NaTex/releases/latest/download/NaTex-Setup-v0.1.exe)**
 2. Haz doble clic para instalar (no requiere permisos de administrador).
 3. ¡Listo! Crea automáticamente un acceso directo en tu Escritorio y Menú Inicio.
 

@@ -10,6 +10,14 @@
     <script src="/static/vendor/katex/katex.min.js"></script>
 </head>
 <body>
+    <!-- Banner de Notificación de Actualización Flotante -->
+    <div id="updateBanner" class="update-banner hidden">
+        <span class="update-banner-icon">🚀</span>
+        <span class="update-banner-text" id="updateBannerText">¡Nueva versión de NaTex disponible!</span>
+        <button id="btnBannerUpdate" class="btn-primary-compact" style="padding: 4px 10px; font-size: 12px;" data-i18n="btn_banner_update">Ver / Actualizar</button>
+        <button id="btnCloseBanner" class="btn-icon-tiny" title="Cerrar">&times;</button>
+    </div>
+
     <header class="top-bar">
         <div class="brand">
             <img src="/static/img/logo.jpg" alt="NaTex Logo" class="logo-img" id="brandLogo" style="cursor:pointer;" title="Ir al Inicio">
@@ -36,6 +44,7 @@
                     <button class="dropdown-item" id="menuItemTemplates"><span>📑</span> <span data-i18n="item_templates">Cargar Plantilla...</span></button>
                     <button class="dropdown-item" id="menuItemSaveTemplate"><span>💾</span> <span data-i18n="item_save_template">Guardar como Plantilla...</span></button>
                     <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" id="menuItemDownloadTex"><span>📥</span> <span data-i18n="item_download_tex">Descargar Código LaTeX (.tex)</span></button>
                     <button class="dropdown-item" id="menuItemDownloadPdf"><span>⬇️</span> <span data-i18n="item_download_pdf">Descargar PDF</span></button>
                 </div>
             </div>
@@ -359,6 +368,7 @@
                     <div style="display:flex; gap:8px; margin:8px 0 12px 0;">
                         <input type="text" id="inputShareUrl" readonly style="flex:1; padding:10px 12px; border-radius:6px; background:var(--bg-dark); color:var(--fox-orange); border:1px solid var(--border-color); font-weight:bold; font-size:13px;" />
                         <button id="btnCopyShareUrl" class="btn-primary">📋 <span data-i18n="btn_copy">Copiar</span></button>
+                        <button id="btnRestartTunnel" class="btn-secondary" title="Reiniciar y generar un nuevo enlace de compartir">🔄 <span data-i18n="btn_restart_tunnel">Reiniciar Link</span></button>
                     </div>
                     <div style="background:var(--bg-card-subtle, #181824); border: 1px solid var(--border-color); border-radius:8px; padding:12px; font-size:12.5px; color:var(--text-muted); line-height:1.5;" data-i18n="share_explanation">
                         💡 <strong>Cómo funciona:</strong> Tu amigo solo hace clic en este link o escanea el QR desde cualquier navegador (PC o celular). Podrá ver el documento, escribir con guardado automático y compilar el PDF junto a ti en tiempo real mientras tengas NaTex abierto.
@@ -524,6 +534,10 @@
                         </button>
                     </div>
                     <div id="updateResultBox" class="hidden" style="margin-top: 10px; padding: 12px; border-radius: 6px; font-size: 12.5px; border: 1px solid var(--border-color); background: var(--bg-dark);"></div>
+                    <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="chkAutoCheckUpdates" checked style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--fox-orange);">
+                        <label for="chkAutoCheckUpdates" style="font-size: 12.5px; cursor: pointer; color: var(--text-main); user-select: none;" data-i18n="chk_auto_updates">Comprobar actualizaciones automáticamente al iniciar</label>
+                    </div>
                 </div>
 
                 <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:10px;">

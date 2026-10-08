@@ -28,7 +28,20 @@ if sys.stderr is None:
     except:
         pass
 
-PORT = 5000
+NO_WINDOW_FLAG = subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0
+
+def find_available_port(start_port=5000, max_attempts=50):
+    for p in range(start_port, start_port + max_attempts):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                s.bind(("", p))
+                return p
+            except OSError:
+                continue
+    return start_port
+
+PORT = find_available_port(5000)
 if getattr(sys, 'frozen', False):
     BASE_DIR = os.path.dirname(sys.executable)
 else:
@@ -46,12 +59,27 @@ DEFAULT_CONFIG = {
     'last_project': 'Mi_Primer_Documento',
     'theme': 'dark',
     'custom_color': '#FF6B35',
-    'language': 'es'
+    'language': 'es',
+    'auto_check_updates': True
 }
 
 tunnel_proc = None
 tunnel_url = None
 shared_project = 'Mi_Primer_Documento'
+
+last_heartbeat_time = time.time()
+heartbeat_lock = threading.Lock()
+
+def watchdog_thread():
+    """Apaga el proceso si no se recibe ningún latido del navegador tras 9 segundos."""
+    time.sleep(15)
+    while True:
+        time.sleep(2)
+        with heartbeat_lock:
+            elapsed = time.time() - last_heartbeat_time
+        if elapsed > 9.0:
+            cleanup_tunnel()
+            os._exit(0)
 
 def load_config():
     if os.path.exists(CONFIG_FILE):
@@ -98,9 +126,9 @@ def start_tunnel_thread():
     if not os.path.exists(CLOUDFLARED_EXE):
         return None
 
-    # Cerrar cualquier cloudflared previo que pudiera haber quedado colgado
+    # Cerrar cualquier cloudflared previo de forma silenciosa sin consola
     try:
-        subprocess.run(['taskkill', '/F', '/IM', 'cloudflared.exe'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(['taskkill', '/F', '/IM', 'cloudflared.exe'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=NO_WINDOW_FLAG)
     except:
         pass
 
@@ -112,7 +140,8 @@ def start_tunnel_thread():
         text=True,
         bufsize=1,
         encoding='utf-8',
-        errors='ignore'
+        errors='ignore',
+        creationflags=NO_WINDOW_FLAG
     )
 
     found_url = None
@@ -507,6 +536,51 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json({'success': False, 'error': 'Coordenadas no encontradas'})
             return
 
+        if path == '/api/system/heartbeat':
+            global last_heartbeat_time
+            with heartbeat_lock:
+                last_heartbeat_time = time.time()
+            self.send_json({'status': 'alive'})
+            return
+
+        if path == '/api/tunnel/restart':
+            if is_guest:
+                self.send_error(403, 'Acceso no autorizado')
+                return
+            cleanup_tunnel()
+            tunnel_url = None
+            qs = urllib.parse.parse_qs(parsed.query)
+            req_proj = qs.get('project', [''])[0]
+            if req_proj:
+                shared_project = req_proj
+            url = start_tunnel_thread()
+            if url:
+                self.send_json({'success': True, 'url': url})
+            else:
+                self.send_json({'success': False, 'error': 'No se pudo reiniciar el túnel de conexión.'})
+            return
+
+        if path == '/api/project/download_tex':
+            qs = urllib.parse.parse_qs(parsed.query)
+            proj = qs.get('name', [shared_project])[0]
+            if is_guest and proj != shared_project:
+                self.send_error(403, 'Acceso no autorizado')
+                return
+            tex_file = os.path.join(PROJECTS_DIR, proj, 'main.tex')
+            if not os.path.exists(tex_file):
+                self.send_error(404, 'Archivo no encontrado')
+                return
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/x-tex; charset=utf-8')
+            self.send_header('Content-Disposition', f'attachment; filename="{urllib.parse.quote(proj)}.tex"')
+            self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            with open(tex_file, 'rb') as f:
+                content = f.read()
+            self.send_header('Content-Length', str(len(content)))
+            self.end_headers()
+            self.wfile.write(content)
+            return
+
         if path == '/api/config':
             if is_guest:
                 self.send_error(403, 'Ajustes no accesibles para invitados')
@@ -516,7 +590,8 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 'gemini_api_key': cfg.get('gemini_api_key', ''),
                 'theme': cfg.get('theme', 'dark'),
                 'custom_color': cfg.get('custom_color', '#FF6B35'),
-                'language': cfg.get('language', 'es')
+                'language': cfg.get('language', 'es'),
+                'auto_check_updates': cfg.get('auto_check_updates', True)
             })
             return
 
@@ -526,6 +601,18 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         is_guest = self.is_external_guest()
+
+        if path == '/api/system/goodbye':
+            goodbye_time = time.time()
+            def shutdown_soon():
+                time.sleep(4.0)
+                with heartbeat_lock:
+                    if last_heartbeat_time < goodbye_time:
+                        cleanup_tunnel()
+                        os._exit(0)
+            threading.Thread(target=shutdown_soon, daemon=True).start()
+            self.send_json({'status': 'bye'})
+            return
 
         if path == '/api/project/save':
             data = self.read_json()
@@ -562,7 +649,7 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
 
             cmd = [COMPILER_EXE, '--synctex', 'main.tex']
             try:
-                proc = subprocess.run(cmd, cwd=proj_dir, capture_output=True, text=True, timeout=90)
+                proc = subprocess.run(cmd, cwd=proj_dir, capture_output=True, text=True, timeout=90, creationflags=NO_WINDOW_FLAG)
                 if proc.returncode == 0:
                     self.send_json({'success': True, 'pdf_url': f'/api/pdf?name={urllib.parse.quote(proj)}'})
                 else:
@@ -900,7 +987,7 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             if os.path.exists(COMPILER_EXE):
                 cmd = [COMPILER_EXE, '--synctex', 'main.tex']
                 try:
-                    subprocess.run(cmd, cwd=proj_dir, capture_output=True, text=True, timeout=90)
+                    subprocess.run(cmd, cwd=proj_dir, capture_output=True, text=True, timeout=90, creationflags=NO_WINDOW_FLAG)
                     has_pdf = os.path.exists(os.path.join(proj_dir, 'main.pdf'))
                 except Exception as comp_err:
                     print(f"[NaTex] Error compilando clase {proj_name}: {comp_err}")
@@ -931,6 +1018,8 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 cfg['custom_color'] = data['custom_color']
             if 'language' in data:
                 cfg['language'] = data['language']
+            if 'auto_check_updates' in data:
+                cfg['auto_check_updates'] = bool(data['auto_check_updates'])
             save_config(cfg)
             self.send_json({'success': True})
             return
@@ -940,7 +1029,7 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json({'success': False, 'error': 'Esta instalación no utiliza Git. Puedes descargar la nueva versión desde el botón de descarga.'})
                 return
             try:
-                res = subprocess.run(['git', 'pull', 'origin', 'main'], cwd=BASE_DIR, capture_output=True, text=True, timeout=30)
+                res = subprocess.run(['git', 'pull', 'origin', 'main'], cwd=BASE_DIR, capture_output=True, text=True, timeout=30, creationflags=NO_WINDOW_FLAG)
                 if res.returncode == 0:
                     self.send_json({'success': True, 'message': 'NaTex se actualizó correctamente desde GitHub. Recargando la aplicación...'})
                 else:
@@ -979,22 +1068,6 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
         body = self.rfile.read(content_length).decode('utf-8')
         return json.loads(body)
 
-def free_port(port):
-    """Cierra cualquier proceso que esté ocupando el puerto antes de iniciar."""
-    try:
-        if sys.platform == 'win32':
-            res = subprocess.run(f'netstat -aon | findstr ":{port}" | findstr "LISTENING"', shell=True, capture_output=True, text=True)
-            for line in res.stdout.strip().splitlines():
-                parts = line.strip().split()
-                if len(parts) >= 5:
-                    pid = parts[-1]
-                    if pid != str(os.getpid()) and pid != '0':
-                        print(f'[NaTex] Liberando puerto {port} (cerrando PID {pid})...')
-                        subprocess.run(f'taskkill /F /PID {pid}', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            time.sleep(0.4)
-    except Exception as e:
-        print(f'[NaTex] Nota al verificar puerto: {e}')
-
 if __name__ == '__main__':
     os.chdir(BASE_DIR)
     try:
@@ -1003,7 +1076,8 @@ if __name__ == '__main__':
     except:
         pass
 
-    free_port(PORT)
+    # Iniciar watchdog de cierre automático de pestaña
+    threading.Thread(target=watchdog_thread, daemon=True).start()
 
     print('==================================================')
     print('             [NaTex] Servidor Local               ')
@@ -1015,7 +1089,5 @@ if __name__ == '__main__':
     try:
         with socketserver.ThreadingTCPServer(("", PORT), NaTexHandler) as httpd:
             httpd.serve_forever()
-    except OSError:
-        free_port(PORT)
-        with socketserver.ThreadingTCPServer(("", PORT), NaTexHandler) as httpd:
-            httpd.serve_forever()
+    except Exception as e:
+        print(f"[NaTex] Error en servidor: {e}")

@@ -50,6 +50,10 @@ const i18n = {
         item_templates: "Cargar Plantilla...",
         item_save_template: "Guardar como Plantilla...",
         item_download_pdf: "Descargar PDF",
+        item_download_tex: "Descargar Código LaTeX (.tex)",
+        btn_restart_tunnel: "Reiniciar Link",
+        chk_auto_updates: "Comprobar actualizaciones automáticamente al iniciar",
+        btn_banner_update: "Ver / Actualizar",
         item_math: "Teclado Matemático Científico...",
         item_voice: "Dictáfono de Clase (Celular / Móvil)...",
         item_gallery: "Galería de Imágenes / Recursos",
@@ -202,6 +206,10 @@ const i18n = {
         item_templates: "Load Template...",
         item_save_template: "Save as Template...",
         item_download_pdf: "Download PDF",
+        item_download_tex: "Download LaTeX Code (.tex)",
+        btn_restart_tunnel: "Restart Link",
+        chk_auto_updates: "Check for updates automatically on startup",
+        btn_banner_update: "View / Update",
         item_math: "Scientific Math Keyboard...",
         item_voice: "Class Voice Dictaphone (Mobile)...",
         item_gallery: "Image Gallery / Assets",
@@ -345,6 +353,7 @@ const i18n = {
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
     initSettings();
+    initHeartbeat();
     initResizer();
     initEditor();
     initDashboard();
@@ -356,6 +365,24 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     setupCollaborationPolling();
 });
+
+function initHeartbeat() {
+    // Latido periódico para mantener vivo el proceso NaTex
+    setInterval(() => {
+        fetch('/api/system/heartbeat').catch(() => {});
+    }, 2500);
+
+    // Aviso inmediato de desconexión al cerrar la pestaña
+    window.addEventListener('beforeunload', () => {
+        try {
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon('/api/system/goodbye');
+            } else {
+                fetch('/api/system/goodbye', { method: 'POST', keepalive: true }).catch(() => {});
+            }
+        } catch (_) {}
+    });
+}
 
 // Configuración, Temas e Idiomas
 function applyLanguage(lang) {
@@ -420,6 +447,12 @@ function initSettings() {
     applyTheme(currentTheme, currentCustomColor);
     applyLanguage(currentLanguage);
 
+    const chkAuto = document.getElementById('chkAutoCheckUpdates');
+    const savedAuto = localStorage.getItem('natex_auto_update');
+    if (chkAuto && savedAuto !== null) {
+        chkAuto.checked = (savedAuto === 'true');
+    }
+
     const savedKey = localStorage.getItem('natex_gemini_key');
     if (savedKey) {
         document.getElementById('inputApiKey').value = savedKey;
@@ -430,7 +463,8 @@ function initSettings() {
                 gemini_api_key: savedKey,
                 theme: currentTheme,
                 custom_color: currentCustomColor,
-                language: currentLanguage
+                language: currentLanguage,
+                auto_check_updates: savedAuto !== null ? savedAuto === 'true' : true
             })
         });
     } else {
@@ -446,6 +480,10 @@ function initSettings() {
                 }
                 if (data.language && !localStorage.getItem('natex_language')) {
                     applyLanguage(data.language);
+                }
+                if (data.auto_check_updates !== undefined && savedAuto === null) {
+                    if (chkAuto) chkAuto.checked = !!data.auto_check_updates;
+                    localStorage.setItem('natex_auto_update', data.auto_check_updates ? 'true' : 'false');
                 }
             });
     }
@@ -531,6 +569,51 @@ function initUpdateChecker() {
             resultBox.innerHTML = `<div style="color:#EF4444;">⚠️ Error: ${e.message}</div>`;
         }
     };
+
+    // Verificación automática en segundo plano al arrancar si está activada
+    setTimeout(async () => {
+        try {
+            const isAuto = localStorage.getItem('natex_auto_update') !== 'false';
+            if (!isAuto) return;
+            const res = await fetch('/api/system/check_update');
+            const data = await res.json();
+            if (data.success && data.has_update) {
+                showUpdateBanner(data);
+            }
+        } catch (_) {}
+    }, 2500);
+}
+
+function showUpdateBanner(data) {
+    const banner = document.getElementById('updateBanner');
+    const bannerText = document.getElementById('updateBannerText');
+    const btnUpdate = document.getElementById('btnBannerUpdate');
+    const btnClose = document.getElementById('btnCloseBanner');
+    if (!banner) return;
+
+    const isEn = currentLanguage === 'en';
+    const ver = data.latest_version || 'v0.2';
+    if (bannerText) {
+        bannerText.innerHTML = isEn 
+            ? `🚀 <strong>New version available (${escapeHtml(ver)})!</strong> Update NaTex to get the latest features.`
+            : `🚀 <strong>¡Nueva versión disponible (${escapeHtml(ver)})!</strong> Actualiza NaTex para obtener las últimas novedades.`;
+    }
+    banner.classList.remove('hidden');
+
+    if (btnUpdate) {
+        btnUpdate.onclick = () => {
+            banner.classList.add('hidden');
+            const modal = document.getElementById('modalSettings');
+            if (modal) modal.classList.remove('hidden');
+            const btnCheck = document.getElementById('btnCheckUpdates');
+            if (btnCheck) btnCheck.click();
+        };
+    }
+    if (btnClose) {
+        btnClose.onclick = () => {
+            banner.classList.add('hidden');
+        };
+    }
 }
 
 function insertAtCursor(text, cursorOffset = 0) {
@@ -1510,7 +1593,9 @@ function setupEventListeners() {
 
     document.getElementById('btnSaveApiKey').onclick = async () => {
         const key = document.getElementById('inputApiKey').value.trim();
+        const autoCheck = document.getElementById('chkAutoCheckUpdates') ? document.getElementById('chkAutoCheckUpdates').checked : true;
         localStorage.setItem('natex_gemini_key', key);
+        localStorage.setItem('natex_auto_update', autoCheck ? 'true' : 'false');
         await fetch('/api/config', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -1518,7 +1603,8 @@ function setupEventListeners() {
                 gemini_api_key: key,
                 theme: currentTheme,
                 custom_color: currentCustomColor,
-                language: currentLanguage
+                language: currentLanguage,
+                auto_check_updates: autoCheck
             })
         });
         alert(currentLanguage === 'en' ? 'Settings saved successfully!' : '¡Ajustes guardados correctamente!');
@@ -1661,6 +1747,9 @@ function initDropdownMenus() {
 
     const itemDownPdf = document.getElementById('menuItemDownloadPdf');
     if (itemDownPdf) itemDownPdf.onclick = () => window.open(`/api/pdf?name=${encodeURIComponent(currentProject)}`, '_blank');
+
+    const itemDownTex = document.getElementById('menuItemDownloadTex');
+    if (itemDownTex) itemDownTex.onclick = () => window.open(`/api/project/download_tex?name=${encodeURIComponent(currentProject)}`, '_blank');
 
     const itemMath = document.getElementById('menuItemMathKeyboard');
     if (itemMath) itemMath.onclick = () => openMathModal();
@@ -2733,6 +2822,55 @@ function initVoiceDictate() {
                 btnCopyShare.textContent = '¡Copiado! ✓';
                 setTimeout(() => btnCopyShare.textContent = '📋 Copiar', 2000);
             });
+        };
+    }
+
+    const btnRestart = document.getElementById('btnRestartTunnel');
+    if (btnRestart) {
+        btnRestart.onclick = async () => {
+            btnRestart.disabled = true;
+            const originalHtml = btnRestart.innerHTML;
+            btnRestart.innerHTML = '⏳ ' + (currentLanguage === 'en' ? 'Restarting...' : 'Reiniciando...');
+            const loading = document.getElementById('shareLoading');
+            const ready = document.getElementById('shareReady');
+            if (loading) {
+                loading.classList.remove('hidden');
+                loading.innerHTML = `<div style="font-size:28px; margin-bottom:8px;">⏳</div><p>${currentLanguage === 'en' ? 'Generating new secure link...' : 'Generando nuevo enlace seguro...'}</p>`;
+            }
+            if (ready) ready.classList.add('hidden');
+
+            try {
+                const res = await fetch(`/api/tunnel/restart?project=${encodeURIComponent(currentProject)}`);
+                const data = await res.json();
+                btnRestart.disabled = false;
+                btnRestart.innerHTML = originalHtml;
+                if (data.success && data.url) {
+                    if (loading) loading.classList.add('hidden');
+                    if (ready) ready.classList.remove('hidden');
+                    const projectLink = `${data.url}/?p=${encodeURIComponent(currentProject)}`;
+                    const inputUrl = document.getElementById('inputShareUrl');
+                    if (inputUrl) inputUrl.value = projectLink;
+
+                    const qrContainer = document.getElementById('shareQrCode');
+                    if (qrContainer && window.QRCode) {
+                        qrContainer.innerHTML = '';
+                        shareQrInstance = new QRCode(qrContainer, {
+                            text: projectLink,
+                            width: 160,
+                            height: 160,
+                            colorDark: '#121214',
+                            colorLight: '#ffffff',
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+                    }
+                } else {
+                    if (loading) loading.innerHTML = `<p style="color:#EF4444;">⚠️ ${data.error || 'Error al reiniciar túnel'}</p>`;
+                }
+            } catch (err) {
+                btnRestart.disabled = false;
+                btnRestart.innerHTML = originalHtml;
+                if (loading) loading.innerHTML = `<p style="color:#EF4444;">⚠️ Error: ${err.message}</p>`;
+            }
         };
     }
 }

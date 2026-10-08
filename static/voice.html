@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NaTex · Dictáfono de Clases a LaTeX</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22><text y=%2226%22 font-size=%2226%22>🎙️</text></svg>">
+    <style>
+        :root {
+            --bg-body: #121214;
+            --bg-card: #1a1a1e;
+            --bg-card-subtle: #232328;
+            --fox-orange: #FF6B35;
+            --fox-orange-glow: rgba(255, 107, 53, 0.35);
+            --fox-orange-hover: #ff7d4d;
+            --text-main: #f0f0f2;
+            --text-muted: #95959e;
+            --border-color: #2e2e36;
+            --success: #10B981;
+            --error: #EF4444;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            padding-bottom: 40px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 4px 18px 4px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo {
+            font-size: 28px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .header-title span {
+            color: var(--fox-orange);
+        }
+
+        .header-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .server-pill {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .server-pill.offline {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--error);
+        }
+
+        .server-pill::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+            display: inline-block;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-field {
+            width: 100%;
+            background: var(--bg-card-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            color: var(--text-main);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: var(--fox-orange);
+            box-shadow: 0 0 0 3px var(--fox-orange-glow);
+        }
+
+        .chips-container {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+        .chips-container::-webkit-scrollbar { display: none; }
+
+        .chip {
+            background: var(--bg-card-subtle);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chip:hover, .chip:active {
+            background: var(--fox-orange);
+            color: #fff;
+            border-color: var(--fox-orange);
+        }
+
+        /* Área de Grabación */
+        .recording-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 10px;
+            text-align: center;
+        }
+
+        .timer-display {
+            font-size: 44px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 24px;
+            color: var(--text-main);
+        }
+
+        .timer-display.recording {
+            color: var(--fox-orange);
+            text-shadow: 0 0 20px var(--fox-orange-glow);
+        }
+
+        .mic-btn-wrapper {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .mic-pulse-ring {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border-radius: 50%;
+            border: 3px solid var(--fox-orange);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .recording .mic-pulse-ring {
+            animation: pulse-ring 1.8s infinite ease-out;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.9); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 0.2; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .btn-mic {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            border: none;
+            background: var(--fox-orange);
+            color: white;
+            font-size: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 25px var(--fox-orange-glow);
+            transition: transform 0.2s, background 0.2s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn-mic:active {
+            transform: scale(0.92);
+        }
+
+        .btn-mic.recording {
+            background: var(--error);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+            animation: breathe 1.5s infinite alternate;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.06); }
+        }
+
+        .record-status-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .recording-controls {
+            display: flex;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-card-subtle);
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary-action {
+            background: var(--fox-orange);
+            color: #fff;
+            border: none;
+            box-shadow: 0 6px 18px var(--fox-orange-glow);
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            border-radius: var(--radius-md);
+            margin-top: 14px;
+        }
+
+        .btn-primary-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 16px;
+            border-radius: var(--radius-md);
+            outline: none;
+        }
+
+        .upload-alternative {
+            text-align: center;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border-color);
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .upload-alternative-btn {
+            background: none;
+            border: none;
+            color: var(--fox-orange);
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        /* Panel de progreso */
+        .progress-box {
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13.5px;
+            color: var(--text-muted);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            background: var(--bg-card-subtle);
+            border: 1px solid var(--border-color);
+        }
+
+        .step-item.active {
+            color: var(--fox-orange);
+            border-color: var(--fox-orange);
+            background: rgba(255, 107, 53, 0.08);
+            font-weight: 600;
+        }
+
+        .step-item.done {
+            color: var(--success);
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            border-top-color: var(--fox-orange);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Resultado de éxito */
+        .result-box {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .success-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            color: var(--success);
+        }
+
+        .success-badge .icon {
+            font-size: 32px;
+        }
+
+        .format-card {
+            background: var(--bg-card-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            font-size: 13px;
+        }
+
+        .format-title {
+            color: var(--fox-orange);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .format-list {
+            margin-left: 20px;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        /* Banner de Clave Gemini */
+        .api-key-banner {
+            display: none;
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid var(--fox-orange);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 18px;
+        }
+
+        .api-key-banner h4 {
+            color: var(--fox-orange);
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .api-key-banner p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .api-key-input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-brand">
+            <div class="header-logo">🦊</div>
+            <div>
+                <div class="header-title">Na<span>Tex</span> Dictáfono</div>
+                <div class="header-subtitle">Graba la clase ➔ LaTeX & PDF</div>
+            </div>
+        </div>
+        <div class="server-pill" id="serverPill">Conectado</div>
+    </header>
+
+    <!-- Banner si falta la clave Gemini -->
+    <div class="api-key-banner" id="apiKeyBanner">
+        <h4>🔑 Clave Gratuita de Gemini Requerida</h4>
+        <p>Para transcribir el audio y generar el código LaTeX de la clase, ingresa tu clave gratuita de <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--fox-orange);">Google AI Studio</a>:</p>
+        <div class="api-key-input-row">
+            <input type="password" id="inputVoiceApiKey" class="input-field" placeholder="Pega tu API Key de Gemini...">
+            <button class="btn-action" id="btnSaveKey" style="background:var(--fox-orange); color:#fff; border:none;">Guardar</button>
+        </div>
+    </div>
+
+    <!-- Tarjeta de Título del Apunte -->
+    <div class="card" id="cardMetadata">
+        <div class="card-title">📚 Asignatura / Título de la Clase</div>
+        <div class="input-group">
+            <input type="text" id="classTitleInput" class="input-field" placeholder="Ej: Cálculo II - Teorema de Green">
+        </div>
+        <div class="chips-container">
+            <button class="chip" onclick="setTitle('Cálculo')">📐 Cálculo</button>
+            <button class="chip" onclick="setTitle('Álgebra Lineal')">🔢 Álgebra Lineal</button>
+            <button class="chip" onclick="setTitle('Física')">⚡ Física</button>
+            <button class="chip" onclick="setTitle('Química')">🧪 Química</button>
+            <button class="chip" onclick="setTitle('Ecuaciones Diferenciales')">📈 EDO</button>
+            <button class="chip" onclick="setDateTimeTitle()">📅 Fecha actual</button>
+        </div>
+    </div>
+
+    <!-- Tarjeta del Dictáfono / Grabación -->
+    <div class="card" id="cardRecorder">
+        <div class="card-title">🎙️ Grabación de Audio</div>
+        
+        <div class="recording-box" id="recordingBox">
+            <div class="timer-display" id="timerDisplay">00:00</div>
+            
+            <div class="mic-btn-wrapper">
+                <div class="mic-pulse-ring" id="pulseRing"></div>
+                <button class="btn-mic" id="btnMicToggle" title="Toca para grabar">
+                    <span id="micIcon">🎙️</span>
+                </button>
+            </div>
+
+            <div class="record-status-label" id="recordStatusLabel">Toca el micrófono para comenzar la clase</div>
+
+            <div class="recording-controls hidden" id="recordControls">
+                <button class="btn-action" id="btnPauseRecord">⏸️ Pausar</button>
+                <button class="btn-action" id="btnStopRecord" style="color:var(--error); border-color:var(--error);">⏹️ Finalizar</button>
+            </div>
+
+            <audio id="audioPreview" controls class="hidden"></audio>
+
+            <button class="btn-primary-action hidden" id="btnProcessVoice">
+                ✨ Transcribir y Crear Apunte LaTeX
+            </button>
+
+            <div class="upload-alternative" id="uploadAlternative">
+                <input type="file" id="fileAudioUpload" accept="audio/*" style="display:none;">
+                <button class="upload-alternative-btn" onclick="document.getElementById('fileAudioUpload').click()">
+                    📁 ¿Ya tienes una nota de voz grabada? Sube el archivo aquí
+                </button>
+            </div>
+        </div>
+
+        <!-- Estados del progreso IA -->
+        <div class="progress-box" id="progressBox">
+            <div class="step-item" id="stepUpload">
+                <div class="step-icon">📤</div>
+                <div class="step-label">1. Subiendo audio de la clase al servidor NaTex...</div>
+            </div>
+            <div class="step-item" id="stepGemini">
+                <div class="step-icon">🧠</div>
+                <div class="step-label">2. Gemini analizando audio y extrayendo conceptos matemáticos...</div>
+            </div>
+            <div class="step-item" id="stepLatex">
+                <div class="step-icon">📝</div>
+                <div class="step-label">3. Redactando Apunte LaTeX estructurado (Transcripción, Temas y Resumen)...</div>
+            </div>
+            <div class="step-item" id="stepCompile">
+                <div class="step-icon">⚡</div>
+                <div class="step-label">4. Compilando PDF listo para estudiar con Tectonic...</div>
+            </div>
+        </div>
+
+        <!-- Resultado Final -->
+        <div class="result-box" id="resultBox">
+            <div class="success-badge">
+                <div class="icon">🎉</div>
+                <div>
+                    <h3 style="font-size:16px; font-weight:700;">¡Apunte Creado con Éxito!</h3>
+                    <p style="font-size:13px; color:var(--text-muted);" id="resultProjectName">Proyecto: Clase_...</p>
+                </div>
+            </div>
+
+            <div class="format-card">
+                <div class="format-title">📋 Estructura Generada en LaTeX:</div>
+                <ol class="format-list">
+                    <li><strong>Lo que dice textual la grabación:</strong> Transcripción fiel con fórmulas en $...$.</li>
+                    <li><strong>Temas principales:</strong> Lista con viñetas \begin{itemize}.</li>
+                    <li><strong>Un resumen bien pulido:</strong> Desarrollo pedagógico con teoremas y fórmulas en bloque.</li>
+                </ol>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <a id="btnViewPdf" href="#" target="_blank" class="btn-primary-action" style="text-align:center; text-decoration:none;">
+                    📄 Ver / Descargar PDF de la Clase
+                </a>
+                <a id="btnOpenEditor" href="/" class="btn-action" style="text-align:center; text-decoration:none; justify-content:center;">
+                    💻 Abrir en el Editor NaTex (PC)
+                </a>
+                <button class="btn-action" onclick="resetRecorder()" style="justify-content:center;">
+                    🎙️ Grabar otra clase
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lógica del dictáfono
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedBlob = null;
+        let recordingStartTime = 0;
+        let timerInterval = null;
+        let isPaused = false;
+        let base64Audio = null;
+        let audioMimeType = 'audio/webm';
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const btnMicToggle = document.getElementById('btnMicToggle');
+        const pulseRing = document.getElementById('pulseRing');
+        const recordStatusLabel = document.getElementById('recordStatusLabel');
+        const recordControls = document.getElementById('recordControls');
+        const btnPauseRecord = document.getElementById('btnPauseRecord');
+        const btnStopRecord = document.getElementById('btnStopRecord');
+        const audioPreview = document.getElementById('audioPreview');
+        const btnProcessVoice = document.getElementById('btnProcessVoice');
+        const uploadAlternative = document.getElementById('uploadAlternative');
+        const fileAudioUpload = document.getElementById('fileAudioUpload');
+        const progressBox = document.getElementById('progressBox');
+        const resultBox = document.getElementById('resultBox');
+        const recordingBox = document.getElementById('recordingBox');
+        const apiKeyBanner = document.getElementById('apiKeyBanner');
+        const inputVoiceApiKey = document.getElementById('inputVoiceApiKey');
+        const btnSaveKey = document.getElementById('btnSaveKey');
+        const serverPill = document.getElementById('serverPill');
+        const classTitleInput = document.getElementById('classTitleInput');
+
+        // Comprobar estado del servidor y clave Gemini
+        async function checkServerStatus() {
+            try {
+                const res = await fetch('/api/voice/status');
+                if (res.ok) {
+                    const data = await res.json();
+                    serverPill.textContent = data.tunnel_url ? 'Nube Cloudflare ✓' : 'Wi-Fi Local ✓';
+                    serverPill.classList.remove('offline');
+                    if (!data.has_gemini_key) {
+                        apiKeyBanner.style.display = 'block';
+                    } else {
+                        apiKeyBanner.style.display = 'none';
+                    }
+                }
+            } catch (err) {
+                serverPill.textContent = 'Desconectado';
+                serverPill.classList.add('offline');
+            }
+        }
+
+        btnSaveKey.onclick = async () => {
+            const key = inputVoiceApiKey.value.trim();
+            if (!key) return alert('Por favor ingresa una clave válida.');
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ gemini_api_key: key })
+                });
+                if (res.ok) {
+                    apiKeyBanner.style.display = 'none';
+                    alert('¡Clave de Gemini guardada correctamente!');
+                }
+            } catch (e) {
+                alert('Error al guardar la clave: ' + e);
+            }
+        };
+
+        function setTitle(val) {
+            classTitleInput.value = val;
+        }
+
+        function setDateTimeTitle() {
+            const now = new Date();
+            const d = now.toLocaleDateString('es-CL').replace(/\//g, '-');
+            const h = now.getHours().toString().padStart(2, '0') + 'h' + now.getMinutes().toString().padStart(2, '0');
+            classTitleInput.value = `Clase_${d}_${h}`;
+        }
+
+        // Manejo de la grabación
+        btnMicToggle.onclick = () => {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                startRecording();
+            } else if (mediaRecorder.state === 'recording') {
+                stopRecording();
+            }
+        };
+
+        btnPauseRecord.onclick = () => {
+            if (!mediaRecorder) return;
+            if (mediaRecorder.state === 'recording') {
+                mediaRecorder.pause();
+                isPaused = true;
+                btnPauseRecord.textContent = '▶️ Reanudar';
+                recordStatusLabel.textContent = 'Grabación pausada';
+            } else if (mediaRecorder.state === 'paused') {
+                mediaRecorder.resume();
+                isPaused = false;
+                btnPauseRecord.textContent = '⏸️ Pausar';
+                recordStatusLabel.textContent = '🎙️ Grabando audio de la clase...';
+            }
+        };
+
+        btnStopRecord.onclick = () => {
+            stopRecording();
+        };
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioChunks = [];
+                
+                // Priorizar formatos comunes de navegador móvil
+                let mime = 'audio/webm';
+                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) mime = 'audio/webm;codecs=opus';
+                else if (MediaRecorder.isTypeSupported('audio/mp4')) mime = 'audio/mp4';
+                else if (MediaRecorder.isTypeSupported('audio/aac')) mime = 'audio/aac';
+                
+                audioMimeType = mime;
+                mediaRecorder = new MediaRecorder(stream, { mimeType: mime });
+
+                mediaRecorder.ondataavailable = e => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    recordedBlob = new Blob(audioChunks, { type: audioMimeType });
+                    const audioUrl = URL.createObjectURL(recordedBlob);
+                    audioPreview.src = audioUrl;
+                    audioPreview.classList.remove('hidden');
+                    btnProcessVoice.classList.remove('hidden');
+                    btnProcessVoice.disabled = false;
+                    recordStatusLabel.textContent = 'Audio listo para transcribir y convertir a LaTeX';
+                    
+                    // Convertir a base64
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const fullBase64 = reader.result;
+                        base64Audio = fullBase64.split(',')[1];
+                    };
+                    reader.readAsDataURL(recordedBlob);
+
+                    // Detener tracks de micrófono
+                    stream.getTracks().forEach(t => t.stop());
+                };
+
+                mediaRecorder.start(1000);
+                recordingStartTime = Date.now();
+                clearInterval(timerInterval);
+                timerInterval = setInterval(updateTimer, 500);
+
+                // UI Grabando
+                btnMicToggle.classList.add('recording');
+                document.getElementById('recordingBox').classList.add('recording');
+                timerDisplay.classList.add('recording');
+                recordStatusLabel.textContent = '🎙️ Grabando clase en vivo...';
+                recordControls.classList.remove('hidden');
+                audioPreview.classList.add('hidden');
+                btnProcessVoice.classList.add('hidden');
+                uploadAlternative.classList.add('hidden');
+            } catch (err) {
+                alert('No se pudo acceder al micrófono. Asegúrate de dar permisos o usar una conexión HTTPS / Local: ' + err.message);
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            clearInterval(timerInterval);
+            btnMicToggle.classList.remove('recording');
+            document.getElementById('recordingBox').classList.remove('recording');
+            timerDisplay.classList.remove('recording');
+            recordControls.classList.add('hidden');
+        }
+
+        function updateTimer() {
+            if (isPaused) return;
+            const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const secs = (elapsed % 60).toString().padStart(2, '0');
+            timerDisplay.textContent = `${mins}:${secs}`;
+        }
+
+        // Subir archivo de audio pre-grabado
+        fileAudioUpload.onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            audioMimeType = file.type || 'audio/webm';
+            const reader = new FileReader();
+            reader.onload = () => {
+                const fullBase64 = reader.result;
+                base64Audio = fullBase64.split(',')[1];
+                audioPreview.src = URL.createObjectURL(file);
+                audioPreview.classList.remove('hidden');
+                btnProcessVoice.classList.remove('hidden');
+                btnProcessVoice.disabled = false;
+                recordStatusLabel.textContent = `Archivo cargado: ${file.name}`;
+                if (!classTitleInput.value) {
+                    classTitleInput.value = file.name.replace(/\.[^/.]+$/, "");
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // Procesar audio con Gemini y compilar a LaTeX
+        btnProcessVoice.onclick = async () => {
+            if (!base64Audio) return alert('Por favor graba o sube un audio primero.');
+            
+            const title = classTitleInput.value.trim();
+            const geminiKey = inputVoiceApiKey.value.trim();
+
+            recordingBox.style.display = 'none';
+            progressBox.style.display = 'flex';
+            resultBox.style.display = 'none';
+
+            const stepUpload = document.getElementById('stepUpload');
+            const stepGemini = document.getElementById('stepGemini');
+            const stepLatex = document.getElementById('stepLatex');
+            const stepCompile = document.getElementById('stepCompile');
+
+            stepUpload.classList.add('active');
+
+            setTimeout(() => {
+                stepUpload.classList.remove('active');
+                stepUpload.classList.add('done');
+                stepGemini.classList.add('active');
+            }, 1200);
+
+            try {
+                const response = await fetch('/api/voice/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        audio_base64: base64Audio,
+                        mime_type: audioMimeType,
+                        title: title,
+                        gemini_api_key: geminiKey
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    alert('Error: ' + data.error);
+                    resetRecorder();
+                    return;
+                }
+
+                stepGemini.classList.remove('active');
+                stepGemini.classList.add('done');
+                stepLatex.classList.add('done');
+                stepCompile.classList.add('done');
+
+                // Mostrar éxito
+                setTimeout(() => {
+                    progressBox.style.display = 'none';
+                    resultBox.style.display = 'flex';
+                    document.getElementById('resultProjectName').textContent = `Proyecto creado: ${data.project}`;
+                    
+                    const btnViewPdf = document.getElementById('btnViewPdf');
+                    if (data.has_pdf && data.pdf_url) {
+                        btnViewPdf.href = data.pdf_url;
+                        btnViewPdf.style.display = 'block';
+                    } else {
+                        btnViewPdf.style.display = 'none';
+                    }
+
+                    const btnOpenEditor = document.getElementById('btnOpenEditor');
+                    btnOpenEditor.href = `/?p=${encodeURIComponent(data.project)}`;
+                }, 800);
+
+            } catch (err) {
+                alert('Error al conectar con el servidor: ' + err.message);
+                resetRecorder();
+            }
+        };
+
+        function resetRecorder() {
+            mediaRecorder = null;
+            audioChunks = [];
+            recordedBlob = null;
+            base64Audio = null;
+            recordingBox.style.display = 'flex';
+            progressBox.style.display = 'none';
+            resultBox.style.display = 'none';
+            timerDisplay.textContent = '00:00';
+            recordStatusLabel.textContent = 'Toca el micrófono para comenzar la clase';
+            audioPreview.classList.add('hidden');
+            btnProcessVoice.classList.add('hidden');
+            uploadAlternative.classList.remove('hidden');
+            
+            ['stepUpload', 'stepGemini', 'stepLatex', 'stepCompile'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('active', 'done');
+            });
+        }
+
+        // Inicializar
+        checkServerStatus();
+    </script>
+</body>
+</html>

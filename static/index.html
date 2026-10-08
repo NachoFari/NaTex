@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NaTex 🦊</title>
+    <link rel="stylesheet" href="/static/css/natex.css">
+    <link rel="stylesheet" href="/static/vendor/katex/katex.min.css">
+    <link rel="icon" href="/static/img/logo.jpg">
+    <script src="/static/vendor/katex/katex.min.js"></script>
+</head>
+<body>
+    <header class="top-bar">
+        <div class="brand">
+            <img src="/static/img/logo.jpg" alt="NaTex Logo" class="logo-img" id="brandLogo" style="cursor:pointer;" title="Ir al Inicio">
+            <div class="brand-text" id="brandText" style="cursor:pointer;" title="Ir al Inicio">
+                <span class="brand-name">NaTex</span>
+                <span class="brand-sub">Studio</span>
+            </div>
+        </div>
+
+        <!-- Menú Superior Tipo Word / Desktop -->
+        <nav class="menu-bar">
+            <button id="navTabHome" class="menu-tab-btn">🏠 <span data-i18n="menu_home">Inicio</span></button>
+            <button id="navTabEditor" class="menu-tab-btn active">📝 <span data-i18n="menu_editor">Editor</span></button>
+
+            <!-- Menú Archivo -->
+            <div class="menu-dropdown editor-only-control">
+                <button class="menu-btn" data-dropdown="menuFile">
+                    <span>📁 <span data-i18n="menu_file">Archivo</span> ▾</span>
+                </button>
+                <div class="dropdown-content hidden" id="menuFile">
+                    <button class="dropdown-item" id="menuItemNewProject"><span>📄</span> <span data-i18n="item_new_project">Nuevo Proyecto...</span></button>
+                    <button class="dropdown-item" id="menuItemCompile"><span>⚡</span> <span data-i18n="item_compile">Compilar Documento</span> <kbd>Ctrl+S</kbd></button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" id="menuItemTemplates"><span>📑</span> <span data-i18n="item_templates">Cargar Plantilla...</span></button>
+                    <button class="dropdown-item" id="menuItemSaveTemplate"><span>💾</span> <span data-i18n="item_save_template">Guardar como Plantilla...</span></button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" id="menuItemDownloadPdf"><span>⬇️</span> <span data-i18n="item_download_pdf">Descargar PDF</span></button>
+                </div>
+            </div>
+
+            <!-- Menú Insertar -->
+            <div class="menu-dropdown editor-only-control">
+                <button class="menu-btn" data-dropdown="menuInsert">
+                    <span>✏️ <span data-i18n="menu_insert">Insertar</span> ▾</span>
+                </button>
+                <div class="dropdown-content hidden" id="menuInsert">
+                    <button class="dropdown-item" id="menuItemMathKeyboard"><span>📐</span> <span data-i18n="item_math">Teclado Matemático Científico...</span> <kbd>Alt+M</kbd></button>
+                    <button class="dropdown-item" id="menuItemVoiceDictate"><span>🎙️</span> <span data-i18n="item_voice">Dictáfono de Clase (Celular / Móvil)...</span></button>
+                    <button class="dropdown-item" id="menuItemGallery"><span>🖼️</span> <span data-i18n="item_gallery">Galería de Imágenes / Recursos</span></button>
+                    <button class="dropdown-item" id="menuItemSyncPdf"><span>📍</span> <span data-i18n="item_sync_pdf">Sincronizar con PDF (SyncTeX)</span></button>
+                </div>
+            </div>
+
+            <!-- Menú Colaborar -->
+            <div class="menu-dropdown editor-only-control">
+                <button class="menu-btn" data-dropdown="menuCollab">
+                    <span>🌐 <span data-i18n="menu_collab">Colaborar</span> ▾</span>
+                </button>
+                <div class="dropdown-content hidden" id="menuCollab">
+                    <button class="dropdown-item" id="menuItemVoiceDictateCollab"><span>🎙️</span> <span data-i18n="item_voice">Grabar Clase desde Celular...</span></button>
+                    <button class="dropdown-item" id="menuItemShare"><span>🔗</span> <span data-i18n="item_share">Compartir con un amigo (Túnel)...</span></button>
+                    <button class="dropdown-item" id="menuItemAI"><span>🤖</span> <span data-i18n="item_ai">Asistente IA Gemini</span></button>
+                </div>
+            </div>
+
+            <!-- Menú Ajustes -->
+            <div class="menu-dropdown">
+                <button class="menu-btn" data-dropdown="menuSettings">
+                    <span>⚙️ <span data-i18n="menu_settings">Ajustes</span> ▾</span>
+                </button>
+                <div class="dropdown-content hidden" id="menuSettings">
+                    <button class="dropdown-item" id="menuItemThemeDark"><span>🌙</span> <span data-i18n="item_theme_dark">Modo Oscuro</span></button>
+                    <button class="dropdown-item" id="menuItemThemeLight"><span>☀️</span> <span data-i18n="item_theme_light">Modo Claro</span></button>
+                    <button class="dropdown-item" id="menuItemConfig"><span>🎨</span> <span data-i18n="item_config">Personalización y Clave IA...</span></button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" id="menuItemLangEs"><span>🇪🇸</span> Español</button>
+                    <button class="dropdown-item" id="menuItemLangEn"><span>🇬🇧</span> English</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Selector de Proyecto -->
+        <div class="top-bar-center editor-only-control">
+            <span class="selector-label" data-i18n="lbl_project">Doc:</span>
+            <select id="projectSelect" class="project-select-compact"></select>
+            <button id="btnNewProject" class="btn-secondary-compact" data-i18n-title="title_new_project" title="Crear nuevo proyecto">+ <span data-i18n="btn_new">Nuevo</span></button>
+        </div>
+
+        <!-- Acciones Rápidas Destacadas a la Derecha -->
+        <div class="toolbar-actions-compact editor-only-control">
+            <button id="btnQuickMath" class="btn-secondary-compact" data-i18n-title="title_quick_math" title="Abrir Teclado Matemático (Alt + M)">
+                📐 <span data-i18n="btn_math_short">Fórmulas</span>
+            </button>
+            <button id="btnQuickVoice" class="btn-secondary-compact" data-i18n-title="title_quick_voice" title="Grabar clase desde celular con enlace o QR">
+                🎙️ <span data-i18n="btn_voice_short">Clase</span>
+            </button>
+            <button id="btnCompile" class="btn-primary-compact" data-i18n-title="title_compile" title="Compilar documento (Ctrl + S)">
+                <span class="icon">⚡</span>
+                <span class="btn-text" data-i18n="btn_compile">Compilar</span>
+            </button>
+            <button id="btnToggleAI" class="btn-accent-compact" data-i18n-title="title_ai" title="Abrir IA Gemini">🤖</button>
+        </div>
+    </header>
+
+    <main class="workspace">
+        <!-- Barra Lateral de Imágenes -->
+        <div class="gallery-sidebar" id="gallerySidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">🖼️ <span data-i18n="sidebar_gallery_title">Galería de Imágenes</span></span>
+                <button id="btnCollapseGallery" class="btn-icon-tiny" title="Ocultar panel">◀</button>
+            </div>
+            <div class="sidebar-dropzone" id="sidebarDropzone">
+                <div class="sidebar-drop-icon">📥</div>
+                <span class="sidebar-drop-text" data-i18n="sidebar_drop_text">Arrastra imágenes aquí o</span>
+                <button class="btn-sidebar-upload" id="btnSidebarUpload">+ <span data-i18n="btn_upload">Subir</span></button>
+                <input type="file" id="sidebarFileInput" accept="image/*" style="display:none;">
+            </div>
+            <div class="gallery-info-hint" data-i18n="gallery_hint">
+                💡 Haz clic en 📋 para copiar el código LaTeX de la figura
+            </div>
+            <div class="gallery-grid" id="sidebarGalleryList">
+                <p class="text-muted" style="font-size:12px; text-align:center; padding:15px;" data-i18n="gallery_empty">No hay imágenes aún</p>
+            </div>
+        </div>
+
+        <div class="editor-pane" id="editorPane">
+            <div class="pane-header">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="pane-title">📝 main.tex</span>
+                    <button id="btnSyncToPdf" class="btn-synctex" title="Ir a la página del PDF donde está esta línea">📍 <span data-i18n="btn_sync_pdf">Ir a PDF</span></button>
+                </div>
+                <div class="editor-status" id="editorStatus">Guardado automático ✓</div>
+            </div>
+            <div class="editor-wrapper">
+                <div class="line-numbers" id="lineNumbers">1</div>
+                <textarea id="codeEditor" spellcheck="false" data-i18n-placeholder="editor_placeholder" placeholder="Escribe tu código LaTeX aquí..."></textarea>
+            </div>
+        </div>
+
+        <div class="resizer" id="dragResizer"></div>
+
+        <div class="preview-pane" id="previewPane">
+            <div class="pane-header">
+                <span class="pane-title" data-i18n="preview_title">📄 Vista Previa (PDF)</span>
+                <div class="preview-actions">
+                    <button id="btnDownloadPdf" class="btn-icon" data-i18n-title="btn_download_title" title="Descargar archivo PDF">⬇️ <span data-i18n="btn_download">Descargar</span></button>
+                    <button id="btnRefreshPdf" class="btn-icon" data-i18n-title="btn_refresh_pdf" title="Recargar PDF">🔄</button>
+                </div>
+            </div>
+            <div class="preview-content">
+                <iframe id="pdfViewer" src="about:blank"></iframe>
+                <div id="emptyState" class="empty-state">
+                    <div class="fox-illustration">🦊</div>
+                    <h3 class="empty-welcome" data-i18n="empty_welcome">Bienvenido a NaTex</h3>
+                    <p data-i18n="empty_compile_hint">Presiona <strong>Compilar (Ctrl + S)</strong> para generar el PDF.</p>
+                </div>
+                <div id="errorBox" class="error-box hidden">
+                    <div class="error-header">
+                        <span data-i18n="compilation_error_title">⚠️ Error de Compilación</span>
+                        <button id="btnAskGeminiError" class="btn-ai-quick" data-i18n="btn_ask_gemini_error">💡 Preguntar a Gemini por qué falló</button>
+                    </div>
+                    <pre id="errorLog"></pre>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- PANTALLA DE INICIO (HOME DASHBOARD) -->
+    <div id="homeDashboard" class="home-dashboard hidden">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="dashboard-greeting" data-i18n="dashboard_greeting">¡Hola, bienvenido a NaTex! 🦊</h1>
+                    <p class="dashboard-subtitle" data-i18n="dashboard_subtitle">Continúa redactando tu documento o crea uno nuevo en segundos.</p>
+                </div>
+                <button id="btnDashboardNewProject" class="hero-btn" style="padding:10px 20px; font-size:13.5px;">+ <span data-i18n="btn_new_project">Nuevo Proyecto</span></button>
+            </div>
+
+            <!-- Hero: Continuar Trabajando -->
+            <div class="hero-card" id="heroCard">
+                <div class="hero-info">
+                    <div class="hero-tag">🔥 <span data-i18n="hero_continue_tag">Continuar trabajando</span></div>
+                    <h2 class="hero-title" id="heroProjectName">Mi_Primer_Documento</h2>
+                    <div class="hero-preview" id="heroProjectPreview">\documentclass{article}...</div>
+                    <div class="hero-stats">
+                        <span class="hero-stat-item">🕒 <span id="heroProjectMtime">-</span></span>
+                        <span class="hero-stat-item">📄 <span id="heroProjectLines">0</span> <span data-i18n="stat_lines">líneas</span></span>
+                        <span class="hero-stat-item">🖼️ <span id="heroProjectFiles">0</span> <span data-i18n="stat_files">archivos</span></span>
+                    </div>
+                </div>
+                <button class="hero-btn" id="btnHeroContinue">
+                    <span>🚀</span> <span data-i18n="btn_hero_continue">Continuar Editando</span>
+                </button>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div>
+                <h3 class="section-title">⚡ <span data-i18n="title_quick_actions">Comenzar</span></h3>
+                <div class="quick-actions-grid">
+                    <div class="quick-card" id="quickBlankProject">
+                        <div class="quick-card-icon">📄</div>
+                        <div class="quick-card-title" data-i18n="quick_blank_title">Proyecto en Blanco</div>
+                        <div class="quick-card-desc" data-i18n="quick_blank_desc">Crea un documento LaTeX limpio desde cero sin plantillas previas.</div>
+                    </div>
+                    <div class="quick-card" id="quickFromTemplate">
+                        <div class="quick-card-icon">📑</div>
+                        <div class="quick-card-title" data-i18n="quick_template_title">Desde una Plantilla</div>
+                        <div class="quick-card-desc" data-i18n="quick_template_desc">Comienza con formatos listos de Tesis, Informes, Posters o Papers.</div>
+                    </div>
+                    <div class="quick-card" id="quickVoiceDictate">
+                        <div class="quick-card-icon">🎙️</div>
+                        <div class="quick-card-title" data-i18n="quick_voice_title">Dictáfono de Clases</div>
+                        <div class="quick-card-desc" data-i18n="quick_voice_desc">Graba tu clase desde el celular y genera el apunte LaTeX estructurado.</div>
+                    </div>
+                    <div class="quick-card" id="quickOpenGallery">
+                        <div class="quick-card-icon">🖼️</div>
+                        <div class="quick-card-title" data-i18n="quick_gallery_title">Galería de Imágenes</div>
+                        <div class="quick-card-desc" data-i18n="quick_gallery_desc">Gestiona figuras, gráficos y recursos de tus documentos.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Proyectos Recientes -->
+            <div>
+                <h3 class="section-title">📁 <span data-i18n="title_recent_projects">Tus Proyectos</span></h3>
+                <div class="projects-grid" id="dashboardProjectsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Constructor y Editor de Ecuaciones Matemáticas -->
+    <div id="modalMathKeyboard" class="modal hidden">
+        <div class="math-modal-content">
+            <div class="math-header">
+                <div class="math-title">
+                    <span>📐 <span data-i18n="math_title">Constructor de Ecuaciones</span></span>
+                    <span class="math-subtitle" data-i18n="math_subtitle">Arma tu fórmula con vista previa visual en vivo</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="math-search-wrapper-header">
+                        <input type="text" id="mathSearchInput" class="math-search-input" data-i18n-placeholder="math_search_placeholder" placeholder="🔍 Buscar símbolo o fórmula..." />
+                    </div>
+                    <button class="modal-close" id="btnCloseMath">&times;</button>
+                </div>
+            </div>
+
+            <!-- Barra de Herramientas Rápida Superior -->
+            <div class="math-toolbar-top">
+                <div class="math-tools-left">
+                    <button class="math-tool-btn" id="btnMathClear" title="Limpiar fórmula">🗑️ <span data-i18n="math_clear">Limpiar</span></button>
+                    <button class="math-tool-btn" id="btnMathUndo" title="Deshacer">↩️</button>
+                    <button class="math-tool-btn" id="btnMathRedo" title="Rehacer">↪️</button>
+                </div>
+                <div class="math-tools-right">
+                    <span class="math-mode-label" data-i18n="math_mode_label">Formato:</span>
+                    <div class="math-mode-switch" id="mathModeSwitch">
+                        <button class="math-mode-btn active" data-mode="inline" title="Fórmula en el texto">$ ... $</button>
+                        <button class="math-mode-btn" data-mode="display" title="Ecuación centrada en bloque">\[ ... \]</button>
+                        <button class="math-mode-btn" data-mode="equation" title="Ecuación numerada">eq (#)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila de Acceso Rápido a Estructuras Frecuentes -->
+            <div class="math-quick-ribbon" id="mathQuickRibbon">
+                <button class="math-quick-btn" data-code="\frac{a}{b}" title="Fracción">a/b</button>
+                <button class="math-quick-btn" data-code="\sqrt{x}" title="Raíz cuadrada">√x</button>
+                <button class="math-quick-btn" data-code="\sqrt[n]{x}" title="Raíz enésima">ⁿ√x</button>
+                <button class="math-quick-btn" data-code="x^{n}" title="Exponente">xⁿ</button>
+                <button class="math-quick-btn" data-code="x_{i}" title="Subíndice">xᵢ</button>
+                <button class="math-quick-btn" data-code="\int_{a}^{b} f(x) \, dx" title="Integral">∫ₐᵇ</button>
+                <button class="math-quick-btn" data-code="\frac{\partial f}{\partial x}" title="Derivada Parcial">∂/∂x</button>
+                <button class="math-quick-btn" data-code="\sum_{i=1}^{n}" title="Sumatoria">∑</button>
+                <button class="math-quick-btn" data-code="\lim_{x \to a}" title="Límite">lim</button>
+                <button class="math-quick-btn" data-code="\left( x \right)" title="Paréntesis escalables">( )</button>
+                <button class="math-quick-btn" data-code="\left[ x \right]" title="Corchetes escalables">[ ]</button>
+                <button class="math-quick-btn" data-code="\left\{ x \right\}" title="Llaves escalables">{ }</button>
+                <button class="math-quick-btn" data-code="\left| x \right|" title="Valor absoluto">|x|</button>
+                <button class="math-quick-btn" data-code="|\psi\rangle" title="Ket Dirac">|ψ⟩</button>
+                <button class="math-quick-btn" data-code="\begin{pmatrix} a & b \\ c & d \end{pmatrix}" title="Matriz 2x2">[ 2×2 ]</button>
+                <button class="math-quick-btn" data-code="\pm" title="Más menos">±</button>
+                <button class="math-quick-btn" data-code="\alpha" title="Alpha">α</button>
+                <button class="math-quick-btn" data-code="\pi" title="Pi">π</button>
+                <button class="math-quick-btn" data-code="\infty" title="Infinito">∞</button>
+            </div>
+
+            <!-- Pestañas de Categoría a Ancho Completo -->
+            <div class="math-nav-bar">
+                <div class="math-category-tabs" id="mathCategoryTabs">
+                    <button class="math-cat-btn active" data-cat="algebra" data-i18n="math_tab_algebra">📐 Básico & Álgebra</button>
+                    <button class="math-cat-btn" data-cat="calculus" data-i18n="math_tab_calculus">📈 Cálculo & Análisis</button>
+                    <button class="math-cat-btn" data-cat="cuantica" data-i18n="math_tab_quantum">⚛️ Física & Cuántica</button>
+                    <button class="math-cat-btn" data-cat="matrices" data-i18n="math_tab_matrices">🔢 Matrices & Vectores</button>
+                    <button class="math-cat-btn" data-cat="griegas" data-i18n="math_tab_greek">𝛂 Griegas & Lógica</button>
+                </div>
+            </div>
+
+            <!-- Paleta de Símbolos por Categoría -->
+            <div class="math-body" id="mathBody">
+                <!-- Se llena dinámicamente -->
+            </div>
+
+            <!-- Panel Inferior: Editor de Código (Izquierda) + Vista Previa en Vivo (Derecha) -->
+            <div class="math-bottom-split">
+                <!-- Columna Izquierda: Código LaTeX -->
+                <div class="math-pane-col">
+                    <div class="math-pane-header">
+                        <span class="math-section-lbl">✏️ <span data-i18n="math_formula_code_label">Código LaTeX:</span></span>
+                        <span class="math-keyboard-hint" data-i18n="math_keyboard_hint">Escribe o haz clic en símbolos</span>
+                    </div>
+                    <textarea id="mathFormulaInput" class="math-formula-textarea" spellcheck="false" placeholder="\frac{-b \pm \sqrt{b^2 - 4ac}}{2a}"></textarea>
+                </div>
+
+                <!-- Columna Derecha: Vista Previa Visual KaTeX en Vivo -->
+                <div class="math-pane-col">
+                    <div class="math-pane-header">
+                        <span class="math-section-lbl">👁️ <span data-i18n="math_preview_title">Vista Previa Visual en Vivo:</span></span>
+                        <span class="math-render-badge" id="mathRenderStatus">KaTeX ✓</span>
+                    </div>
+                    <div class="math-live-preview-box" id="mathFormulaPreview">
+                        <!-- Render KaTeX en vivo -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción Finales -->
+            <div class="math-modal-footer">
+                <button id="btnCloseMathSecondary" class="btn-ghost" data-i18n="btn_cancel">Cancelar</button>
+                <div style="display:flex; gap:10px;">
+                    <button id="btnCopyMathCode" class="btn-secondary">📋 <span data-i18n="btn_copy_code">Copiar Código</span></button>
+                    <button id="btnInsertMathCode" class="btn-primary" style="padding:8px 18px;">
+                        <span>📥</span>
+                        <span data-i18n="btn_insert_doc">Insertar en Documento</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Compartir con Amigo -->
+    <div id="modalShare" class="modal hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>🔗 <span data-i18n="share_modal_title">Compartir NaTex con un Amigo</span></h3>
+                <button class="modal-close" id="btnCloseShare">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="shareLoading" style="text-align:center; padding:20px;">
+                    <div style="font-size:28px; margin-bottom:8px;">⏳</div>
+                    <p data-i18n="share_loading">Generando enlace seguro para tu amigo...</p>
+                </div>
+                <div id="shareReady" class="hidden">
+                    <div id="shareQrContainer" style="display: flex; justify-content: center; align-items: center; background: #ffffff; padding: 14px; border-radius: 12px; margin: 0 auto 12px auto; width: 190px; height: 190px; box-shadow: 0 4px 16px rgba(0,0,0,0.25);">
+                        <div id="shareQrCode"></div>
+                    </div>
+                    <label for="inputShareUrl"><strong data-i18n="share_ready_label">Enlace para tu amigo:</strong></label>
+                    <div style="display:flex; gap:8px; margin:8px 0 12px 0;">
+                        <input type="text" id="inputShareUrl" readonly style="flex:1; padding:10px 12px; border-radius:6px; background:var(--bg-dark); color:var(--fox-orange); border:1px solid var(--border-color); font-weight:bold; font-size:13px;" />
+                        <button id="btnCopyShareUrl" class="btn-primary">📋 <span data-i18n="btn_copy">Copiar</span></button>
+                    </div>
+                    <div style="background:var(--bg-card-subtle, #181824); border: 1px solid var(--border-color); border-radius:8px; padding:12px; font-size:12.5px; color:var(--text-muted); line-height:1.5;" data-i18n="share_explanation">
+                        💡 <strong>Cómo funciona:</strong> Tu amigo solo hace clic en este link o escanea el QR desde cualquier navegador (PC o celular). Podrá ver el documento, escribir con guardado automático y compilar el PDF junto a ti en tiempo real mientras tengas NaTex abierto.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drawer del Asistente Gemini -->
+    <div id="aiDrawer" class="ai-drawer hidden">
+        <div class="ai-header">
+            <div class="ai-title">
+                <span>🦊 <span data-i18n="ai_title">IA NaTex</span></span>
+            </div>
+            <button id="btnCloseAI" class="btn-close">&times;</button>
+        </div>
+        <div class="ai-quick-actions">
+            <button class="pill-btn" data-i18n="ai_pill_table" data-prompt="¿Cómo hago una tabla de 3 columnas bien formateada en LaTeX? Dame el código listo.">📊 Crear Tabla</button>
+            <button class="pill-btn" data-i18n="ai_pill_formulas" data-prompt="Dame la fórmula matemática para una distribución normal y una matriz 3x3 en LaTeX.">📐 Fórmulas</button>
+            <button class="pill-btn" data-i18n="ai_pill_abstract" data-prompt="Ayúdame a redactar un abstract o resumen académico formal para mi informe.">✍️ Redactar Abstract</button>
+        </div>
+        <div class="ai-messages" id="aiMessages">
+            <div class="message ai-msg">
+                <div class="msg-bubble" data-i18n="ai_welcome_msg">¡Hola! Soy tu asistente en NaTex. Pregúntame sobre fórmulas, redacción o errores de compilación de LaTeX.</div>
+            </div>
+        </div>
+        <div class="ai-input-bar">
+            <input type="text" id="aiInput" data-i18n-placeholder="ai_placeholder" placeholder="Pregunta algo o pide código LaTeX..." />
+            <button id="btnSendAI" class="btn-send" data-i18n="btn_ai_send">Enviar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Plantillas -->
+    <div id="modalTemplates" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📑 <span data-i18n="templates_title">Seleccionar Plantilla</span></h3>
+                <button class="modal-close" id="btnCloseTemplates">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc" data-i18n="templates_desc">Elige una plantilla para cargar en tu proyecto actual:</p>
+                <h4 data-i18n="templates_builtin">Plantillas Integradas</h4>
+                <div class="template-grid" id="builtInTemplates"></div>
+                <h4 style="margin-top: 24px;" data-i18n="templates_custom">Mis Plantillas Personalizadas</h4>
+                <div class="template-grid" id="userTemplates">
+                    <p class="text-muted" data-i18n="templates_empty">Aún no has guardado plantillas propias.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Galería de Imágenes y Recursos -->
+    <div id="modalUpload" class="modal hidden">
+        <div class="modal-content" style="max-width: 820px; width: 92%;">
+            <div class="modal-header">
+                <div>
+                    <h3>🖼️ <span data-i18n="gallery_modal_title">Galería de Imágenes</span></h3>
+                    <p class="modal-subtitle" style="font-size:12.5px; color:var(--text-muted); margin-top:2px;" data-i18n="gallery_modal_subtitle">Gestiona figuras, copia el código LaTeX para tu documento o renombra tus imágenes.</p>
+                </div>
+                <button class="modal-close" id="btnCloseUpload">&times;</button>
+            </div>
+            <div class="modal-body" style="padding-top: 10px;">
+                <!-- Barra de Control: Filtro de Proyecto + Botón Subir -->
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:13px; font-weight:600; color:var(--text-muted);" data-i18n="gallery_filter_label">Proyecto:</span>
+                        <select id="galleryProjectFilter" style="background:var(--bg-elevated); color:var(--text-main); border:1px solid var(--border-color); padding:6px 12px; border-radius:6px; font-size:12.5px;">
+                            <option value="all" data-i18n="gallery_filter_all">Todos los proyectos</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-primary" id="btnGalleryUploadTrigger" style="padding:6px 14px; font-size:12.5px;">+ <span data-i18n="btn_upload">Subir</span></button>
+                    </div>
+                </div>
+
+                <!-- Dropzone de Subida -->
+                <div class="dropzone" id="dropzone" style="margin-bottom:16px; padding:16px;">
+                    <div class="drop-icon" style="font-size:26px;">📁</div>
+                    <p data-i18n="resources_drop" style="font-size:12.5px; margin:4px 0;">Arrastra imágenes aquí (.png, .jpg) o</p>
+                    <input type="file" id="fileInput" accept="image/*,.pdf,.bib" style="display:none;">
+                    <button class="btn-secondary" id="btnBrowseFile" data-i18n="btn_browse" style="padding:5px 12px; font-size:12px;">Explorar Archivo</button>
+                </div>
+
+                <!-- Grid de Tarjetas de Imágenes -->
+                <div id="galleryModalGrid" class="gallery-modal-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Ajustes (Personalización, Temas, Idioma, API Key) -->
+    <div id="modalSettings" class="modal hidden">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <h3>⚙️ <span data-i18n="settings_title">Ajustes y Personalización</span></h3>
+                <button class="modal-close" id="btnCloseSettings">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Sección Tema -->
+                <div class="settings-section">
+                    <label class="settings-label" data-i18n="theme_label">🎨 Tema de la Aplicación:</label>
+                    <div class="theme-options-grid">
+                        <div class="theme-card-option active" id="themeOptDark" data-theme="dark">
+                            <span style="font-size:20px;">🌙</span>
+                            <span data-i18n="theme_dark">Oscuro</span>
+                        </div>
+                        <div class="theme-card-option" id="themeOptLight" data-theme="light">
+                            <span style="font-size:20px;">☀️</span>
+                            <span data-i18n="theme_light">Claro</span>
+                        </div>
+                        <div class="theme-card-option" id="themeOptCustom" data-theme="custom">
+                            <span style="font-size:20px;">🎨</span>
+                            <span data-i18n="theme_custom">Personalizado</span>
+                        </div>
+                    </div>
+                    
+                    <div id="customAccentContainer" style="margin-top: 10px;">
+                        <span style="font-size:12px; color:var(--text-muted);" data-i18n="accent_color_label">Color de acento:</span>
+                        <div class="accent-colors-list">
+                            <div class="color-dot active" style="background:#FF6B35;" data-color="#FF6B35" title="Fox Orange"></div>
+                            <div class="color-dot" style="background:#3B82F6;" data-color="#3B82F6" title="Cyber Blue"></div>
+                            <div class="color-dot" style="background:#10B981;" data-color="#10B981" title="Emerald"></div>
+                            <div class="color-dot" style="background:#8B5CF6;" data-color="#8B5CF6" title="Royal Purple"></div>
+                            <div class="color-dot" style="background:#EC4899;" data-color="#EC4899" title="Rose"></div>
+                            <input type="color" id="customColorPicker" value="#FF6B35" style="width:28px; height:28px; border-radius:50%; border:none; cursor:pointer; background:none;" title="Color a medida" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección Idioma -->
+                <div class="settings-section">
+                    <label class="settings-label" data-i18n="language_label">🌐 Idioma / Language:</label>
+                    <div class="lang-selector-group">
+                        <button class="lang-btn active" id="btnLangEs" data-lang="es">
+                            <span>🇪🇸</span> Español
+                        </button>
+                        <button class="lang-btn" id="btnLangEn" data-lang="en">
+                            <span>🇬🇧</span> English
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sección Gemini API Key -->
+                <div class="settings-section">
+                    <label class="settings-label" for="inputApiKey"><span data-i18n="gemini_key_label">Clave de API de Google Gemini (Gratis):</span></label>
+                    <p class="text-muted" style="margin-bottom:8px; font-size:12.5px;" data-i18n="gemini_key_desc">
+                        Cada persona puede colocar su propia clave gratuita de <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--fox-orange);">Google AI Studio</a>.
+                    </p>
+                    <input type="password" id="inputApiKey" data-i18n-placeholder="gemini_key_placeholder" placeholder="Pega tu API Key de Gemini aquí (ej. AIzaSy...)" style="width:100%; padding:10px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color);" />
+                </div>
+
+                <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:10px;">
+                    <button id="btnSaveApiKey" class="btn-primary" data-i18n="btn_save_settings">Guardar Ajustes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Dictáfono de Clase (Celular / Móvil) -->
+    <div id="modalVoiceDictate" class="modal hidden">
+        <div class="modal-content" style="max-width: 530px;">
+            <div class="modal-header">
+                <h3>🎙️ <span data-i18n="voice_modal_title">Dictáfono de Clases (Celular)</span></h3>
+                <button class="modal-close" id="btnCloseVoiceModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 13.5px; line-height: 1.5; color: var(--text-muted); margin-bottom: 12px;" data-i18n="voice_desc">
+                    Graba la clase desde tu teléfono móvil. NaTex transcribirá el audio con <strong>Google Gemini</strong> y creará un nuevo apunte LaTeX estructurado listo para compilar a PDF con:
+                </p>
+
+                <div style="background: var(--bg-card-subtle, #1a1a1e); border: 1px solid var(--border-color, #2e2e36); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 12.5px;">
+                    <div style="color: var(--fox-orange, #FF6B35); font-weight: 600; margin-bottom: 4px;" data-i18n="voice_sections_title">📋 Secciones generadas:</div>
+                    <ul style="margin-left: 18px; color: var(--text-muted, #95959e); line-height: 1.45;">
+                        <li><strong data-i18n="voice_sec_1">1. Lo que dice textual la grabación</strong> <span data-i18n="voice_sec_1_sub">(con fórmulas $...$)</span></li>
+                        <li><strong data-i18n="voice_sec_2">2. Temas principales</strong> <span data-i18n="voice_sec_2_sub">(lista \begin{itemize})</span></li>
+                        <li><strong data-i18n="voice_sec_3">3. Un resumen bien pulido</strong> <span data-i18n="voice_sec_3_sub">(teoremas y fórmulas en bloque)</span></li>
+                    </ul>
+                </div>
+
+                <div style="text-align: center; margin-bottom: 14px;">
+                    <span style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;" data-i18n="voice_scan_instruction">📱 Escanea con la cámara de tu celular</span>
+                    <div id="voiceQrContainer" style="display: flex; justify-content: center; align-items: center; background: #ffffff; padding: 14px; border-radius: 12px; margin: 10px auto; width: 195px; height: 195px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
+                        <div id="voiceQrCode"></div>
+                    </div>
+                    <div id="voiceConnBadge" style="display: inline-block; font-size: 11.5px; padding: 4px 12px; border-radius: 12px; background: rgba(255,107,53,0.15); color: var(--fox-orange); font-weight: 600;">
+                        Cargando conexión...
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;" data-i18n="voice_direct_link_label">Enlace directo al dictáfono:</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="inputVoiceUrl" readonly style="flex: 1; padding: 10px 12px; border-radius: 6px; background: var(--bg-dark, #121214); color: var(--text-main, #f0f0f2); border: 1px solid var(--border-color, #2e2e36); font-family: monospace; font-size: 13px;" />
+                        <button id="btnCopyVoiceUrl" class="btn-secondary" title="Copiar enlace">📋 <span data-i18n="btn_copy">Copiar</span></button>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px;">
+                    <button id="btnToggleVoiceTunnel" class="btn-secondary" style="font-size: 12.5px;">
+                        🚀 <span data-i18n="btn_toggle_tunnel">Activar Túnel Cloudflare (Fuera de Wi-Fi)</span>
+                    </button>
+                    <button id="btnOpenVoiceTab" class="btn-primary" style="font-size: 12.5px;">
+                        🌐 <span data-i18n="btn_open_dictaphone_here">Abrir Dictáfono Aquí</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/vendor/qrcode.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

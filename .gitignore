@@ -1,0 +1,27 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+.venv/
+env/
+
+# Configuracion y Credenciales Privadas (Protege tu clave Gemini)
+config.json
+
+# Proyectos del usuario (solo se incluye el proyecto tutorial inicial)
+projects/*
+!projects/Mi_Primer_Documento/
+projects/Mi_Primer_Documento/*.synctex.gz
+
+# Empaquetado y Releases
+build/
+dist/
+*.spec
+*.zip
+
+# Sistema y editores
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini

@@ -17,6 +17,17 @@ import atexit
 import gzip
 import socket
 
+if sys.stdout is None:
+    try:
+        sys.stdout = open(os.devnull, 'w', encoding='utf-8')
+    except:
+        pass
+if sys.stderr is None:
+    try:
+        sys.stderr = open(os.devnull, 'w', encoding='utf-8')
+    except:
+        pass
+
 PORT = 5000
 if getattr(sys, 'frozen', False):
     BASE_DIR = os.path.dirname(sys.executable)
@@ -367,7 +378,51 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json({'success': True, 'images': images})
             return
 
+        if path == '/api/system/check_update':
+            CURRENT_VERSION = "0.1"
+            is_git = os.path.exists(os.path.join(BASE_DIR, '.git'))
+            try:
+                ctx = ssl._create_unverified_context()
+                req = urllib.request.Request(
+                    'https://api.github.com/repos/NachoFari/NaTex/releases/latest',
+                    headers={'User-Agent': 'NaTex-Studio'}
+                )
+                with urllib.request.urlopen(req, context=ctx, timeout=8) as resp:
+                    rel_data = json.loads(resp.read().decode('utf-8'))
+                    tag = rel_data.get('tag_name', '').lstrip('v').lstrip('.')
+                    has_update = False
+                    try:
+                        v_latest = [int(x) for x in re.findall(r'\d+', tag)]
+                        v_current = [int(x) for x in re.findall(r'\d+', CURRENT_VERSION)]
+                        if v_latest > v_current:
+                            has_update = True
+                    except:
+                        if tag and tag != CURRENT_VERSION:
+                            has_update = True
+
+                    self.send_json({
+                        'success': True,
+                        'current_version': 'v0.1',
+                        'latest_version': rel_data.get('tag_name', 'v0.1'),
+                        'has_update': has_update,
+                        'release_name': rel_data.get('name', ''),
+                        'release_notes': rel_data.get('body', ''),
+                        'download_url': 'https://github.com/NachoFari/NaTex/releases/latest/download/NaTex-Setup-v0.1.exe',
+                        'releases_page': 'https://github.com/NachoFari/NaTex/releases',
+                        'is_git_repo': is_git
+                    })
+                    return
+            except Exception as e:
+                self.send_json({
+                    'success': False,
+                    'error': f'No se pudo conectar con GitHub: {str(e)}',
+                    'current_version': 'v0.1',
+                    'is_git_repo': is_git
+                })
+                return
+
         if path == '/api/templates':
+
             built_in = []
             if os.path.exists(TEMPLATES_DIR):
                 for t in os.listdir(TEMPLATES_DIR):
@@ -880,6 +935,20 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json({'success': True})
             return
 
+        if path == '/api/system/apply_update':
+            if not os.path.exists(os.path.join(BASE_DIR, '.git')):
+                self.send_json({'success': False, 'error': 'Esta instalación no utiliza Git. Puedes descargar la nueva versión desde el botón de descarga.'})
+                return
+            try:
+                res = subprocess.run(['git', 'pull', 'origin', 'main'], cwd=BASE_DIR, capture_output=True, text=True, timeout=30)
+                if res.returncode == 0:
+                    self.send_json({'success': True, 'message': 'NaTex se actualizó correctamente desde GitHub. Recargando la aplicación...'})
+                else:
+                    self.send_json({'success': False, 'error': res.stderr or res.stdout or 'Error al ejecutar git pull'})
+            except Exception as e:
+                self.send_json({'success': False, 'error': str(e)})
+            return
+
         self.send_error(404, 'Ruta POST no encontrada')
 
     def serve_file(self, filepath, content_type):
@@ -927,10 +996,10 @@ def free_port(port):
         print(f'[NaTex] Nota al verificar puerto: {e}')
 
 if __name__ == '__main__':
-    desktop_dir = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(desktop_dir)
+    os.chdir(BASE_DIR)
     try:
-        sys.stdout.reconfigure(encoding='utf-8')
+        if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8')
     except:
         pass
 

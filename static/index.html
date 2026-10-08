@@ -510,6 +510,22 @@
                     <input type="password" id="inputApiKey" data-i18n-placeholder="gemini_key_placeholder" placeholder="Pega tu API Key de Gemini aquí (ej. AIzaSy...)" style="width:100%; padding:10px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color);" />
                 </div>
 
+                <!-- Sección Actualizaciones de Software -->
+                <div class="settings-section" style="border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <label class="settings-label" style="margin-bottom: 2px;">🚀 <span data-i18n="updates_title">Actualizaciones de NaTex:</span></label>
+                            <div id="updateStatusText" style="font-size: 12.5px; color: var(--text-muted);">
+                                <span data-i18n="updates_current_ver">Versión instalada:</span> <strong>v0.1</strong>
+                            </div>
+                        </div>
+                        <button id="btnCheckUpdates" class="btn-secondary" style="font-size: 12px; padding: 7px 14px;">
+                            🔍 <span data-i18n="btn_check_updates">Comprobar Actualizaciones</span>
+                        </button>
+                    </div>
+                    <div id="updateResultBox" class="hidden" style="margin-top: 10px; padding: 12px; border-radius: 6px; font-size: 12.5px; border: 1px solid var(--border-color); background: var(--bg-dark);"></div>
+                </div>
+
                 <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:10px;">
                     <button id="btnSaveApiKey" class="btn-primary" data-i18n="btn_save_settings">Guardar Ajustes</button>
                 </div>

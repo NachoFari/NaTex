@@ -183,7 +183,10 @@ const i18n = {
         gallery_filter_all: "Todos los proyectos",
         btn_upload_image: "Subir Imagen",
         voice_conn_loading: "Cargando conexión...",
-        title_go_home: "Ir al Inicio"
+        title_go_home: "Ir al Inicio",
+        updates_title: "Actualizaciones de NaTex:",
+        updates_current_ver: "Versión instalada:",
+        btn_check_updates: "Comprobar Actualizaciones"
     },
     en: {
         nav_home: "Home",
@@ -332,7 +335,10 @@ const i18n = {
         gallery_filter_all: "All projects",
         btn_upload_image: "Upload Image",
         voice_conn_loading: "Loading connection...",
-        title_go_home: "Go to Home"
+        title_go_home: "Go to Home",
+        updates_title: "NaTex Updates:",
+        updates_current_ver: "Installed version:",
+        btn_check_updates: "Check for Updates"
     }
 };
 
@@ -345,6 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initMathKeyboard();
     initSyncTeX();
     initVoiceDictate();
+    initUpdateChecker();
     loadProjects();
     setupEventListeners();
     setupCollaborationPolling();
@@ -442,6 +449,88 @@ function initSettings() {
                 }
             });
     }
+}
+
+function initUpdateChecker() {
+    const btnCheck = document.getElementById('btnCheckUpdates');
+    const resultBox = document.getElementById('updateResultBox');
+    if (!btnCheck || !resultBox) return;
+
+    btnCheck.onclick = async () => {
+        btnCheck.disabled = true;
+        const isEn = currentLanguage === 'en';
+        btnCheck.innerText = isEn ? '⏳ Checking...' : '⏳ Comprobando...';
+        resultBox.classList.remove('hidden');
+        resultBox.style.display = 'block';
+        resultBox.innerHTML = `<span style="color:var(--text-muted);">${isEn ? 'Connecting to GitHub...' : 'Conectando con GitHub...'}</span>`;
+
+        try {
+            const res = await fetch('/api/system/check_update');
+            const data = await res.json();
+            btnCheck.disabled = false;
+            btnCheck.innerText = isEn ? '🔍 Check for Updates' : '🔍 Comprobar Actualizaciones';
+
+            if (!data.success) {
+                resultBox.innerHTML = `<div style="color:#EF4444;">⚠️ ${data.error || (isEn ? 'Could not connect to GitHub.' : 'No se pudo conectar con GitHub.')}</div>`;
+                return;
+            }
+
+            if (data.has_update) {
+                let html = `
+                    <div style="color:#10B981; font-weight:600; margin-bottom:6px;">
+                        🎉 ${isEn ? 'New version available:' : '¡Nueva versión disponible:'} ${escapeHtml(data.latest_version)}
+                    </div>
+                `;
+                if (data.release_name) {
+                    html += `<div style="font-size:12px; margin-bottom:8px; color:var(--text-main);">${escapeHtml(data.release_name)}</div>`;
+                }
+                html += `<div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">`;
+                if (data.is_git_repo) {
+                    html += `<button id="btnApplyGitUpdate" class="btn-primary" style="font-size:12px; padding:6px 12px;">🚀 ${isEn ? 'Update Now (Git)' : 'Actualizar Ahora (Git)'}</button>`;
+                }
+                html += `
+                    <a href="${data.releases_page || 'https://github.com/NachoFari/NaTex/releases'}" target="_blank" class="btn-secondary" style="font-size:12px; padding:6px 12px; text-decoration:none; display:inline-flex; align-items:center;">
+                        📦 ${isEn ? 'Download Installer' : 'Descargar Instalador'}
+                    </a>
+                </div>`;
+                resultBox.innerHTML = html;
+
+                const btnGit = document.getElementById('btnApplyGitUpdate');
+                if (btnGit) {
+                    btnGit.onclick = async () => {
+                        btnGit.disabled = true;
+                        btnGit.innerText = isEn ? '⏳ Updating...' : '⏳ Actualizando...';
+                        try {
+                            const uRes = await fetch('/api/system/apply_update', { method: 'POST' });
+                            const uData = await uRes.json();
+                            if (uData.success) {
+                                resultBox.innerHTML = `<div style="color:#10B981; font-weight:600;">✅ ${uData.message}</div>`;
+                                setTimeout(() => window.location.reload(), 2500);
+                            } else {
+                                btnGit.disabled = false;
+                                btnGit.innerText = isEn ? 'Retry' : 'Reintentar';
+                                resultBox.innerHTML += `<div style="color:#EF4444; margin-top:6px; font-size:11.5px;">❌ ${uData.error}</div>`;
+                            }
+                        } catch (err) {
+                            btnGit.disabled = false;
+                            resultBox.innerHTML += `<div style="color:#EF4444; margin-top:6px; font-size:11.5px;">❌ Error: ${err.message}</div>`;
+                        }
+                    };
+                }
+            } else {
+                resultBox.innerHTML = `
+                    <div style="color:#10B981; display:flex; align-items:center; gap:6px;">
+                        <span>✅</span>
+                        <span>${isEn ? 'You have the latest version (v0.1).' : '¡Tienes la versión más reciente (v0.1)!'}</span>
+                    </div>
+                `;
+            }
+        } catch (e) {
+            btnCheck.disabled = false;
+            btnCheck.innerText = isEn ? '🔍 Check for Updates' : '🔍 Comprobar Actualizaciones';
+            resultBox.innerHTML = `<div style="color:#EF4444;">⚠️ Error: ${e.message}</div>`;
+        }
+    };
 }
 
 function insertAtCursor(text, cursorOffset = 0) {

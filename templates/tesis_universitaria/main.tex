@@ -1,0 +1,90 @@
+\documentclass[12pt, letterpaper]{report}
+
+\usepackage[top=2.5cm, bottom=2.5cm, left=3cm, right=2cm]{geometry}
+\usepackage[spanish]{babel}
+\usepackage{setspace}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\definecolor{primary}{RGB}{255, 107, 53}
+\onehalfspacing
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\small \slshape \nouppercase{\leftmark}}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+% PORTADA OFICIAL DE TESIS
+\begin{titlepage}
+  \centering
+  {\scshape\Large Universidad Nacional \par}
+  {\scshape\large Departamento de Ciencias e Ingeniería \par}
+  \vspace{3.5cm}
+
+  {\Huge \bfseries \color{primary} DISEÑO E IMPLEMENTACIÓN DE UN ENTORNO LOCAL INTELIGENTE PARA LA EDICIÓN DE DOCUMENTOS CIENTÍFICOS \par}
+  \vspace{1.5cm}
+  {\Large Memoria de Título para optar al Grado Académico de\\ \textbf{Ingeniero Civil Informático} \par}
+  \vspace{2.5cm}
+
+  \begin{flushright}
+    \large
+    \textbf{Memorista:} Nombre del Estudiante \\
+    \textbf{Profesor Guía:} Dr. Manuel E. Silva \\
+    \textbf{Profesor Correferente:} Dr. Andrés C. Castro
+  \end{flushright}
+
+  \vfill
+  {\large Valparaíso, Chile -- 2026 \par}
+\end{titlepage}
+
+% DEDICATORIA Y AGRADECIMIENTOS
+\chapter*{Dedicatoria y Agradecimientos}
+A mi familia, docentes y compañeros de ruta que hicieron posible este camino de investigación y desarrollo tecnológico. A la comunidad de código abierto por democratizar el conocimiento para las futuras generaciones.
+
+% RESUMEN
+\chapter*{Resumen}
+En este trabajo de titulación se propone la arquitectura de un entorno de desarrollo integrado local orientado a la redacción de informes científicos en LaTeX. La solución elimina cuellos de botella de red y democratiza el trabajo en equipo en tiempo real mediante túneles seguros y asistencia por inteligencia artificial.
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+% CAPÍTULOS
+\chapter{Introducción}
+\section{Contexto y Motivación}
+La investigación académica contemporánea depende de la exactitud formal y tipográfica que ofrece el estándar LaTeX. Sin embargo, las alternativas disponibles en el mercado presentan barreras económicas o de conectividad.
+
+\section{Objetivos}
+\subsection{Objetivo General}
+Diseñar, implementar y validar un entorno local ligero para la compilación y coedición de documentos académicos.
+
+\chapter{Marco Teórico y Estado del Arte}
+\section{Arquitecturas de Compilación TeX}
+El compilador Tectonic transforma la distribución monolítica de TeX Live en un motor portable y autónomo capaz de gestionar dependencias dinámicamente.
+
+\begin{equation}
+  \mathcal{T}_{\text{build}} = f(\mathcal{C}_{\text{ast}}, \mathcal{F}_{\text{fonts}}, \mathcal{P}_{\text{packages}})
+\end{equation}
+
+\chapter{Metodología e Implementación}
+\section{Módulos del Sistema}
+El sistema se compone del núcleo de compilación en segundo plano, sincronización por WebSockets/HTTP y un asistente semántico basado en la API de Google Gemini.
+
+\chapter{Resultados y Discusión}
+Se comprobó la estabilidad del sistema con proyectos de más de 120 páginas, garantizando compilaciones en menos de 2 segundos.
+
+\chapter{Conclusiones y Trabajo Futuro}
+La implementación demostró que es posible alcanzar una experiencia fluida, robusta y gratuita sin depender de servidores en la nube.
+
+\begin{thebibliography}{9}
+\bibitem{knuth} D. Knuth, \textit{The TeXbook}, 1984.
+\bibitem{tectonic} P. Williams, \textit{Tectonic Project Documentation}, 2023.
+\end{thebibliography}
+
+\end{document}

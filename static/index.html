@@ -9,7 +9,7 @@
     <link rel="icon" href="/static/img/logo.jpg">
     <script src="/static/vendor/katex/katex.min.js"></script>
 </head>
-<body>
+<body class="view-home">
     <!-- Banner de Notificación de Actualización Flotante -->
     <div id="updateBanner" class="update-banner hidden">
         <span class="update-banner-icon">🚀</span>
@@ -29,8 +29,8 @@
 
         <!-- Menú Superior Tipo Word / Desktop -->
         <nav class="menu-bar">
-            <button id="navTabHome" class="menu-tab-btn">🏠 <span data-i18n="menu_home">Inicio</span></button>
-            <button id="navTabEditor" class="menu-tab-btn active">📝 <span data-i18n="menu_editor">Editor</span></button>
+            <button id="navTabHome" class="menu-tab-btn active">🏠 <span data-i18n="menu_home">Inicio</span></button>
+            <button id="navTabEditor" class="menu-tab-btn">📝 <span data-i18n="menu_editor">Editor</span></button>
 
             <!-- Menú Archivo -->
             <div class="menu-dropdown editor-only-control">
@@ -46,6 +46,7 @@
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item" id="menuItemDownloadTex"><span>📥</span> <span data-i18n="item_download_tex">Descargar Código LaTeX (.tex)</span></button>
                     <button class="dropdown-item" id="menuItemDownloadPdf"><span>⬇️</span> <span data-i18n="item_download_pdf">Descargar PDF</span></button>
+                    <button class="dropdown-item" id="menuItemOpenPdfTab"><span>↗️</span> <span data-i18n="item_open_pdf_tab">Ver PDF en Otra Pestaña</span></button>
                 </div>
             </div>
 
@@ -56,9 +57,9 @@
                 </button>
                 <div class="dropdown-content hidden" id="menuInsert">
                     <button class="dropdown-item" id="menuItemMathKeyboard"><span>📐</span> <span data-i18n="item_math">Teclado Matemático Científico...</span> <kbd>Alt+M</kbd></button>
+                    <button class="dropdown-item" id="menuItemTableBuilder"><span>📊</span> <span data-i18n="item_table_builder">Creador de Tablas...</span> <kbd>Alt+T</kbd></button>
                     <button class="dropdown-item" id="menuItemVoiceDictate"><span>🎙️</span> <span data-i18n="item_voice">Dictáfono de Clase (Celular / Móvil)...</span></button>
                     <button class="dropdown-item" id="menuItemGallery"><span>🖼️</span> <span data-i18n="item_gallery">Galería de Imágenes / Recursos</span></button>
-                    <button class="dropdown-item" id="menuItemSyncPdf"><span>📍</span> <span data-i18n="item_sync_pdf">Sincronizar con PDF (SyncTeX)</span></button>
                 </div>
             </div>
 
@@ -94,13 +95,12 @@
         <div class="top-bar-center editor-only-control">
             <span class="selector-label" data-i18n="lbl_project">Doc:</span>
             <select id="projectSelect" class="project-select-compact"></select>
-            <button id="btnNewProject" class="btn-secondary-compact" data-i18n-title="title_new_project" title="Crear nuevo proyecto">+ <span data-i18n="btn_new">Nuevo</span></button>
         </div>
 
         <!-- Acciones Rápidas Destacadas a la Derecha -->
         <div class="toolbar-actions-compact editor-only-control">
-            <button id="btnQuickMath" class="btn-secondary-compact" data-i18n-title="title_quick_math" title="Abrir Teclado Matemático (Alt + M)">
-                📐 <span data-i18n="btn_math_short">Fórmulas</span>
+            <button id="btnToggleGallery" class="btn-secondary-compact" data-i18n-title="title_gallery" title="Galería de Imágenes">
+                🖼️ <span data-i18n="btn_gallery">Galería</span>
             </button>
             <button id="btnQuickVoice" class="btn-secondary-compact" data-i18n-title="title_quick_voice" title="Grabar clase desde celular con enlace o QR">
                 🎙️ <span data-i18n="btn_voice_short">Clase</span>
@@ -113,9 +113,55 @@
         </div>
     </header>
 
-    <main class="workspace">
-        <!-- Barra Lateral de Imágenes -->
-        <div class="gallery-sidebar" id="gallerySidebar">
+    <main class="workspace" style="display: none;">
+        <!-- Barra Lateral Estilo Overleaf (Archivos + Esquema) -->
+        <aside class="project-sidebar" id="projectSidebar">
+            <!-- Sección Superior: Árbol de Archivos (File tree) -->
+            <div class="sidebar-section-tree" id="sidebarSectionTree">
+                <div class="sidebar-section-header">
+                    <span class="sidebar-section-title" id="titleFileTree">
+                        <span class="toggle-icon">⌵</span> <span data-i18n="sidebar_files_title">Archivos</span>
+                    </span>
+                    <div class="sidebar-header-actions">
+                        <button id="btnSidebarNewFile" class="btn-sidebar-icon" title="Nuevo archivo (.tex, .bib)">📄<span class="badge-plus">+</span></button>
+                        <button id="btnSidebarNewFolder" class="btn-sidebar-icon" title="Nueva carpeta">📁<span class="badge-plus">+</span></button>
+                        <button id="btnSidebarUpload" class="btn-sidebar-icon" title="Subir archivo o imagen">⬆️</button>
+                        <button id="btnCollapseSidebar" class="btn-sidebar-icon" title="Ocultar barra lateral">✕</button>
+                        <input type="file" id="sidebarFileInput" multiple accept=".tex,.bib,.png,.jpg,.jpeg,.webp,.pdf,.txt,.sty,.cls" style="display:none;">
+                    </div>
+                </div>
+                <div class="file-tree-container" id="fileTreeContainer">
+                    <div class="file-tree-list" id="fileTreeList">
+                        <!-- Generado dinámicamente con estilo Overleaf -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divisor Horizontal Redimensionable -->
+            <div class="sidebar-h-resizer" id="sidebarHResizer" title="Arrastra para ajustar tamaño">
+                <span class="resizer-dots">⁝⁝⁝</span>
+            </div>
+
+            <!-- Sección Inferior: Esquema del Documento (File outline) -->
+            <div class="sidebar-section-outline" id="sidebarSectionOutline">
+                <div class="sidebar-section-header">
+                    <span class="sidebar-section-title" id="titleOutline">
+                        <span class="toggle-icon">⌵</span> <span data-i18n="sidebar_outline_title">Esquema del Documento</span>
+                    </span>
+                    <div class="sidebar-header-actions">
+                        <span class="outline-count-badge" id="outlineCountBadge" title="Número de secciones">0</span>
+                    </div>
+                </div>
+                <div class="outline-container" id="outlineContainer">
+                    <div class="outline-tree-list" id="outlineTreeList">
+                        <p class="text-muted outline-empty" data-i18n="outline_empty">No hay secciones aún (\section{...})</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Barra Lateral de Imágenes (Coexiste con Project Sidebar) -->
+        <div class="gallery-sidebar collapsed" id="gallerySidebar">
             <div class="sidebar-header">
                 <span class="sidebar-title">🖼️ <span data-i18n="sidebar_gallery_title">Galería de Imágenes</span></span>
                 <button id="btnCollapseGallery" class="btn-icon-tiny" title="Ocultar panel">◀</button>
@@ -123,8 +169,8 @@
             <div class="sidebar-dropzone" id="sidebarDropzone">
                 <div class="sidebar-drop-icon">📥</div>
                 <span class="sidebar-drop-text" data-i18n="sidebar_drop_text">Arrastra imágenes aquí o</span>
-                <button class="btn-sidebar-upload" id="btnSidebarUpload">+ <span data-i18n="btn_upload">Subir</span></button>
-                <input type="file" id="sidebarFileInput" accept="image/*" style="display:none;">
+                <button class="btn-sidebar-upload" id="btnGallerySidebarUpload">+ <span data-i18n="btn_upload">Subir</span></button>
+                <input type="file" id="gallerySidebarFileInput" accept="image/*" style="display:none;">
             </div>
             <div class="gallery-info-hint" data-i18n="gallery_hint">
                 💡 Haz clic en 📋 para copiar el código LaTeX de la figura
@@ -136,8 +182,9 @@
 
         <div class="editor-pane" id="editorPane">
             <div class="pane-header">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span class="pane-title">📝 main.tex</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button id="btnToggleSidebar" class="btn-icon-tiny" title="Mostrar/Ocultar barra lateral">☰</button>
+                    <span class="pane-title" id="editorCurrentFileTitle">📝 main.tex</span>
                     <button id="btnSyncToPdf" class="btn-synctex" title="Ir a la página del PDF donde está esta línea">📍 <span data-i18n="btn_sync_pdf">Ir a PDF</span></button>
                 </div>
                 <div class="editor-status" id="editorStatus">Guardado automático ✓</div>
@@ -154,6 +201,7 @@
             <div class="pane-header">
                 <span class="pane-title" data-i18n="preview_title">📄 Vista Previa (PDF)</span>
                 <div class="preview-actions">
+                    <button id="btnOpenPdfNewTab" class="btn-icon" data-i18n-title="btn_open_pdf_tab_title" title="Abrir PDF compilado en otra pestaña o ventana">↗️ <span data-i18n="btn_open_pdf_tab">Ver en Pestaña</span></button>
                     <button id="btnDownloadPdf" class="btn-icon" data-i18n-title="btn_download_title" title="Descargar archivo PDF">⬇️ <span data-i18n="btn_download">Descargar</span></button>
                     <button id="btnRefreshPdf" class="btn-icon" data-i18n-title="btn_refresh_pdf" title="Recargar PDF">🔄</button>
                 </div>
@@ -177,7 +225,7 @@
     </main>
 
     <!-- PANTALLA DE INICIO (HOME DASHBOARD) -->
-    <div id="homeDashboard" class="home-dashboard hidden">
+    <div id="homeDashboard" class="home-dashboard">
         <div class="dashboard-container">
             <div class="dashboard-header">
                 <div>
@@ -235,6 +283,97 @@
             <div>
                 <h3 class="section-title">📁 <span data-i18n="title_recent_projects">Tus Proyectos</span></h3>
                 <div class="projects-grid" id="dashboardProjectsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Creador de Tablas -->
+    <div id="modalTableBuilder" class="modal hidden">
+        <div class="table-modal-content">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h3 class="modal-title">📊 <span data-i18n="table_builder_title">Creador de Tablas</span></h3>
+                    <span class="modal-subtitle" data-i18n="table_builder_subtitle">Crea tu tabla de forma visual o pega celdas copiadas directamente con Ctrl+V</span>
+                </div>
+                <button class="modal-close" id="btnCloseTableModal">&times;</button>
+            </div>
+
+            <div class="table-builder-body">
+                <!-- Barra de Configuración y Dimensiones -->
+                <div class="table-controls-bar">
+                    <div class="table-dim-controls">
+                        <label class="dim-label">
+                            <span data-i18n="lbl_rows">Filas:</span>
+                            <input type="number" id="tblRowsInput" min="1" max="50" value="3" class="input-dim">
+                        </label>
+                        <button id="btnTblAddRow" class="btn-dim-action" title="Agregar fila">+ Fila</button>
+                        <button id="btnTblRemoveRow" class="btn-dim-action" title="Quitar fila">- Fila</button>
+
+                        <span class="dim-divider">|</span>
+
+                        <label class="dim-label">
+                            <span data-i18n="lbl_cols">Columnas:</span>
+                            <input type="number" id="tblColsInput" min="1" max="25" value="3" class="input-dim">
+                        </label>
+                        <button id="btnTblAddCol" class="btn-dim-action" title="Agregar columna">+ Col</button>
+                        <button id="btnTblRemoveCol" class="btn-dim-action" title="Quitar columna">- Col</button>
+
+                        <button id="btnTblClear" class="btn-dim-action" title="Limpiar todas las celdas">🧹 Limpiar</button>
+                    </div>
+
+                    <div class="table-style-options">
+                        <label class="checkbox-label" title="Poner la primera fila en negrita \textbf">
+                            <input type="checkbox" id="tblChkHeader" checked>
+                            <span data-i18n="chk_table_header">Encabezado</span>
+                        </label>
+                        <label class="checkbox-label" title="Usar estilo profesional booktabs (\toprule, \midrule, \bottomrule)">
+                            <input type="checkbox" id="tblChkBooktabs" checked>
+                            <span>Booktabs (Pro)</span>
+                        </label>
+                        <label class="checkbox-label" title="Líneas verticales entre columnas">
+                            <input type="checkbox" id="tblChkBorders">
+                            <span>Bordes |</span>
+                        </label>
+                        <label class="select-label">
+                            <span>Alineación:</span>
+                            <select id="tblAlignSelect" class="select-compact">
+                                <option value="c" selected>Centrado (c)</option>
+                                <option value="l">Izquierda (l)</option>
+                                <option value="r">Derecha (r)</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Cuadrícula Mini-Excel Interactiva -->
+                <div class="table-grid-wrapper" id="tableGridWrapper">
+                    <div class="table-grid-scroll">
+                        <table class="excel-grid" id="excelGrid">
+                            <!-- Filas y celdas dinámicas -->
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Meta información: Título y Etiqueta -->
+                <div class="table-meta-inputs">
+                    <input type="text" id="tblCaptionInput" class="input-compact flex-2" placeholder="Título / Caption de la tabla (ej. Comparativa de Resultados)" value="Resultados Experimentales">
+                    <input type="text" id="tblLabelInput" class="input-compact flex-1" placeholder="Etiqueta / Label (ej. tab:resultados)" value="tab:resultados">
+                </div>
+
+                <!-- Vista Previa de Código LaTeX -->
+                <div class="table-preview-section">
+                    <div class="preview-header-small">
+                        <span>Código LaTeX generado:</span>
+                        <span class="preview-badge-hint">💡 Puedes pegar celdas de Excel con Ctrl+V</span>
+                    </div>
+                    <pre class="table-code-preview" id="tblCodePreview"></pre>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btnCancelTableModal" class="btn-secondary">Cancelar</button>
+                <button id="btnCopyTableCode" class="btn-secondary">📋 Copiar Código</button>
+                <button id="btnInsertTableDoc" class="btn-primary">📥 Insertar en Documento</button>
             </div>
         </div>
     </div>
@@ -381,8 +520,9 @@
     <!-- Drawer del Asistente Gemini -->
     <div id="aiDrawer" class="ai-drawer hidden">
         <div class="ai-header">
-            <div class="ai-title">
+            <div class="ai-title" style="display:flex; align-items:center; gap:8px;">
                 <span>🦊 <span data-i18n="ai_title">IA NaTex</span></span>
+                <span id="aiActiveProviderBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 12px; background: rgba(255,107,53,0.18); color: var(--fox-orange); font-weight: 600; border: 1px solid var(--fox-orange);">Gemini</span>
             </div>
             <button id="btnCloseAI" class="btn-close">&times;</button>
         </div>
@@ -511,13 +651,69 @@
                     </div>
                 </div>
 
-                <!-- Sección Gemini API Key -->
-                <div class="settings-section">
-                    <label class="settings-label" for="inputApiKey"><span data-i18n="gemini_key_label">Clave de API de Google Gemini (Gratis):</span></label>
-                    <p class="text-muted" style="margin-bottom:8px; font-size:12.5px;" data-i18n="gemini_key_desc">
-                        Cada persona puede colocar su propia clave gratuita de <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--fox-orange);">Google AI Studio</a>.
-                    </p>
-                    <input type="password" id="inputApiKey" data-i18n-placeholder="gemini_key_placeholder" placeholder="Pega tu API Key de Gemini aquí (ej. AIzaSy...)" style="width:100%; padding:10px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color);" />
+                <!-- Sección Proveedor de Inteligencia Artificial (Multi-IA) -->
+                <div class="settings-section" style="border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 14px;">
+                    <label class="settings-label" for="selectAiProvider">🧠 <span data-i18n="ai_provider_label">Proveedor de Inteligencia Artificial:</span></label>
+                    <select id="selectAiProvider" style="width: 100%; padding: 9px 12px; border-radius: 6px; background: var(--bg-dark); color: var(--text-main); border: 1px solid var(--border-color); font-size: 13.5px; margin-bottom: 12px; cursor: pointer;">
+                        <option value="gemini" data-i18n="provider_gemini">Google Gemini</option>
+                        <option value="openai" data-i18n="provider_openai">OpenAI</option>
+                        <option value="claude" data-i18n="provider_claude">Anthropic Claude</option>
+                        <option value="nvidia" data-i18n="provider_nvidia">NVIDIA NIM</option>
+                        <option value="custom" data-i18n="provider_custom">Local / Personalizada</option>
+                    </select>
+
+                    <!-- Panel Gemini -->
+                    <div id="aiPanelGemini" class="ai-provider-panel">
+                        <label class="settings-label" for="inputApiKey"><span data-i18n="gemini_key_label">Clave de API de Google Gemini:</span></label>
+                        <p class="text-muted" style="margin-bottom:8px; font-size:12px;" data-i18n="gemini_key_desc">
+                            Obtén tu clave de API en <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--fox-orange);">Google AI Studio</a>.
+                        </p>
+                        <input type="password" id="inputApiKey" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px;" />
+                    </div>
+
+                    <!-- Panel OpenAI -->
+                    <div id="aiPanelOpenai" class="ai-provider-panel hidden">
+                        <label class="settings-label" for="inputApiKeyOpenai"><span data-i18n="openai_key_label">Clave de API de OpenAI:</span></label>
+                        <p class="text-muted" style="margin-bottom:8px; font-size:12px;">
+                            Obtén tu API key en <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--fox-orange);">OpenAI Platform</a>.
+                        </p>
+                        <input type="password" id="inputApiKeyOpenai" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px;" />
+                    </div>
+
+                    <!-- Panel Claude -->
+                    <div id="aiPanelClaude" class="ai-provider-panel hidden">
+                        <label class="settings-label" for="inputApiKeyClaude"><span data-i18n="claude_key_label">Clave de API de Anthropic Claude:</span></label>
+                        <p class="text-muted" style="margin-bottom:8px; font-size:12px;">
+                            Obtén tu API key en <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--fox-orange);">Anthropic Console</a>.
+                        </p>
+                        <input type="password" id="inputApiKeyClaude" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px;" />
+                    </div>
+
+                    <!-- Panel NVIDIA -->
+                    <div id="aiPanelNvidia" class="ai-provider-panel hidden">
+                        <label class="settings-label" for="inputApiKeyNvidia"><span data-i18n="nvidia_key_label">Clave de API de NVIDIA NIM:</span></label>
+                        <p class="text-muted" style="margin-bottom:8px; font-size:12px;">
+                            Obtén tu API key en <a href="https://build.nvidia.com/" target="_blank" style="color:var(--fox-orange);">NVIDIA NIM Catalog</a>.
+                        </p>
+                        <input type="password" id="inputApiKeyNvidia" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px;" />
+                    </div>
+
+                    <!-- Panel Custom/Local -->
+                    <div id="aiPanelCustom" class="ai-provider-panel hidden">
+                        <label class="settings-label" for="inputCustomUrl"><span data-i18n="custom_url_label">URL Endpoint de API (Compatible OpenAI):</span></label>
+                        <input type="text" id="inputCustomUrl" placeholder="http://localhost:11434/v1/chat/completions" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px; margin-bottom:8px;" />
+                        <label class="settings-label" for="inputCustomApiKey"><span data-i18n="custom_key_label">Token o API Key (Opcional):</span></label>
+                        <input type="password" id="inputCustomApiKey" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px;" />
+                        <p class="text-muted" style="margin-top:6px; font-size:11.5px;" data-i18n="custom_hint">Compatible con Ollama, LM Studio, vLLM y proxies locales OpenAI.</p>
+                    </div>
+
+                    <input type="hidden" id="inputAiModel" value="" />
+
+                    <!-- Advertencia Dictáfono -->
+                    <div style="margin-top: 12px; padding: 10px 12px; border-radius: 6px; background: rgba(255, 170, 0, 0.08); border-left: 3px solid #ffaa00; font-size: 12px; line-height: 1.45; color: var(--text-muted);">
+                        <strong style="color: #ffaa00; display: block; margin-bottom: 3px;">ℹ️ <span data-i18n="ai_voice_warning_title">Aviso sobre el Dictáfono:</span></strong>
+                        <span data-i18n="ai_voice_warning_desc">La función de grabar y resumir clases con micrófono requiere la API de Google Gemini (procesamiento directo de audio). Las demás APIs funcionan para el chat y asistencia de LaTeX.</span>
+                    </div>
                 </div>
 
                 <!-- Sección Actualizaciones de Software -->
@@ -599,6 +795,13 @@
     </div>
 
     <script src="/static/vendor/qrcode.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/state.js"></script>
+    <script src="/static/js/sidebar.js"></script>
+    <script src="/static/js/table_builder.js"></script>
+    <script src="/static/js/gallery.js"></script>
+    <script src="/static/js/math_editor.js"></script>
+    <script src="/static/js/editor.js"></script>
     <script src="/static/js/app.js"></script>
 </body>
 </html>

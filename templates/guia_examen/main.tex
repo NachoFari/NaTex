@@ -1,0 +1,81 @@
+\documentclass[11pt, letterpaper]{article}
+
+\usepackage[margin=2cm]{geometry}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+
+\definecolor{primary}{RGB}{255, 107, 53}
+\definecolor{darkslate}{RGB}{15, 23, 42}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small \textbf{Universidad Nacional} -- Departamento de Matemáticas}
+\fancyhead[R]{\small \textbf{Cálculo III} -- Semestre 2026-1}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+% MEMBRETE Y TABLA DE IDENTIFICACIÓN
+\begin{tcolorbox}[colback=darkslate, colframe=primary, arc=2mm, boxrule=1.5pt]
+  \color{white}
+  \begin{center}
+    {\Large \bfseries EVALUACIÓN PARCIAL N$^\circ$ 2 -- CÁLCULO VECTORIAL}\\[0.2cm]
+    {\small Tiempo máximo: 90 minutos \quad $\bullet$ \quad Puntaje total: 60 puntos \quad $\bullet$ \quad Exigencia: 60\%}
+  \end{center}
+\end{tcolorbox}
+
+\vspace{0.3cm}
+
+\noindent
+\begin{tabular}{|p{10cm}|p{6.8cm}|}
+  \hline
+  \textbf{Nombre del Estudiante:} & \textbf{RUT / Identificación:} \\
+  \vspace{0.3cm} & \vspace{0.3cm} \\
+  \hline
+  \textbf{Profesor:} Dr. M. Fernández & \textbf{Fila / Sección:} 101 \\
+  \hline
+\end{tabular}
+
+\vspace{0.4cm}
+
+\begin{tcolorbox}[colback=primary!10, colframe=primary, arc=2mm, title=\textbf{Instrucciones Generales}]
+  $\bullet$ Responda con letra clara y orden en el espacio indicado. Justifique cada paso matemáticamente. \\
+  $\bullet$ Se prohíbe el uso de dispositivos celulares o calculadoras programables.
+\end{tcolorbox}
+
+\vspace{0.5cm}
+
+\subsection*{Problema 1 (15 Puntos) -- Integrales de Línea y Campos Conservativos}
+Considere el campo vectorial bidimensional:
+\begin{equation*}
+  \mathbf{F}(x, y) = \left( 2x y^3 + e^x \sin y \right) \mathbf{i} + \left( 3x^2 y^2 + e^x \cos y \right) \mathbf{j}
+\end{equation*}
+
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Demuestre que el campo $\mathbf{F}$ es conservativo en todo $\mathbb{R}^2$.
+  \item Encuentre la función potencial escalar $\phi(x, y)$ tal que $\mathbf{F} = \nabla \phi$.
+  \item Calcule el trabajo realizado por $\mathbf{F}$ al desplazar una partícula a lo largo de la curva suave $C$ desde el punto $A(0, 0)$ hasta $B(1, \pi/2)$.
+\end{enumerate}
+
+\vspace{3.5cm}
+
+\subsection*{Problema 2 (20 Puntos) -- Teorema de Green en el Plano}
+Utilice el Teorema de Green para evaluar la integral de línea en sentido antihorario:
+\begin{equation*}
+  \oint_C \left( y^2 - \arctan x \right) dx + \left( 3x - \ln(y^2 + 1) \right) dy
+\end{equation*}
+Donde $C$ es la frontera de la región encerrada entre las curvas $y = x^2$ e $y = 4$.
+
+\vspace{3.5cm}
+
+\subsection*{Problema 3 (25 Puntos) -- Teorema de la Divergencia de Gauss}
+Sea $\mathbf{F}(x, y, z) = x^3 \mathbf{i} + y^3 \mathbf{j} + z^3 \mathbf{k}$ y sea $S$ la superficie de la esfera unitaria $x^2 + y^2 + z^2 = 1$ orientada con la normal exterior. Calcule el flujo total:
+\begin{equation*}
+  \Phi = \iint_S \mathbf{F} \cdot d\mathbf{S}
+\end{equation*}
+
+\end{document}

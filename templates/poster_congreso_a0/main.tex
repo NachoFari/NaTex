@@ -1,0 +1,145 @@
+\documentclass[final]{article}
+\usepackage[paperwidth=84.1cm, paperheight=118.9cm, margin=2.5cm]{geometry}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{tcolorbox}
+\usepackage{graphicx}
+\usepackage{array}
+
+\definecolor{primary}{RGB}{255, 107, 53}
+\definecolor{secondary}{RGB}{15, 23, 42}
+\definecolor{accent}{RGB}{6, 182, 212}
+\definecolor{boxbg}{RGB}{248, 250, 252}
+
+\tcbset{
+  colback=boxbg,
+  colframe=primary,
+  coltitle=white,
+  fonttitle=\Huge\bfseries,
+  boxrule=3mm,
+  arc=6mm,
+  boxsep=1.5cm,
+  left=1cm, right=1cm, top=1cm, bottom=1cm
+}
+
+\begin{document}
+\pagestyle{empty}
+
+% HEADER GIGANTE DEL PÓSTER
+\begin{tcolorbox}[colback=secondary, colframe=primary, boxrule=4mm, arc=8mm]
+  \centering
+  \vspace{0.8cm}
+  {\fontsize{64}{76}\selectfont \bfseries \color{white} TÍTULO PRINCIPAL DEL PÓSTER CIENTÍFICO}\\[1.5cm]
+  {\fontsize{38}{46}\selectfont \color{primary} \textbf{Dr. Nombre del Investigador}$^1$, \textbf{MSc. Co-Autor Uno}$^2$, \textbf{Lic. Co-Autor Dos}$^1$}\\[1cm]
+  {\fontsize{28}{36}\selectfont \color{gray!40} $^1$Departamento de Ciencias e Ingeniería, Universidad Nacional \quad $\bullet$ \quad $^2$Laboratorio de Investigación Avanzada}\\[0.6cm]
+  {\fontsize{24}{30}\selectfont \color{accent} Contacto: \texttt{investigador@universidad.edu} \quad $\bullet$ \quad Congreso Internacional de Ciencia y Tecnología 2026}
+  \vspace{0.8cm}
+\end{tcolorbox}
+
+\vspace{1.5cm}
+
+\setlength{\columnsep}{2.5cm}
+\begin{multicols}{3}
+
+  % COLUMNA 1
+  \begin{tcolorbox}[title=1. Introducción y Motivación]
+    {\LARGE
+    El procesamiento eficiente de grandes volúmenes de datos requiere arquitecturas optimizadas que minimicen los tiempos de latencia y el consumo energético.
+    
+    \vspace{0.8cm}
+    \textbf{Objetivos Principales:}
+    \begin{itemize}
+      \setlength{\itemsep}{0.6cm}
+      \item Desarrollar un modelo analítico escalable.
+      \item Validar la convergencia numérica en tiempo real.
+      \item Evaluar el rendimiento frente a estándares actuales.
+    \end{itemize}
+    }
+  \end{tcolorbox}
+
+  \vspace{1.2cm}
+
+  \begin{tcolorbox}[title=2. Marco Teórico y Formulación]
+    {\LARGE
+    La dinámica fundamental del sistema se expresa a través de la ecuación diferencial generalizada de conservación:
+    
+    \begin{equation*}
+      \frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \mathbf{u}) = \sum_{k=1}^{N} \mathcal{S}_k(\mathbf{x}, t)
+    \end{equation*}
+
+    Donde $\rho$ representa la densidad de probabilidad del estado y $\mathbf{u}$ el campo vectorial de transporte acoplado.
+    }
+  \end{tcolorbox}
+
+  % COLUMNA 2
+  \begin{tcolorbox}[title=3. Metodología Experimental]
+    {\LARGE
+    Se implementó un esquema de muestreo discreto con validación cruzada cuádruple:
+    
+    \vspace{0.8cm}
+    \begin{enumerate}
+      \setlength{\itemsep}{0.6cm}
+      \item Adquisición de señales a frecuencia de muestreo $f_s = 48\text{ kHz}$.
+      \item Filtrado adaptativo mediante transformada wavelet ortogonal.
+      \item Optimización convexa del vector de parámetros $\boldsymbol{\theta}^*$.
+    \end{enumerate}
+    }
+  \end{tcolorbox}
+
+  \vspace{1.2cm}
+
+  \begin{tcolorbox}[title=4. Resultados y Métricas]
+    {\LARGE
+    Los ensayos experimentales confirman una reducción sustancial del margen de error:
+    
+    \vspace{1cm}
+    \centering
+    \renewcommand{\arraystretch}{1.6}
+    \begin{tabular}{|l|c|c|c|}
+      \hline
+      \textbf{Algoritmo} & \textbf{Precisión} & \textbf{Tiempo (s)} & \textbf{Speedup} \\
+      \hline
+      Modelo Base & 88.4\% & 14.8 & $1.0\times$ \\
+      Propuesta A & 94.1\% & 6.2 & $2.4\times$ \\
+      \textbf{NaTex Model} & \textbf{99.2\%} & \textbf{1.9} & $\mathbf{7.8\times}$ \\
+      \hline
+    \end{tabular}
+    \vspace{0.8cm}
+    }
+  \end{tcolorbox}
+
+  % COLUMNA 3
+  \begin{tcolorbox}[title=5. Discusión y Análisis]
+    {\LARGE
+    La tasa de convergencia lograda evidencia que la formulación matricial reduce la complejidad temporal de $\mathcal{O}(N^3)$ a $\mathcal{O}(N \log N)$.
+    
+    \vspace{0.8cm}
+    Las perturbaciones térmicas y de ruido Gaussiano se mitigaron con una relación señal-ruido ($\text{SNR}$) superior a $38\text{ dB}$.
+    }
+  \end{tcolorbox}
+
+  \vspace{1.2cm}
+
+  \begin{tcolorbox}[title=6. Conclusiones y Referencias]
+    {\LARGE
+    \textbf{Conclusiones:}
+    \begin{itemize}
+      \setlength{\itemsep}{0.5cm}
+      \item Se validó la reproducibilidad del modelo al 100\%.
+      \item El método es apto para despliegue industrial.
+    \end{itemize}
+
+    \vspace{1cm}
+    \textbf{Referencias Clave:}
+    \begin{enumerate}
+      \setlength{\itemsep}{0.4cm}
+      \item Shannon, C. E. (1948). \textit{A Mathematical Theory of Communication}.
+      \item Goodfellow, I. et al. (2016). \textit{Deep Learning}, MIT Press.
+    \end{enumerate}
+    }
+  \end{tcolorbox}
+
+\end{multicols}
+
+\end{document}

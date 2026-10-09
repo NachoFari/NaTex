@@ -1,0 +1,109 @@
+\documentclass[11pt, letterpaper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[spanish]{babel}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+
+\definecolor{natexorange}{RGB}{255, 107, 53}
+\definecolor{darkslate}{RGB}{15, 23, 42}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small \color{gray} Informe de Laboratorio -- Asignatura}
+\fancyhead[R]{\small \color{gray} NaTex Studio}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+% PORTADA FORMAL UNIVERSITARIA
+\begin{titlepage}
+  \centering
+  {\scshape\LARGE Universidad Nacional de Ingeniería \par}
+  \vspace{0.5cm}
+  {\scshape\Large Facultad de Ciencias Físicas y Matemáticas \par}
+  {\scshape\large Departamento de Ingeniería Eléctrica \par}
+  \vspace{3cm}
+
+  \begin{tcolorbox}[colback=darkslate, colframe=natexorange, arc=3mm, boxrule=2pt]
+    \centering
+    \vspace{0.3cm}
+    {\Huge \bfseries \color{white} INFORME DE LABORATORIO N$^\circ$ 1 \par}
+    \vspace{0.4cm}
+    {\Large \color{natexorange} Análisis de Circuitos RLC y Respuesta en Frecuencia \par}
+    \vspace{0.3cm}
+  \end{tcolorbox}
+
+  \vspace{3cm}
+
+  \begin{flushleft}
+    \large
+    \textbf{Integrantes:} \\
+    $\bullet$ Juan Pérez González (RUT: 20.123.456-7) \\
+    $\bullet$ María Rodríguez Silva (RUT: 19.876.543-2) \\[0.4cm]
+    \textbf{Profesor Guía:} Dr. Carlos M. Benítez \\
+    \textbf{Ayudante:} Ing. Roberto Soto \\
+    \textbf{Fecha de Entrega:} \today
+  \end{flushleft}
+
+  \vfill
+  {\large Santiago, Chile \par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Resumen Ejecutivo}
+En esta experiencia práctica se estudió el comportamiento en régimen transitorio y permanente de un circuito RLC serie. Se midió la frecuencia de resonancia natural y el factor de calidad $Q$, comparando los resultados experimentales con las predicciones del modelo teórico. Los resultados arrojaron un error porcentual inferior al $2.8\%$.
+
+\section{Introducción y Objetivos}
+\subsection{Objetivo General}
+Caracterizar la respuesta frecuencial de un circuito RLC serie excitado por una señal senoidal.
+
+\subsection{Objetivos Específicos}
+\begin{enumerate}
+  \item Determinar experimentalmente la frecuencia de resonancia $\omega_0$.
+  \item Calcular el ancho de banda a $-3\text{ dB}$.
+  \item Analizar la influencia de la resistencia en el amortiguamiento del sistema.
+\end{enumerate}
+
+\section{Marco Teórico}
+La ecuación diferencial que rige la corriente $i(t)$ en el circuito serie es:
+\begin{equation}
+  L \frac{d^2 i(t)}{dt^2} + R \frac{di(t)}{dt} + \frac{1}{C} i(t) = \frac{dv_s(t)}{dt}
+\end{equation}
+
+La frecuencia de resonancia teórica y el factor de calidad vienen dados por:
+\begin{equation}
+  \omega_0 = \frac{1}{\sqrt{LC}}, \qquad Q = \frac{\omega_0 L}{R} = \frac{1}{R} \sqrt{\frac{L}{C}}
+\end{equation}
+
+\section{Procedimiento Experimental y Datos}
+Se utilizó un osciloscopio digital, un generador de funciones, un inductor de $L = 10\text{ mH}$, un capacitor de $C = 100\text{ nF}$ y una resistencia de $R = 100\,\Omega$.
+
+\begin{table}[h]
+  \centering
+  \caption{Mediciones de voltaje y desfase en función de la frecuencia.}
+  \vspace{0.2cm}
+  \begin{tabular}{ccccc}
+    \toprule
+    \textbf{Frecuencia (kHz)} & \textbf{$V_{\text{in}}$ (V)} & \textbf{$V_{\text{out}}$ (V)} & \textbf{Ganancia (dB)} & \textbf{Desfase ($^\circ$)} \\
+    \midrule
+    1.0 & 5.00 & 1.25 & -12.04 & +75 \\
+    3.0 & 5.00 & 3.48 & -3.15 & +42 \\
+    \textbf{5.03 ($\approx f_0$)} & \textbf{5.00} & \textbf{4.92} & \textbf{-0.14} & \textbf{0} \\
+    7.0 & 5.00 & 3.20 & -3.87 & -48 \\
+    10.0 & 5.00 & 1.10 & -13.15 & -78 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Conclusiones}
+Se comprobó satisfactoriamente la teoría de resonancia en circuitos RLC. El factor de calidad obtenido experimentalmente fue de $Q_{\text{exp}} = 3.12$, concordando estrechamente con el valor analítico esperado de $Q_{\text{teo}} = 3.16$.
+
+\end{document}

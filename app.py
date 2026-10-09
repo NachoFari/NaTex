@@ -16,6 +16,7 @@ import sys
 import atexit
 import gzip
 import socket
+import shutil
 
 if sys.stdout is None:
     try:
@@ -55,7 +56,14 @@ CLOUDFLARED_EXE = os.path.join(BASE_DIR, 'tools', 'cloudflared.exe')
 CONFIG_FILE = os.path.join(BASE_DIR, 'config.json')
 
 DEFAULT_CONFIG = {
+    'ai_provider': 'gemini',
     'gemini_api_key': '',
+    'openai_api_key': '',
+    'claude_api_key': '',
+    'nvidia_api_key': '',
+    'ai_model': '',
+    'custom_api_url': 'http://localhost:11434/v1/chat/completions',
+    'custom_api_key': '',
     'last_project': 'Mi_Primer_Documento',
     'theme': 'dark',
     'custom_color': '#FF6B35',
@@ -204,6 +212,176 @@ def get_local_ip():
     except Exception:
         return '127.0.0.1'
 
+def call_ai_service(prompt, system_prompt=None, cfg=None):
+    """Enruta y ejecuta solicitudes de IA hacia Gemini, OpenAI, Claude, NVIDIA NIM o APIs locales/personalizadas."""
+    if cfg is None:
+        cfg = load_config()
+
+    provider = cfg.get('ai_provider', 'gemini').lower()
+    custom_model = (cfg.get('ai_model') or '').strip()
+
+    if not system_prompt:
+        system_prompt = (
+            "Eres el asistente inteligente de NaTex Studio, un editor y compilador de LaTeX moderno y veloz. "
+            "Responde de manera concisa, clara, directa y profesional. Cuando sea pertinente, incluye fragmentos de código "
+            "LaTeX listos para copiar y compilar."
+        )
+
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+
+    if provider == 'gemini':
+        api_key = (cfg.get('gemini_api_key') or '').strip()
+        if not api_key:
+            return False, "Falta la API Key de Google Gemini. Puedes ingresarla en Ajustes (⚙️)."
+
+        model = custom_model or 'gemini-2.0-flash'
+        url = f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}'
+        payload = {
+            'contents': [{
+                'parts': [{'text': f"{system_prompt}\n\nUsuario: {prompt}"}]
+            }]
+        }
+        try:
+            req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers={'Content-Type': 'application/json'})
+            with urllib.request.urlopen(req, context=ctx, timeout=40) as resp:
+                res_data = json.loads(resp.read().decode('utf-8'))
+                text = res_data['candidates'][0]['content']['parts'][0]['text']
+                return True, text
+        except urllib.error.HTTPError as e:
+            err_msg = e.read().decode('utf-8', errors='ignore')
+            return False, f"Error de Gemini (HTTP {e.code}): {err_msg}"
+        except Exception as e:
+            return False, f"Error al conectar con Gemini: {str(e)}"
+
+    elif provider == 'openai':
+        api_key = (cfg.get('openai_api_key') or '').strip()
+        if not api_key:
+            return False, "Falta la API Key de OpenAI. Puedes ingresarla en Ajustes (⚙️)."
+
+        model = custom_model or 'gpt-4o-mini'
+        url = 'https://api.openai.com/v1/chat/completions'
+        payload = {
+            'model': model,
+            'messages': [
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': prompt}
+            ],
+            'temperature': 0.7
+        }
+        try:
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode('utf-8'),
+                headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {api_key}'}
+            )
+            with urllib.request.urlopen(req, context=ctx, timeout=40) as resp:
+                res_data = json.loads(resp.read().decode('utf-8'))
+                text = res_data['choices'][0]['message']['content']
+                return True, text
+        except urllib.error.HTTPError as e:
+            err_msg = e.read().decode('utf-8', errors='ignore')
+            return False, f"Error de OpenAI (HTTP {e.code}): {err_msg}"
+        except Exception as e:
+            return False, f"Error al conectar con OpenAI: {str(e)}"
+
+    elif provider == 'claude':
+        api_key = (cfg.get('claude_api_key') or '').strip()
+        if not api_key:
+            return False, "Falta la API Key de Anthropic Claude. Puedes ingresarla en Ajustes (⚙️)."
+
+        model = custom_model or 'claude-3-5-sonnet-20241022'
+        url = 'https://api.anthropic.com/v1/messages'
+        payload = {
+            'model': model,
+            'max_tokens': 4096,
+            'system': system_prompt,
+            'messages': [
+                {'role': 'user', 'content': prompt}
+            ]
+        }
+        try:
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode('utf-8'),
+                headers={
+                    'Content-Type': 'application/json',
+                    'x-api-key': api_key,
+                    'anthropic-version': '2023-06-01'
+                }
+            )
+            with urllib.request.urlopen(req, context=ctx, timeout=40) as resp:
+                res_data = json.loads(resp.read().decode('utf-8'))
+                text = res_data['content'][0]['text']
+                return True, text
+        except urllib.error.HTTPError as e:
+            err_msg = e.read().decode('utf-8', errors='ignore')
+            return False, f"Error de Claude (HTTP {e.code}): {err_msg}"
+        except Exception as e:
+            return False, f"Error al conectar con Claude: {str(e)}"
+
+    elif provider == 'nvidia':
+        api_key = (cfg.get('nvidia_api_key') or '').strip()
+        if not api_key:
+            return False, "Falta la API Key de NVIDIA NIM. Puedes ingresarla en Ajustes (⚙️)."
+
+        model = custom_model or 'meta/llama-3.1-70b-instruct'
+        url = 'https://integrate.api.nvidia.com/v1/chat/completions'
+        payload = {
+            'model': model,
+            'messages': [
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': prompt}
+            ],
+            'temperature': 0.6,
+            'max_tokens': 4096
+        }
+        try:
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode('utf-8'),
+                headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {api_key}'}
+            )
+            with urllib.request.urlopen(req, context=ctx, timeout=40) as resp:
+                res_data = json.loads(resp.read().decode('utf-8'))
+                text = res_data['choices'][0]['message']['content']
+                return True, text
+        except urllib.error.HTTPError as e:
+            err_msg = e.read().decode('utf-8', errors='ignore')
+            return False, f"Error de NVIDIA (HTTP {e.code}): {err_msg}"
+        except Exception as e:
+            return False, f"Error al conectar con NVIDIA: {str(e)}"
+
+    elif provider == 'custom':
+        url = (cfg.get('custom_api_url') or '').strip() or 'http://localhost:11434/v1/chat/completions'
+        api_key = (cfg.get('custom_api_key') or '').strip()
+        model = custom_model or 'llama3.2'
+
+        payload = {
+            'model': model,
+            'messages': [
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': prompt}
+            ]
+        }
+        headers = {'Content-Type': 'application/json'}
+        if api_key:
+            headers['Authorization'] = f'Bearer {api_key}'
+        try:
+            req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers=headers)
+            with urllib.request.urlopen(req, context=ctx, timeout=40) as resp:
+                res_data = json.loads(resp.read().decode('utf-8'))
+                text = res_data['choices'][0]['message']['content']
+                return True, text
+        except urllib.error.HTTPError as e:
+            err_msg = e.read().decode('utf-8', errors='ignore')
+            return False, f"Error de API Personalizada (HTTP {e.code}): {err_msg}"
+        except Exception as e:
+            return False, f"Error al conectar con API Personalizada: {str(e)}"
+
+    return False, f"Proveedor de IA desconocido: '{provider}'."
+
 class NaTexHandler(http.server.SimpleHTTPRequestHandler):
     def is_external_guest(self):
         host = self.headers.get('Host', '').split(':')[0].lower()
@@ -304,32 +482,83 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
         if path == '/api/project/load':
             qs = urllib.parse.parse_qs(parsed.query)
             proj = qs.get('name', [shared_project])[0]
+            req_file = qs.get('file', ['main.tex'])[0]
             if is_guest and proj != shared_project:
                 self.send_error(403, 'Acceso no autorizado al proyecto')
                 return
 
             proj_dir = os.path.join(PROJECTS_DIR, proj)
-            tex_file = os.path.join(proj_dir, 'main.tex')
-            
+            if '..' in req_file or req_file.startswith(('/', '\\')):
+                req_file = 'main.tex'
+
+            target_path = os.path.join(proj_dir, req_file)
             code = ''
             mtime = 0
-            if os.path.exists(tex_file):
-                mtime = os.path.getmtime(tex_file)
-                with open(tex_file, 'r', encoding='utf-8', errors='ignore') as f:
+            if os.path.exists(target_path) and os.path.isfile(target_path):
+                mtime = os.path.getmtime(target_path)
+                with open(target_path, 'r', encoding='utf-8', errors='ignore') as f:
                     code = f.read()
-            
+            elif req_file == 'main.tex':
+                os.makedirs(proj_dir, exist_ok=True)
+                with open(target_path, 'w', encoding='utf-8') as f:
+                    code = '\\documentclass{article}\n\\begin{document}\n¡Hola Mundo en LaTeX!\n\\end{document}'
+                    f.write(code)
+                mtime = os.path.getmtime(target_path)
+
             files = []
             if os.path.exists(proj_dir):
-                for f in os.listdir(proj_dir):
-                    if f != 'main.tex' and not f.endswith('.pdf'):
-                        files.append(f)
+                ignored_suffixes = ('.pdf', '.synctex.gz', '.synctex', '.aux', '.log', '.out', '.toc', '.fls', '.fdb_latexmk', '.bbl', '.blg', '.xdv')
+                def scan_dir(cur_dir, rel_prefix=""):
+                    items = []
+                    try:
+                        entries = sorted(os.listdir(cur_dir))
+                    except Exception:
+                        return items
+                    for entry in entries:
+                        if entry.startswith('.') or any(entry.lower().endswith(ext) for ext in ignored_suffixes):
+                            continue
+                        full_p = os.path.join(cur_dir, entry)
+                        rel_p = f"{rel_prefix}/{entry}" if rel_prefix else entry
+                        is_d = os.path.isdir(full_p)
+                        item = {
+                            'name': entry,
+                            'path': rel_p,
+                            'is_dir': is_d,
+                            'size': 0 if is_d else os.path.getsize(full_p)
+                        }
+                        if is_d:
+                            item['children'] = scan_dir(full_p, rel_p)
+                        items.append(item)
+                    return items
+                files = scan_dir(proj_dir)
 
-            has_pdf = os.path.exists(os.path.join(proj_dir, 'main.pdf'))
+            stem = os.path.splitext(req_file)[0]
+            specific_pdf = f"{stem}.pdf"
+            pdf_file_to_use = None
+            if req_file == 'main.tex':
+                if os.path.exists(os.path.join(proj_dir, 'main.pdf')):
+                    pdf_file_to_use = 'main.pdf'
+            else:
+                if os.path.exists(os.path.join(proj_dir, specific_pdf)):
+                    pdf_file_to_use = specific_pdf
+                elif not (r'\documentclass' in code) and os.path.exists(os.path.join(proj_dir, 'main.pdf')):
+                    pdf_file_to_use = 'main.pdf'
+
+            has_pdf = pdf_file_to_use is not None
             if not is_guest:
                 cfg = load_config()
                 cfg['last_project'] = proj
                 save_config(cfg)
-            self.send_json({'success': True, 'name': proj, 'code': code, 'mtime': mtime, 'files': files, 'has_pdf': has_pdf})
+            self.send_json({
+                'success': True,
+                'name': proj,
+                'file': req_file,
+                'code': code,
+                'mtime': mtime,
+                'files': files,
+                'has_pdf': has_pdf,
+                'pdf_file': pdf_file_to_use
+            })
             return
 
         if path == '/api/project/check_update':
@@ -341,7 +570,10 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
 
             since = float(qs.get('since', [0])[0])
             proj_dir = os.path.join(PROJECTS_DIR, proj)
-            tex_file = os.path.join(proj_dir, 'main.tex')
+            req_file = qs.get('file', ['main.tex'])[0]
+            if '..' in req_file or req_file.startswith(('/', '\\')):
+                req_file = 'main.tex'
+            tex_file = os.path.join(proj_dir, req_file)
             
             if os.path.exists(tex_file):
                 current_mtime = os.path.getmtime(tex_file)
@@ -360,7 +592,18 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_error(403, 'Acceso denegado al PDF')
                 return
 
-            pdf_path = os.path.join(PROJECTS_DIR, proj, 'main.pdf')
+            req_pdf = qs.get('file', ['main.pdf'])[0]
+            if '..' in req_pdf or req_pdf.startswith(('/', '\\')):
+                req_pdf = 'main.pdf'
+            if not req_pdf.lower().endswith('.pdf'):
+                req_pdf = os.path.splitext(req_pdf)[0] + '.pdf'
+
+            pdf_path = os.path.join(PROJECTS_DIR, proj, req_pdf)
+            if not os.path.exists(pdf_path):
+                main_pdf = os.path.join(PROJECTS_DIR, proj, 'main.pdf')
+                if os.path.exists(main_pdf):
+                    pdf_path = main_pdf
+
             if os.path.exists(pdf_path):
                 self.serve_file(pdf_path, 'application/pdf')
             else:
@@ -501,7 +744,11 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_error(403, 'Acceso no autorizado')
                 return
             line = int(qs.get('line', [1])[0])
-            synctex_path = os.path.join(PROJECTS_DIR, proj, 'main.synctex.gz')
+            req_file = qs.get('file', ['main.tex'])[0]
+            stem = os.path.splitext(os.path.basename(req_file))[0]
+            synctex_path = os.path.join(PROJECTS_DIR, proj, f'{stem}.synctex.gz')
+            if not os.path.exists(synctex_path):
+                synctex_path = os.path.join(PROJECTS_DIR, proj, 'main.synctex.gz')
             line_to_page, _ = parse_synctex_file(synctex_path)
             target_page = 1
             if line in line_to_page:
@@ -524,7 +771,11 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             page = int(qs.get('page', [1])[0])
             x = float(qs.get('x', [0])[0])
             y = float(qs.get('y', [0])[0])
-            synctex_path = os.path.join(PROJECTS_DIR, proj, 'main.synctex.gz')
+            req_file = qs.get('file', ['main.tex'])[0]
+            stem = os.path.splitext(os.path.basename(req_file))[0]
+            synctex_path = os.path.join(PROJECTS_DIR, proj, f'{stem}.synctex.gz')
+            if not os.path.exists(synctex_path):
+                synctex_path = os.path.join(PROJECTS_DIR, proj, 'main.synctex.gz')
             _, nodes = parse_synctex_file(synctex_path)
             x_sp = x * 65536
             y_sp = y * 65536
@@ -541,6 +792,17 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             with heartbeat_lock:
                 last_heartbeat_time = time.time()
             self.send_json({'status': 'alive'})
+            return
+
+        if path == '/api/system/open_browser':
+            qs = urllib.parse.parse_qs(parsed.query)
+            target = qs.get('path', [''])[0]
+            if target.startswith('/'):
+                full_url = f'http://localhost:{PORT}{target}'
+            else:
+                full_url = target
+            threading.Thread(target=lambda: webbrowser.open(full_url), daemon=True).start()
+            self.send_json({'success': True})
             return
 
         if path == '/api/tunnel/restart':
@@ -566,13 +828,17 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             if is_guest and proj != shared_project:
                 self.send_error(403, 'Acceso no autorizado')
                 return
-            tex_file = os.path.join(PROJECTS_DIR, proj, 'main.tex')
+            req_file = qs.get('file', ['main.tex'])[0]
+            if '..' in req_file or req_file.startswith(('/', '\\')):
+                req_file = 'main.tex'
+            tex_file = os.path.join(PROJECTS_DIR, proj, req_file)
             if not os.path.exists(tex_file):
                 self.send_error(404, 'Archivo no encontrado')
                 return
             self.send_response(200)
             self.send_header('Content-Type', 'text/x-tex; charset=utf-8')
-            self.send_header('Content-Disposition', f'attachment; filename="{urllib.parse.quote(proj)}.tex"')
+            download_name = req_file if req_file != 'main.tex' else f"{proj}.tex"
+            self.send_header('Content-Disposition', f'attachment; filename="{urllib.parse.quote(download_name)}"')
             self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
             with open(tex_file, 'rb') as f:
                 content = f.read()
@@ -587,7 +853,14 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 return
             cfg = load_config()
             self.send_json({
+                'ai_provider': cfg.get('ai_provider', 'gemini'),
                 'gemini_api_key': cfg.get('gemini_api_key', ''),
+                'openai_api_key': cfg.get('openai_api_key', ''),
+                'claude_api_key': cfg.get('claude_api_key', ''),
+                'nvidia_api_key': cfg.get('nvidia_api_key', ''),
+                'ai_model': cfg.get('ai_model', ''),
+                'custom_api_url': cfg.get('custom_api_url', 'http://localhost:11434/v1/chat/completions'),
+                'custom_api_key': cfg.get('custom_api_key', ''),
                 'theme': cfg.get('theme', 'dark'),
                 'custom_color': cfg.get('custom_color', '#FF6B35'),
                 'language': cfg.get('language', 'es'),
@@ -620,14 +893,97 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             if is_guest and proj != shared_project:
                 self.send_json({'success': False, 'error': 'Acceso no autorizado a este proyecto'})
                 return
+            req_file = data.get('file', 'main.tex')
+            if '..' in req_file or req_file.startswith(('/', '\\')):
+                req_file = 'main.tex'
             code = data.get('code', '')
             proj_dir = os.path.join(PROJECTS_DIR, proj)
             os.makedirs(proj_dir, exist_ok=True)
-            tex_file = os.path.join(proj_dir, 'main.tex')
-            with open(tex_file, 'w', encoding='utf-8') as f:
+            target_path = os.path.join(proj_dir, req_file)
+            parent_d = os.path.dirname(target_path)
+            if parent_d:
+                os.makedirs(parent_d, exist_ok=True)
+            with open(target_path, 'w', encoding='utf-8') as f:
                 f.write(code)
-            mtime = os.path.getmtime(tex_file)
-            self.send_json({'success': True, 'mtime': mtime})
+            mtime = os.path.getmtime(target_path)
+            self.send_json({'success': True, 'mtime': mtime, 'file': req_file})
+            return
+
+        if path == '/api/project/file/create':
+            data = self.read_json()
+            proj = data.get('name', shared_project)
+            if is_guest and proj != shared_project:
+                self.send_json({'success': False, 'error': 'Acceso no autorizado'})
+                return
+            filename = data.get('filename', '').strip()
+            is_folder = data.get('is_folder', False)
+            if not filename or '..' in filename or filename.startswith(('/', '\\')):
+                self.send_json({'success': False, 'error': 'Nombre de archivo inválido'})
+                return
+            proj_dir = os.path.join(PROJECTS_DIR, proj)
+            target_path = os.path.join(proj_dir, filename)
+            try:
+                if is_folder:
+                    os.makedirs(target_path, exist_ok=True)
+                else:
+                    parent_d = os.path.dirname(target_path)
+                    if parent_d:
+                        os.makedirs(parent_d, exist_ok=True)
+                    if not os.path.exists(target_path):
+                        with open(target_path, 'w', encoding='utf-8') as f:
+                            if filename.endswith('.tex'):
+                                f.write(f"% {filename}\n")
+                            else:
+                                f.write("")
+                self.send_json({'success': True, 'filename': filename})
+            except Exception as e:
+                self.send_json({'success': False, 'error': str(e)})
+            return
+
+        if path == '/api/project/file/delete':
+            data = self.read_json()
+            proj = data.get('name', shared_project)
+            if is_guest and proj != shared_project:
+                self.send_json({'success': False, 'error': 'Acceso no autorizado'})
+                return
+            filename = data.get('filename', '').strip()
+            if not filename or filename == 'main.tex' or '..' in filename or filename.startswith(('/', '\\')):
+                self.send_json({'success': False, 'error': 'No se puede eliminar el archivo principal'})
+                return
+            proj_dir = os.path.join(PROJECTS_DIR, proj)
+            target_path = os.path.join(proj_dir, filename)
+            try:
+                if os.path.isfile(target_path):
+                    os.remove(target_path)
+                elif os.path.isdir(target_path):
+                    shutil.rmtree(target_path)
+                self.send_json({'success': True})
+            except Exception as e:
+                self.send_json({'success': False, 'error': str(e)})
+            return
+
+        if path == '/api/project/file/rename':
+            data = self.read_json()
+            proj = data.get('name', shared_project)
+            if is_guest and proj != shared_project:
+                self.send_json({'success': False, 'error': 'Acceso no autorizado'})
+                return
+            old_name = data.get('old_filename', '').strip()
+            new_name = data.get('new_filename', '').strip()
+            if not old_name or not new_name or old_name == 'main.tex' or '..' in old_name or '..' in new_name:
+                self.send_json({'success': False, 'error': 'No se puede renombrar este archivo'})
+                return
+            old_dir = os.path.dirname(old_name)
+            if old_dir and '/' not in new_name and '\\' not in new_name:
+                new_name = f"{old_dir}/{new_name}"
+            proj_dir = os.path.join(PROJECTS_DIR, proj)
+            old_path = os.path.join(proj_dir, old_name)
+            new_path = os.path.join(proj_dir, new_name)
+            try:
+                os.rename(old_path, new_path)
+                self.send_json({'success': True, 'new_filename': new_name})
+            except Exception as e:
+                self.send_json({'success': False, 'error': str(e)})
             return
 
         if path == '/api/project/compile':
@@ -637,21 +993,43 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json({'success': False, 'error': 'Acceso no autorizado a este proyecto'})
                 return
             code = data.get('code', '')
+            req_file = data.get('file', 'main.tex')
+            if not req_file or '..' in req_file or req_file.startswith(('/', '\\')):
+                req_file = 'main.tex'
             proj_dir = os.path.join(PROJECTS_DIR, proj)
             os.makedirs(proj_dir, exist_ok=True)
             
-            with open(os.path.join(proj_dir, 'main.tex'), 'w', encoding='utf-8') as f:
+            with open(os.path.join(proj_dir, req_file), 'w', encoding='utf-8') as f:
                 f.write(code)
 
             if not os.path.exists(COMPILER_EXE):
                 self.send_json({'success': False, 'log': 'Error: tectonic.exe no encontrado en compiler/'})
                 return
 
-            cmd = [COMPILER_EXE, '--synctex', 'main.tex']
+            compile_target = req_file
+            has_docclass = r'\documentclass' in code
+            if not has_docclass and req_file != 'main.tex':
+                main_tex_path = os.path.join(proj_dir, 'main.tex')
+                if os.path.exists(main_tex_path):
+                    try:
+                        with open(main_tex_path, 'r', encoding='utf-8', errors='ignore') as mf:
+                            if r'\documentclass' in mf.read():
+                                compile_target = 'main.tex'
+                    except:
+                        pass
+
+            cmd = [COMPILER_EXE, '--synctex', compile_target]
             try:
                 proc = subprocess.run(cmd, cwd=proj_dir, capture_output=True, text=True, timeout=90, creationflags=NO_WINDOW_FLAG)
                 if proc.returncode == 0:
-                    self.send_json({'success': True, 'pdf_url': f'/api/pdf?name={urllib.parse.quote(proj)}'})
+                    stem = os.path.splitext(compile_target)[0]
+                    pdf_filename = f"{stem}.pdf"
+                    self.send_json({
+                        'success': True,
+                        'pdf_url': f'/api/pdf?name={urllib.parse.quote(proj)}&file={urllib.parse.quote(pdf_filename)}',
+                        'compiled_file': compile_target,
+                        'pdf_file': pdf_filename
+                    })
                 else:
                     err_log = (proc.stderr or '') + '\n' + (proc.stdout or '')
                     self.send_json({'success': False, 'log': err_log})
@@ -679,7 +1057,6 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 if not os.path.exists(tpl_dir):
                     tpl_dir = os.path.join(USER_TEMPLATES_DIR, template_id)
                 if os.path.exists(tpl_dir):
-                    import shutil
                     for item in os.listdir(tpl_dir):
                         s = os.path.join(tpl_dir, item)
                         d = os.path.join(proj_dir, item)
@@ -699,25 +1076,45 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             data = self.read_json()
             proj = data.get('project', 'Mi_Primer_Documento')
             template_id = data.get('template')
+            target_file = data.get('target_file', 'main.tex')
+            if not target_file or '..' in target_file or target_file.startswith(('/', '\\')):
+                target_file = 'main.tex'
+
             tpl_dir = os.path.join(TEMPLATES_DIR, template_id)
             if not os.path.exists(tpl_dir):
                 tpl_dir = os.path.join(USER_TEMPLATES_DIR, template_id)
             
             if os.path.exists(tpl_dir):
-                import shutil
                 proj_dir = os.path.join(PROJECTS_DIR, proj)
-                for item in os.listdir(tpl_dir):
-                    s = os.path.join(tpl_dir, item)
-                    d = os.path.join(proj_dir, item)
-                    if os.path.isfile(s):
-                        shutil.copy2(s, d)
+                os.makedirs(proj_dir, exist_ok=True)
                 
-                tex_file = os.path.join(proj_dir, 'main.tex')
+                tpl_main_tex = os.path.join(tpl_dir, 'main.tex')
                 code = ''
-                if os.path.exists(tex_file):
-                    with open(tex_file, 'r', encoding='utf-8', errors='ignore') as f:
+                if os.path.exists(tpl_main_tex):
+                    with open(tpl_main_tex, 'r', encoding='utf-8', errors='ignore') as f:
                         code = f.read()
-                self.send_json({'success': True, 'code': code})
+
+                if target_file == 'main.tex':
+                    for item in os.listdir(tpl_dir):
+                        s = os.path.join(tpl_dir, item)
+                        d = os.path.join(proj_dir, item)
+                        if os.path.isfile(s):
+                            shutil.copy2(s, d)
+                else:
+                    # Copiar solo recursos auxiliares (imágenes, fuentes, .sty, .cls), NUNCA sobreescribir main.tex ni otros archivos .tex
+                    for item in os.listdir(tpl_dir):
+                        if item == 'main.tex':
+                            continue
+                        s = os.path.join(tpl_dir, item)
+                        d = os.path.join(proj_dir, item)
+                        if os.path.isfile(s) and not os.path.exists(d):
+                            shutil.copy2(s, d)
+                    
+                    target_path = os.path.join(proj_dir, target_file)
+                    with open(target_path, 'w', encoding='utf-8') as f:
+                        f.write(code)
+
+                self.send_json({'success': True, 'code': code, 'file': target_file})
             else:
                 self.send_json({'success': False, 'error': 'Plantilla no encontrada'})
             return
@@ -735,7 +1132,6 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             dest = os.path.join(USER_TEMPLATES_DIR, name)
             os.makedirs(dest, exist_ok=True)
             proj_dir = os.path.join(PROJECTS_DIR, proj)
-            import shutil
             for item in os.listdir(proj_dir):
                 if item != 'main.pdf':
                     s = os.path.join(proj_dir, item)
@@ -831,46 +1227,19 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json({'success': False, 'error': str(e)})
             return
 
-        if path == '/api/gemini':
+        if path == '/api/gemini' or path == '/api/ai/chat':
             data = self.read_json()
             prompt = data.get('prompt', '')
-            cfg = load_config()
-            api_key = cfg.get('gemini_api_key', '')
-
-            if not api_key:
-                self.send_json({'success': False, 'error': 'No hay API Key configurada. Puedes agregar tu clave gratuita en el botón Ajustes.'})
+            if not prompt:
+                self.send_json({'success': False, 'error': 'El mensaje está vacío.'})
                 return
-
-            url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}'
-            payload = {
-                'contents': [
-                    {
-                        'parts': [
-                            {'text': 'Eres el asistente inteligente de NaTex, un editor de LaTeX ágil y moderno. Responde siempre de manera concisa, clara, con ejemplos en LaTeX listos para copiar, y con tono amigable pero profesional.\n\nUsuario: ' + prompt}
-                        ]
-                    }
-                ]
-            }
-
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
-
-            try:
-                req = urllib.request.Request(
-                    url, 
-                    data=json.dumps(payload).encode('utf-8'),
-                    headers={'Content-Type': 'application/json'}
-                )
-                with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
-                    res_data = json.loads(resp.read().decode('utf-8'))
-                    text = res_data['candidates'][0]['content']['parts'][0]['text']
-                    self.send_json({'success': True, 'response': text})
-            except urllib.error.HTTPError as e:
-                err_msg = e.read().decode('utf-8', errors='ignore')
-                self.send_json({'success': False, 'error': f'Error de Google Gemini (HTTP {e.code}): {err_msg}'})
-            except Exception as e:
-                self.send_json({'success': False, 'error': str(e)})
+            cfg = load_config()
+            system_prompt = data.get('system_prompt', None)
+            ok, response_text = call_ai_service(prompt, system_prompt=system_prompt, cfg=cfg)
+            if ok:
+                self.send_json({'success': True, 'response': response_text, 'provider': cfg.get('ai_provider', 'gemini')})
+            else:
+                self.send_json({'success': False, 'error': response_text})
             return
 
         if path == '/api/voice/process':
@@ -1010,8 +1379,10 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
                 return
             data = self.read_json()
             cfg = load_config()
-            if 'gemini_api_key' in data:
-                cfg['gemini_api_key'] = data['gemini_api_key']
+            ai_keys = ['ai_provider', 'gemini_api_key', 'openai_api_key', 'claude_api_key', 'nvidia_api_key', 'ai_model', 'custom_api_url', 'custom_api_key']
+            for k in ai_keys:
+                if k in data:
+                    cfg[k] = data[k]
             if 'theme' in data:
                 cfg['theme'] = data['theme']
             if 'custom_color' in data:
@@ -1076,18 +1447,46 @@ if __name__ == '__main__':
     except:
         pass
 
-    # Iniciar watchdog de cierre automático de pestaña
-    threading.Thread(target=watchdog_thread, daemon=True).start()
-
     print('==================================================')
-    print('             [NaTex] Servidor Local               ')
+    print('       [NaTex Desktop Studio] Modo Nativo         ')
     print('==================================================')
-    print(f'Abriendo http://localhost:{PORT}')
-    threading.Timer(0.8, lambda: webbrowser.open(f'http://localhost:{PORT}')).start()
+    print(f'Iniciando servidor local en puerto {PORT}...')
 
     socketserver.ThreadingTCPServer.allow_reuse_address = True
     try:
-        with socketserver.ThreadingTCPServer(("", PORT), NaTexHandler) as httpd:
-            httpd.serve_forever()
+        httpd = socketserver.ThreadingTCPServer(("", PORT), NaTexHandler)
     except Exception as e:
-        print(f"[NaTex] Error en servidor: {e}")
+        print(f"[NaTex] Error al vincular puerto {PORT}: {e}")
+        sys.exit(1)
+
+    server_thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    server_thread.start()
+
+    url = f'http://localhost:{PORT}'
+    print(f'[NaTex] Servidor activo en {url}')
+
+    # Iniciar en ventana nativa independiente de escritorio
+    opened_native = False
+    try:
+        import webview
+        print('[NaTex] Abriendo ventana nativa de escritorio independiente...')
+        window = webview.create_window(
+            title='NaTex Studio',
+            url=url,
+            width=1420,
+            height=900,
+            min_size=(1050, 680),
+            background_color='#0E1015'
+        )
+        webview.start(gui='edgechromium', debug=False)
+        opened_native = True
+    except Exception as e:
+        print(f'[NaTex] Modo ventana nativa no disponible ({e}), usando navegador...')
+        webbrowser.open(url)
+        # Iniciar watchdog de cierre automático de pestaña sólo si está en navegador
+        threading.Thread(target=watchdog_thread, daemon=True).start()
+        while True:
+            time.sleep(1)
+
+    cleanup_tunnel()
+    os._exit(0)

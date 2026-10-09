@@ -1,355 +1,4 @@
-// NaTex Studio Controller
-let currentProject = 'Mi_Primer_Documento';
-let isCompiling = false;
-let autoSaveTimer = null;
-let lastMtime = 0;
-let isUserTyping = false;
-let typingTimeout = null;
-
-let currentLanguage = localStorage.getItem('natex_language') || 'es';
-let currentTheme = localStorage.getItem('natex_theme') || 'dark';
-let currentCustomColor = localStorage.getItem('natex_custom_color') || '#FF6B35';
-
-// Elementos DOM
-const codeEditor = document.getElementById('codeEditor');
-const lineNumbers = document.getElementById('lineNumbers');
-const editorStatus = document.getElementById('editorStatus');
-const projectSelect = document.getElementById('projectSelect');
-const btnCompile = document.getElementById('btnCompile');
-const pdfViewer = document.getElementById('pdfViewer');
-const emptyState = document.getElementById('emptyState');
-const errorBox = document.getElementById('errorBox');
-const errorLog = document.getElementById('errorLog');
-
-// Modales & Vistas
-const aiDrawer = document.getElementById('aiDrawer');
-const modalTemplates = document.getElementById('modalTemplates');
-const modalUpload = document.getElementById('modalUpload');
-const modalSettings = document.getElementById('modalSettings');
-const modalShare = document.getElementById('modalShare');
-const modalMathKeyboard = document.getElementById('modalMathKeyboard');
-const homeDashboard = document.getElementById('homeDashboard');
-const navTabHome = document.getElementById('navTabHome');
-const navTabEditor = document.getElementById('navTabEditor');
-const btnMathKeyboard = document.getElementById('btnMathKeyboard');
-const btnSyncToPdf = document.getElementById('btnSyncToPdf');
-
-// Diccionario i18n Multilenguaje
-const i18n = {
-    es: {
-        nav_home: "Inicio",
-        nav_editor: "Editor",
-        menu_home: "Inicio",
-        menu_editor: "Editor",
-        menu_file: "Archivo",
-        menu_insert: "Insertar",
-        menu_collab: "Colaborar",
-        menu_settings: "Ajustes",
-        item_new_project: "Nuevo Proyecto...",
-        item_compile: "Compilar Documento",
-        item_templates: "Cargar Plantilla...",
-        item_save_template: "Guardar como Plantilla...",
-        item_download_pdf: "Descargar PDF",
-        item_download_tex: "Descargar Código LaTeX (.tex)",
-        btn_restart_tunnel: "Reiniciar Link",
-        chk_auto_updates: "Comprobar actualizaciones automáticamente al iniciar",
-        btn_banner_update: "Ver / Actualizar",
-        item_math: "Teclado Matemático Científico...",
-        item_voice: "Dictáfono de Clase (Celular / Móvil)...",
-        item_gallery: "Galería de Imágenes / Recursos",
-        item_sync_pdf: "Sincronizar con PDF (SyncTeX)",
-        item_share: "Compartir con un amigo (Túnel)...",
-        item_ai: "Asistente IA Gemini",
-        item_theme_dark: "Modo Oscuro",
-        item_theme_light: "Modo Claro",
-        item_config: "Personalización y Clave IA...",
-        btn_math_short: "Fórmulas",
-        btn_voice_short: "Clase",
-        voice_modal_title: "Dictáfono de Clases (Celular)",
-        lbl_project: "Proyecto:",
-        btn_new: "Nuevo",
-        btn_compile: "Compilar",
-        btn_math: "Teclado Matemático",
-        btn_share: "Compartir",
-        btn_templates: "Plantillas",
-        btn_save_template: "Guardar Plantilla",
-        btn_gallery: "Galería",
-        btn_settings: "Ajustes",
-        btn_ai: "IA",
-        sidebar_gallery_title: "Galería de Imágenes",
-        sidebar_drop_text: "Arrastra imágenes aquí o",
-        btn_upload: "Subir",
-        gallery_hint: "💡 Haz clic en 📋 para copiar el código LaTeX de la figura",
-        gallery_empty: "No hay imágenes aún",
-        btn_sync_pdf: "Ir a PDF",
-        dashboard_subtitle: "Continúa redactando tu documento o crea uno nuevo en segundos.",
-        btn_new_project: "Nuevo Proyecto",
-        hero_continue_tag: "Continuar trabajando",
-        stat_lines: "líneas",
-        stat_files: "archivos",
-        btn_hero_continue: "Continuar Editando",
-        title_quick_actions: "Comenzar",
-        quick_blank_title: "Proyecto en Blanco",
-        quick_blank_desc: "Crea un documento LaTeX limpio desde cero sin plantillas previas.",
-        quick_template_title: "Desde una Plantilla",
-        quick_template_desc: "Comienza con formatos listos de Tesis, Informes, Posters o Papers.",
-        quick_voice_title: "Dictáfono de Clases",
-        quick_voice_desc: "Graba tu clase desde el celular y genera el apunte LaTeX estructurado.",
-        quick_gallery_title: "Galería de Imágenes",
-        quick_gallery_desc: "Gestiona figuras, gráficos y recursos de tus documentos.",
-        title_recent_projects: "Tus Proyectos",
-        math_title: "Constructor de Ecuaciones",
-        math_subtitle: "Arma tu fórmula con vista previa visual en vivo",
-        math_clear: "Limpiar",
-        math_mode_label: "Formato:",
-        math_formula_code_label: "Código LaTeX de la Ecuación:",
-        math_keyboard_hint: "Haz clic en los símbolos arriba o escribe con el teclado",
-        math_preview_title: "Vista Previa Visual en Vivo:",
-        btn_copy_code: "Copiar Código",
-        btn_insert_doc: "Insertar en Documento",
-        btn_cancel: "Cancelar",
-        math_tab_algebra: "Básico & Álgebra",
-        math_tab_calculus: "Cálculo & Análisis",
-        math_tab_quantum: "Física & Cuántica",
-        math_tab_matrices: "Matrices & Vectores",
-        math_tab_greek: "Griegas & Símbolos",
-        btn_copy: "Copiar",
-        btn_insert_cursor: "Insertar en Cursor",
-        share_modal_title: "Compartir NaTex con un Amigo",
-        share_loading: "Generando enlace seguro para tu amigo...",
-        share_ready_label: "Enlace para tu amigo:",
-        templates_title: "Seleccionar Plantilla",
-        templates_desc: "Elige una plantilla para cargar en tu proyecto actual:",
-        templates_builtin: "Plantillas Integradas",
-        templates_custom: "Mis Plantillas Personalizadas",
-        templates_empty: "Aún no has guardado plantillas propias.",
-        resources_title: "Recursos e Imágenes",
-        resources_drop: "Arrastra imágenes aquí (.png, .jpg) o",
-        btn_browse: "Explorar Archivo",
-        resources_files: "Archivos en este proyecto:",
-        settings_title: "Ajustes y Personalización",
-        theme_label: "🎨 Tema de la Aplicación:",
-        theme_dark: "Oscuro",
-        theme_light: "Claro",
-        theme_custom: "Personalizado",
-        accent_color_label: "Color de acento:",
-        language_label: "🌐 Idioma / Language:",
-        gemini_key_label: "Clave de API de Google Gemini (Gratis):",
-        gemini_key_desc: "Cada persona puede colocar su propia clave gratuita de Google AI Studio.",
-        btn_save_settings: "Guardar Ajustes",
-        status_auto_saved: "Guardado automático ✓",
-        status_saving: "Guardando...",
-        status_compiling: "Compilando documento...",
-        status_compiled_ok: "Compilación exitosa ✓",
-        status_compile_err: "Error en compilación",
-        status_math_inserted: "Fórmula insertada ✓",
-        status_copied: "¡Copiado al portapapeles! ✓",
-        dashboard_greeting: "¡Hola, bienvenido a NaTex! 🦊",
-        preview_title: "📄 Vista Previa (PDF)",
-        btn_download: "Descargar",
-        btn_download_title: "Descargar archivo PDF",
-        btn_refresh_pdf: "Recargar PDF",
-        empty_welcome: "Bienvenido a NaTex",
-        empty_compile_hint: "Presiona <strong>Compilar (Ctrl + S)</strong> para generar el PDF.",
-        compilation_error_title: "⚠️ Error de Compilación",
-        btn_ask_gemini_error: "💡 Preguntar a Gemini por qué falló",
-        editor_placeholder: "Escribe tu código LaTeX aquí...",
-        title_new_project: "Crear nuevo proyecto",
-        title_quick_math: "Abrir Teclado Matemático (Alt + M)",
-        title_quick_voice: "Grabar clase desde celular con enlace o QR",
-        title_compile: "Compilar documento (Ctrl + S)",
-        title_ai: "Abrir IA Gemini",
-        math_search_placeholder: "🔍 Buscar símbolo o fórmula...",
-        ai_title: "IA NaTex",
-        ai_pill_table: "📊 Crear Tabla",
-        ai_pill_formulas: "📐 Fórmulas",
-        ai_pill_abstract: "✍️ Redactar Abstract",
-        ai_welcome_msg: "¡Hola! Soy tu asistente en NaTex. Pregúntame sobre fórmulas, redacción o errores de compilación de LaTeX.",
-        ai_placeholder: "Pregunta algo o pide código LaTeX...",
-        btn_ai_send: "Enviar",
-        share_explanation: "💡 <strong>Cómo funciona:</strong> Tu amigo solo hace clic en este link o escanea el QR desde cualquier navegador (PC o celular). Podrá ver el documento, escribir con guardado automático y compilar el PDF junto a ti en tiempo real mientras tengas NaTex abierto.",
-        voice_desc: "Graba la clase desde tu teléfono móvil. NaTex transcribirá el audio con <strong>Google Gemini</strong> y creará un nuevo apunte LaTeX estructurado listo para compilar a PDF con:",
-        voice_sections_title: "📋 Secciones generadas:",
-        voice_sec_1: "1. Lo que dice textual la grabación",
-        voice_sec_1_sub: "(con fórmulas $...$)",
-        voice_sec_2: "2. Temas principales",
-        voice_sec_2_sub: "(lista \\begin{itemize})",
-        voice_sec_3: "3. Un resumen bien pulido",
-        voice_sec_3_sub: "(teoremas y fórmulas en bloque)",
-        voice_scan_instruction: "📱 Escanea con la cámara de tu celular",
-        voice_direct_link_label: "Enlace directo al dictáfono:",
-        btn_toggle_tunnel: "Activar Túnel Cloudflare (Fuera de Wi-Fi)",
-        btn_open_dictaphone_here: "Abrir Dictáfono Aquí",
-        gemini_key_placeholder: "Pega tu API Key de Gemini aquí (ej. AIzaSy...)",
-        gallery_modal_title: "Galería de Imágenes",
-        gallery_modal_subtitle: "Gestiona figuras, copia el código LaTeX para tu documento o renombra tus imágenes.",
-        gallery_filter_label: "Proyecto:",
-        gallery_filter_all: "Todos los proyectos",
-        btn_upload_image: "Subir Imagen",
-        voice_conn_loading: "Cargando conexión...",
-        title_go_home: "Ir al Inicio",
-        updates_title: "Actualizaciones de NaTex:",
-        updates_current_ver: "Versión instalada:",
-        btn_check_updates: "Comprobar Actualizaciones"
-    },
-    en: {
-        nav_home: "Home",
-        nav_editor: "Editor",
-        menu_home: "Home",
-        menu_editor: "Editor",
-        menu_file: "File",
-        menu_insert: "Insert",
-        menu_collab: "Collab",
-        menu_settings: "Settings",
-        item_new_project: "New Project...",
-        item_compile: "Compile Document",
-        item_templates: "Load Template...",
-        item_save_template: "Save as Template...",
-        item_download_pdf: "Download PDF",
-        item_download_tex: "Download LaTeX Code (.tex)",
-        btn_restart_tunnel: "Restart Link",
-        chk_auto_updates: "Check for updates automatically on startup",
-        btn_banner_update: "View / Update",
-        item_math: "Scientific Math Keyboard...",
-        item_voice: "Class Voice Dictaphone (Mobile)...",
-        item_gallery: "Image Gallery / Assets",
-        item_sync_pdf: "Sync with PDF (SyncTeX)",
-        item_share: "Share with a friend (Tunnel)...",
-        item_ai: "Gemini AI Assistant",
-        item_theme_dark: "Dark Mode",
-        item_theme_light: "Light Mode",
-        item_config: "Customization & AI Key...",
-        btn_math_short: "Formulas",
-        btn_voice_short: "Class",
-        voice_modal_title: "Class Voice Dictaphone (Mobile)",
-        lbl_project: "Project:",
-        btn_new: "New",
-        btn_compile: "Compile",
-        btn_math: "Math Keyboard",
-        btn_share: "Share",
-        btn_templates: "Templates",
-        btn_save_template: "Save Template",
-        btn_gallery: "Gallery",
-        btn_settings: "Settings",
-        btn_ai: "AI",
-        sidebar_gallery_title: "Image Gallery",
-        sidebar_drop_text: "Drop images here or",
-        btn_upload: "Upload",
-        gallery_hint: "💡 Click 📋 to copy the figure LaTeX code",
-        gallery_empty: "No images yet",
-        btn_sync_pdf: "Go to PDF",
-        dashboard_subtitle: "Resume writing your document or create a new one in seconds.",
-        btn_new_project: "New Project",
-        hero_continue_tag: "Continue Working",
-        stat_lines: "lines",
-        stat_files: "files",
-        btn_hero_continue: "Continue Editing",
-        title_quick_actions: "Get Started",
-        quick_blank_title: "Blank Project",
-        quick_blank_desc: "Create a fresh LaTeX document from scratch without templates.",
-        quick_template_title: "From a Template",
-        quick_template_desc: "Start with pre-built Thesis, Reports, Posters, or Papers.",
-        quick_voice_title: "Class Voice Dictaphone",
-        quick_voice_desc: "Record your lecture from your phone and auto-generate structured LaTeX notes.",
-        quick_gallery_title: "Image Gallery",
-        quick_gallery_desc: "Manage figures, charts, and document assets.",
-        title_recent_projects: "Your Projects",
-        math_title: "Equation Builder",
-        math_subtitle: "Build your formula with live visual preview",
-        math_clear: "Clear",
-        math_mode_label: "Format:",
-        math_formula_code_label: "LaTeX Equation Code:",
-        math_keyboard_hint: "Click symbols above or type with your keyboard",
-        math_preview_title: "Live Visual Preview:",
-        btn_copy_code: "Copy Code",
-        btn_insert_doc: "Insert into Document",
-        btn_cancel: "Cancel",
-        math_tab_algebra: "Basics & Algebra",
-        math_tab_calculus: "Calculus & Analysis",
-        math_tab_quantum: "Physics & Quantum",
-        math_tab_matrices: "Matrices & Vectors",
-        math_tab_greek: "Greek & Symbols",
-        btn_copy: "Copy",
-        btn_insert_cursor: "Insert at Cursor",
-        share_modal_title: "Share NaTex with a Friend",
-        share_loading: "Generating secure link for your friend...",
-        share_ready_label: "Link for your friend:",
-        templates_title: "Select Template",
-        templates_desc: "Choose a template to load into your current project:",
-        templates_builtin: "Built-in Templates",
-        templates_custom: "My Custom Templates",
-        templates_empty: "You haven't saved any custom templates yet.",
-        resources_title: "Assets & Images",
-        resources_drop: "Drop images here (.png, .jpg) or",
-        btn_browse: "Browse File",
-        resources_files: "Files in this project:",
-        settings_title: "Settings & Customization",
-        theme_label: "🎨 App Theme:",
-        theme_dark: "Dark",
-        theme_light: "Light",
-        theme_custom: "Custom",
-        accent_color_label: "Accent Color:",
-        language_label: "🌐 Language / Idioma:",
-        gemini_key_label: "Google Gemini API Key (Free):",
-        gemini_key_desc: "You can get your free key from Google AI Studio.",
-        btn_save_settings: "Save Settings",
-        status_auto_saved: "Auto-saved ✓",
-        status_saving: "Saving...",
-        status_compiling: "Compiling document...",
-        status_compiled_ok: "Compilation successful ✓",
-        status_compile_err: "Compilation error",
-        status_math_inserted: "Formula inserted ✓",
-        status_copied: "Copied to clipboard! ✓",
-        dashboard_greeting: "Hello, welcome to NaTex! 🦊",
-        preview_title: "📄 Live Preview (PDF)",
-        btn_download: "Download",
-        btn_download_title: "Download PDF file",
-        btn_refresh_pdf: "Reload PDF",
-        empty_welcome: "Welcome to NaTex",
-        empty_compile_hint: "Press <strong>Compile (Ctrl + S)</strong> to generate the PDF.",
-        compilation_error_title: "⚠️ Compilation Error",
-        btn_ask_gemini_error: "💡 Ask Gemini why it failed",
-        editor_placeholder: "Write your LaTeX code here...",
-        title_new_project: "Create new project",
-        title_quick_math: "Open Math Keyboard (Alt + M)",
-        title_quick_voice: "Record class from mobile phone with link or QR",
-        title_compile: "Compile document (Ctrl + S)",
-        title_ai: "Open Gemini AI",
-        math_search_placeholder: "🔍 Search symbol or formula...",
-        ai_title: "NaTex AI",
-        ai_pill_table: "📊 Create Table",
-        ai_pill_formulas: "📐 Formulas",
-        ai_pill_abstract: "✍️ Write Abstract",
-        ai_welcome_msg: "Hello! I'm your NaTex assistant. Ask me about formulas, writing, or LaTeX compilation errors.",
-        ai_placeholder: "Ask a question or request LaTeX code...",
-        btn_ai_send: "Send",
-        share_explanation: "💡 <strong>How it works:</strong> Your friend simply clicks this link or scans the QR from any browser (PC or mobile). They can view the document, write with auto-save, and compile the PDF together in real time while NaTex is open.",
-        voice_desc: "Record lectures from your mobile phone. NaTex will transcribe audio with <strong>Google Gemini</strong> and generate structured LaTeX notes ready to compile to PDF with:",
-        voice_sections_title: "📋 Generated sections:",
-        voice_sec_1: "1. Verbatim transcript",
-        voice_sec_1_sub: "(with $...$ formulas)",
-        voice_sec_2: "2. Key topics",
-        voice_sec_2_sub: "(\\begin{itemize} list)",
-        voice_sec_3: "3. Polished executive summary",
-        voice_sec_3_sub: "(block formulas and theorems)",
-        voice_scan_instruction: "📱 Scan with your phone camera",
-        voice_direct_link_label: "Direct dictaphone link:",
-        btn_toggle_tunnel: "Enable Cloudflare Tunnel (Outside Wi-Fi)",
-        btn_open_dictaphone_here: "Open Dictaphone Here",
-        gemini_key_placeholder: "Paste your Gemini API Key here (e.g. AIzaSy...)",
-        gallery_modal_title: "Image Gallery",
-        gallery_modal_subtitle: "Manage figures, copy LaTeX code for your document, or rename your images.",
-        gallery_filter_label: "Project:",
-        gallery_filter_all: "All projects",
-        btn_upload_image: "Upload Image",
-        voice_conn_loading: "Loading connection...",
-        title_go_home: "Go to Home",
-        updates_title: "NaTex Updates:",
-        updates_current_ver: "Installed version:",
-        btn_check_updates: "Check for Updates"
-    }
-};
-
+// NaTex Studio - Orquestador Principal
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
     initSettings();
@@ -361,9 +10,18 @@ document.addEventListener('DOMContentLoaded', () => {
     initSyncTeX();
     initVoiceDictate();
     initUpdateChecker();
+    initProjectSidebar();
+    initTableBuilder();
     loadProjects();
     setupEventListeners();
     setupCollaborationPolling();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('p')) {
+        setView('editor');
+    } else {
+        setView('home');
+    }
 });
 
 function initHeartbeat() {
@@ -385,40 +43,6 @@ function initHeartbeat() {
 }
 
 // Configuración, Temas e Idiomas
-function applyLanguage(lang) {
-    currentLanguage = lang;
-    localStorage.setItem('natex_language', lang);
-    const dict = i18n[lang] || i18n.es;
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (dict[key]) {
-            if (dict[key].includes('<') && dict[key].includes('>')) {
-                el.innerHTML = dict[key];
-            } else {
-                el.innerText = dict[key];
-            }
-        }
-    });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
-        if (dict[key]) {
-            el.placeholder = dict[key];
-        }
-    });
-    document.querySelectorAll('[data-i18n-title]').forEach(el => {
-        const key = el.getAttribute('data-i18n-title');
-        if (dict[key]) {
-            el.title = dict[key];
-        }
-    });
-    const btnEs = document.getElementById('btnLangEs');
-    const btnEn = document.getElementById('btnLangEn');
-    if (btnEs && btnEn) {
-        btnEs.classList.toggle('active', lang === 'es');
-        btnEn.classList.toggle('active', lang === 'en');
-    }
-}
-
 function applyTheme(theme, customColor) {
     currentTheme = theme;
     if (customColor) currentCustomColor = customColor;
@@ -443,6 +67,88 @@ function applyTheme(theme, customColor) {
     });
 }
 
+function updateAiBadge(provider) {
+    const badge = document.getElementById('aiActiveProviderBadge');
+    if (!badge) return;
+    const names = {
+        'gemini': 'Gemini',
+        'openai': 'OpenAI',
+        'claude': 'Claude',
+        'nvidia': 'NVIDIA NIM',
+        'custom': 'Local / Custom'
+    };
+    badge.textContent = names[provider] || provider || 'IA';
+}
+
+function updateAiProviderPanels(provider) {
+    const panels = {
+        'gemini': document.getElementById('aiPanelGemini'),
+        'openai': document.getElementById('aiPanelOpenai'),
+        'claude': document.getElementById('aiPanelClaude'),
+        'nvidia': document.getElementById('aiPanelNvidia'),
+        'custom': document.getElementById('aiPanelCustom')
+    };
+    for (const [key, panel] of Object.entries(panels)) {
+        if (panel) {
+            if (key === provider) {
+                panel.classList.remove('hidden');
+            } else {
+                panel.classList.add('hidden');
+            }
+        }
+    }
+}
+
+async function loadConfigFromServer() {
+    try {
+        const res = await fetch('/api/config');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const prov = data.ai_provider || 'gemini';
+        const sel = document.getElementById('selectAiProvider');
+        if (sel) sel.value = prov;
+        updateAiProviderPanels(prov);
+        updateAiBadge(prov);
+
+        if (document.getElementById('inputApiKey') && data.gemini_api_key) {
+            document.getElementById('inputApiKey').value = data.gemini_api_key;
+        }
+        if (document.getElementById('inputApiKeyOpenai') && data.openai_api_key) {
+            document.getElementById('inputApiKeyOpenai').value = data.openai_api_key;
+        }
+        if (document.getElementById('inputApiKeyClaude') && data.claude_api_key) {
+            document.getElementById('inputApiKeyClaude').value = data.claude_api_key;
+        }
+        if (document.getElementById('inputApiKeyNvidia') && data.nvidia_api_key) {
+            document.getElementById('inputApiKeyNvidia').value = data.nvidia_api_key;
+        }
+        if (document.getElementById('inputCustomUrl') && data.custom_api_url) {
+            document.getElementById('inputCustomUrl').value = data.custom_api_url;
+        }
+        if (document.getElementById('inputCustomApiKey') && data.custom_api_key) {
+            document.getElementById('inputCustomApiKey').value = data.custom_api_key;
+        }
+        if (document.getElementById('inputAiModel') && data.ai_model) {
+            document.getElementById('inputAiModel').value = data.ai_model;
+        }
+
+        if (data.theme && !localStorage.getItem('natex_theme')) {
+            applyTheme(data.theme, data.custom_color);
+        }
+        if (data.language && !localStorage.getItem('natex_language')) {
+            applyLanguage(data.language);
+        }
+        const chkAuto = document.getElementById('chkAutoCheckUpdates');
+        if (chkAuto && data.auto_check_updates !== undefined && localStorage.getItem('natex_auto_update') === null) {
+            chkAuto.checked = !!data.auto_check_updates;
+            localStorage.setItem('natex_auto_update', data.auto_check_updates ? 'true' : 'false');
+        }
+    } catch (e) {
+        console.warn("No se pudo cargar la configuración:", e);
+    }
+}
+
 function initSettings() {
     applyTheme(currentTheme, currentCustomColor);
     applyLanguage(currentLanguage);
@@ -453,40 +159,15 @@ function initSettings() {
         chkAuto.checked = (savedAuto === 'true');
     }
 
-    const savedKey = localStorage.getItem('natex_gemini_key');
-    if (savedKey) {
-        document.getElementById('inputApiKey').value = savedKey;
-        fetch('/api/config', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                gemini_api_key: savedKey,
-                theme: currentTheme,
-                custom_color: currentCustomColor,
-                language: currentLanguage,
-                auto_check_updates: savedAuto !== null ? savedAuto === 'true' : true
-            })
-        });
-    } else {
-        fetch('/api/config')
-            .then(r => r.json())
-            .then(data => {
-                if (data.gemini_api_key) {
-                    document.getElementById('inputApiKey').value = data.gemini_api_key;
-                    localStorage.setItem('natex_gemini_key', data.gemini_api_key);
-                }
-                if (data.theme && !localStorage.getItem('natex_theme')) {
-                    applyTheme(data.theme, data.custom_color);
-                }
-                if (data.language && !localStorage.getItem('natex_language')) {
-                    applyLanguage(data.language);
-                }
-                if (data.auto_check_updates !== undefined && savedAuto === null) {
-                    if (chkAuto) chkAuto.checked = !!data.auto_check_updates;
-                    localStorage.setItem('natex_auto_update', data.auto_check_updates ? 'true' : 'false');
-                }
-            });
+    const selAi = document.getElementById('selectAiProvider');
+    if (selAi) {
+        selAi.onchange = () => {
+            updateAiProviderPanels(selAi.value);
+            updateAiBadge(selAi.value);
+        };
     }
+
+    loadConfigFromServer();
 }
 
 function initUpdateChecker() {
@@ -616,121 +297,6 @@ function showUpdateBanner(data) {
     }
 }
 
-function insertAtCursor(text, cursorOffset = 0) {
-    const start = codeEditor.selectionStart;
-    const end = codeEditor.selectionEnd;
-    const val = codeEditor.value;
-    codeEditor.value = val.substring(0, start) + text + val.substring(end);
-    const newPos = start + (cursorOffset !== 0 ? cursorOffset : text.length);
-    codeEditor.selectionStart = codeEditor.selectionEnd = newPos;
-    codeEditor.focus();
-    updateLineNumbers();
-    triggerAutoSave();
-
-    const dict = i18n[currentLanguage] || i18n.es;
-    editorStatus.innerText = dict.status_math_inserted;
-    editorStatus.style.color = '#10B981';
-    setTimeout(() => {
-        editorStatus.innerText = dict.status_auto_saved;
-    }, 2000);
-}
-
-// Editor, Números de Línea y Guardado Automático
-function initEditor() {
-    codeEditor.addEventListener('input', () => {
-        updateLineNumbers();
-        triggerAutoSave();
-    });
-
-    codeEditor.addEventListener('scroll', () => {
-        lineNumbers.scrollTop = codeEditor.scrollTop;
-    });
-
-    codeEditor.addEventListener('keydown', (e) => {
-        isUserTyping = true;
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => { isUserTyping = false; }, 2000);
-
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const start = codeEditor.selectionStart;
-            const end = codeEditor.selectionEnd;
-            codeEditor.value = codeEditor.value.substring(0, start) + '    ' + codeEditor.value.substring(end);
-            codeEditor.selectionStart = codeEditor.selectionEnd = start + 4;
-            updateLineNumbers();
-            triggerAutoSave();
-        }
-
-        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'Enter')) {
-            e.preventDefault();
-            compileDocument();
-        }
-    });
-}
-
-function triggerAutoSave() {
-    editorStatus.innerText = 'Guardando...';
-    editorStatus.style.color = '#FF6B35';
-    clearTimeout(autoSaveTimer);
-
-    autoSaveTimer = setTimeout(async () => {
-        try {
-            const res = await fetch('/api/project/save', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    name: currentProject,
-                    code: codeEditor.value
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                lastMtime = data.mtime;
-                editorStatus.innerText = 'Guardado automático ✓';
-                editorStatus.style.color = '#10B981';
-            }
-        } catch (err) {
-            editorStatus.innerText = 'Error al auto-guardar';
-            editorStatus.style.color = '#EF4444';
-        }
-    }, 1200);
-}
-
-// Sincronización en tiempo real para colaboradores
-function setupCollaborationPolling() {
-    setInterval(async () => {
-        if (isUserTyping || isCompiling) return;
-        try {
-            const res = await fetch(`/api/project/check_update?name=${encodeURIComponent(currentProject)}&since=${lastMtime}`);
-            const data = await res.json();
-            if (data.updated) {
-                lastMtime = data.mtime;
-                const start = codeEditor.selectionStart;
-                const end = codeEditor.selectionEnd;
-                codeEditor.value = data.code;
-                codeEditor.selectionStart = start;
-                codeEditor.selectionEnd = end;
-                updateLineNumbers();
-                editorStatus.innerText = 'Sincronizado con colaborador ✓';
-                editorStatus.style.color = '#10B981';
-                setTimeout(() => {
-                    editorStatus.innerText = 'Guardado automático ✓';
-                }, 3000);
-            }
-        } catch (e) {}
-    }, 2500);
-}
-
-function updateLineNumbers() {
-    const lines = codeEditor.value.split('\n').length;
-    let numbers = '';
-    for (let i = 1; i <= lines; i++) {
-        numbers += i + '\n';
-    }
-    lineNumbers.innerText = numbers;
-}
-
-// Proyectos
 async function loadProjects() {
     const urlParams = new URLSearchParams(window.location.search);
     const lockedProject = urlParams.get('p');
@@ -788,19 +354,33 @@ async function loadProject(projName) {
     await loadProjectCode(projName);
 }
 
-async function loadProjectCode(projName) {
+async function loadProjectCode(projName, targetFile = 'main.tex') {
     editorStatus.innerText = 'Cargando...';
-    const res = await fetch(`/api/project/load?name=${encodeURIComponent(projName)}`);
+    currentOpenFile = targetFile;
+    updateEditorFileTitle();
+    const res = await fetch(`/api/project/load?name=${encodeURIComponent(projName)}&file=${encodeURIComponent(targetFile)}`);
     const data = await res.json();
     codeEditor.value = data.code || '';
     lastMtime = data.mtime || 0;
     updateLineNumbers();
+    codeEditor.focus();
     editorStatus.innerText = 'Guardado automático ✓';
     editorStatus.style.color = '#10B981';
-    updateFilesList(data.files || []);
-    updateGallerySidebar(data.files || []);
 
-    if (data.has_pdf) {
+    projectFilesList = data.files || [];
+    renderFileTree(projectFilesList);
+    parseDocumentOutline(data.code || '');
+
+    try {
+        updateFilesList(data.files || []);
+        updateGallerySidebar(data.files || []);
+    } catch (e) {
+        console.warn('Gallery update warning:', e);
+    }
+
+    if (data.has_pdf && data.pdf_file) {
+        showPdf(`/api/pdf?name=${encodeURIComponent(projName)}&file=${encodeURIComponent(data.pdf_file)}&t=${Date.now()}`);
+    } else if (data.has_pdf) {
         showPdf(`/api/pdf?name=${encodeURIComponent(projName)}&t=${Date.now()}`);
     } else {
         emptyState.classList.remove('hidden');
@@ -823,6 +403,7 @@ async function compileDocument() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 name: currentProject,
+                file: currentOpenFile,
                 code: codeEditor.value
             })
         });
@@ -831,6 +412,7 @@ async function compileDocument() {
         if (data.success) {
             errorBox.classList.add('hidden');
             showPdf(`${data.pdf_url}&t=${Date.now()}`);
+            parseDocumentOutline(codeEditor.value);
             editorStatus.innerText = 'Compilado con éxito ✓';
             editorStatus.style.color = '#10B981';
             setTimeout(() => {
@@ -937,17 +519,25 @@ async function openTemplatesModal() {
     const builtInDiv = document.getElementById('builtInTemplates');
     const userDiv = document.getElementById('userTemplates');
 
-    const icons = {
-        'poster_2col': '📢',
-        'informe_tecnico': '📑',
-        'paper_cientifico': '🔬'
+    const templateMeta = {
+        'poster_congreso_a0': { icon: '📢', name: 'Póster Congreso A0 (3 Col)' },
+        'poster_academico_a3': { icon: '🖼️', name: 'Póster Académico A3 (2 Col)' },
+        'presentacion_slides': { icon: '📽️', name: 'Presentación Slides (PPT 16:9)' },
+        'informe_laboratorio': { icon: '📑', name: 'Informe Técnico y Lab' },
+        'paper_1col': { icon: '📄', name: 'Paper Científico (1 Columna)' },
+        'paper_2col': { icon: '🔬', name: 'Paper Científico IEEE (2 Col)' },
+        'tesis_universitaria': { icon: '🎓', name: 'Tesis y Memoria de Título' },
+        'curriculum_vitae': { icon: '💼', name: 'Curriculum Vitae (CV)' },
+        'guia_examen': { icon: '📝', name: 'Examen y Guía Ejercicios' },
+        'cheat_sheet_formulas': { icon: '⚡', name: 'Cheat Sheet / Fórmulas (3 Col)' }
     };
 
     builtInDiv.innerHTML = '';
     data.built_in.forEach(t => {
+        const meta = templateMeta[t.id] || { icon: '📄', name: t.name };
         const card = document.createElement('div');
         card.className = 'template-card';
-        card.innerHTML = `<div class="template-icon">${icons[t.id] || '📄'}</div><div class="template-title">${t.name}</div>`;
+        card.innerHTML = `<div class="template-icon">${meta.icon}</div><div class="template-title">${meta.name}</div>`;
         card.onclick = () => applyTemplate(t.id);
         builtInDiv.appendChild(card);
     });
@@ -969,468 +559,35 @@ async function openTemplatesModal() {
 }
 
 async function applyTemplate(templateId) {
-    if (!confirm('¿Deseas reemplazar el código actual con esta plantilla? Asegúrate de haber guardado tus cambios.')) return;
+    const isEn = currentLanguage === 'en';
+    const targetFile = currentOpenFile || 'main.tex';
+    const confirmMsg = isEn 
+        ? `Replace the content of '${targetFile}' with this template? Make sure you have saved any changes.`
+        : `¿Deseas reemplazar el código de '${targetFile}' con esta plantilla? Asegúrate de haber guardado tus cambios.`;
+    if (!confirm(confirmMsg)) return;
+
     const res = await fetch('/api/templates/apply', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({project: currentProject, template: templateId})
+        body: JSON.stringify({
+            project: currentProject, 
+            template: templateId,
+            target_file: targetFile
+        })
     });
     const data = await res.json();
     if (data.success) {
         codeEditor.value = data.code;
+        currentOpenFile = data.file || targetFile;
+        updateEditorFileTitle();
         updateLineNumbers();
         modalTemplates.classList.add('hidden');
+        setView('editor');
         compileDocument();
     }
 }
 
 // Galería de Imágenes y Recursos del Proyecto
-function isImageFile(filename) {
-    const ext = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2).toLowerCase();
-    return ['png', 'jpg', 'jpeg', 'webp', 'svg', 'bmp', 'gif'].includes(ext);
-}
-
-function getFigureSnippet(filename) {
-    const labelClean = filename.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
-    return `\\begin{figure}[h]\n  \\centering\n  \\includegraphics[width=0.7\\linewidth]{${filename}}\n  \\caption{Descripción de la figura}\n  \\label{fig:${labelClean}}\n\\end{figure}`;
-}
-
-function fallbackCopyText(text) {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    try {
-        document.execCommand('copy');
-    } catch (err) {}
-    document.body.removeChild(ta);
-}
-
-window.copyFigureCode = async function(filename, btnElement) {
-    const snippet = getFigureSnippet(filename);
-    try {
-        await navigator.clipboard.writeText(snippet);
-    } catch (e) {
-        fallbackCopyText(snippet);
-    }
-
-    if (btnElement) {
-        const origHtml = btnElement.innerHTML;
-        btnElement.innerHTML = '✓';
-        btnElement.style.color = '#10B981';
-        setTimeout(() => {
-            btnElement.innerHTML = origHtml;
-            btnElement.style.color = '';
-        }, 1800);
-    }
-
-    const card = btnElement ? btnElement.closest('.gallery-card') : null;
-    if (card) {
-        const hint = card.querySelector('.gallery-insert-hint');
-        if (hint) {
-            const origHint = hint.innerHTML;
-            hint.innerHTML = '✓ ¡Código copiado!';
-            hint.style.color = '#10B981';
-            setTimeout(() => {
-                hint.innerHTML = origHint;
-                hint.style.color = '';
-            }, 1800);
-        }
-    }
-
-    editorStatus.innerText = `¡Código LaTeX de "${filename}" copiado! 📋`;
-    editorStatus.style.color = '#10B981';
-    setTimeout(() => {
-        editorStatus.innerText = 'Guardado automático ✓';
-    }, 2800);
-};
-
-window.copyFilename = async function(filename, nameElement) {
-    try {
-        await navigator.clipboard.writeText(filename);
-    } catch (e) {
-        fallbackCopyText(filename);
-    }
-    editorStatus.innerText = `Nombre "${filename}" copiado al portapapeles 📋`;
-    editorStatus.style.color = '#10B981';
-    if (nameElement) {
-        const origColor = nameElement.style.color;
-        nameElement.style.color = '#10B981';
-        setTimeout(() => { nameElement.style.color = origColor; }, 1500);
-    }
-    setTimeout(() => {
-        editorStatus.innerText = 'Guardado automático ✓';
-    }, 2500);
-};
-
-function updateGallerySidebar(files) {
-    const galleryList = document.getElementById('sidebarGalleryList');
-    if (!galleryList) return;
-    
-    const imageFiles = (files || []).filter(isImageFile);
-    galleryList.innerHTML = '';
-    
-    if (imageFiles.length === 0) {
-        galleryList.innerHTML = `
-            <div style="text-align:center; padding: 25px 12px; color: var(--text-muted); font-size: 11.5px; line-height: 1.5;">
-                <div style="font-size: 26px; margin-bottom: 6px;">📷</div>
-                <strong style="color:#aaa;">Sin imágenes</strong>
-                <p style="margin-top: 4px; font-size: 11px;">Sube o arrastra una imagen para verla aquí y usarla en tu documento.</p>
-            </div>
-        `;
-        return;
-    }
-
-    imageFiles.forEach(f => {
-        const card = document.createElement('div');
-        card.className = 'gallery-card';
-        card.title = `Clic para copiar código LaTeX de "${f}"`;
-        
-        const assetUrl = `/api/project/asset?name=${encodeURIComponent(currentProject)}&file=${encodeURIComponent(f)}&t=${Date.now()}`;
-        
-        card.innerHTML = `
-            <div class="gallery-thumb-wrapper">
-                <img src="${assetUrl}" alt="${escapeHtml(f)}" class="gallery-thumb" loading="lazy">
-                <div class="gallery-insert-hint">📋 Copiar código LaTeX</div>
-            </div>
-            <div class="gallery-meta">
-                <span class="gallery-name" title="Clic para copiar solo el nombre de archivo">${escapeHtml(f)}</span>
-                <div class="gallery-actions">
-                    <button class="gallery-btn-action gallery-btn-copy" title="Copiar código LaTeX (\begin{figure}...)" aria-label="Copiar código">📋</button>
-                    <button class="gallery-btn-action gallery-btn-rename" title="Renombrar imagen" aria-label="Renombrar imagen">✏️</button>
-                    <button class="gallery-btn-action gallery-btn-delete" title="Eliminar imagen" aria-label="Eliminar imagen">🗑️</button>
-                </div>
-            </div>
-        `;
-
-        // Al hacer clic en la miniatura: copiar código LaTeX al portapapeles
-        const thumb = card.querySelector('.gallery-thumb-wrapper');
-        const btnCopy = card.querySelector('.gallery-btn-copy');
-        const btnRename = card.querySelector('.gallery-btn-rename');
-        const btnDel = card.querySelector('.gallery-btn-delete');
-
-        if (thumb) {
-            thumb.addEventListener('click', () => {
-                copyFigureCode(f, btnCopy);
-            });
-        }
-
-        if (btnCopy) {
-            btnCopy.addEventListener('click', (e) => {
-                e.stopPropagation();
-                copyFigureCode(f, btnCopy);
-            });
-        }
-
-        if (btnRename) {
-            btnRename.addEventListener('click', (e) => {
-                e.stopPropagation();
-                renameGalleryAsset(f, currentProject);
-            });
-        }
-
-        if (btnDel) {
-            btnDel.addEventListener('click', (e) => {
-                e.stopPropagation();
-                deleteGalleryAsset(f, currentProject);
-            });
-        }
-
-        // Clic en el nombre para copiar solo el nombre
-        const nameSpan = card.querySelector('.gallery-name');
-        if (nameSpan) {
-            nameSpan.addEventListener('click', (e) => {
-                e.stopPropagation();
-                copyFilename(f, nameSpan);
-            });
-        }
-
-
-        galleryList.appendChild(card);
-    });
-}
-
-function updateFilesList(files) {
-    const list = document.getElementById('projectFilesList');
-    if (!list) return;
-    list.innerHTML = '';
-    if (!files || files.length === 0) {
-        list.innerHTML = '<li class="text-muted">No hay imágenes en este proyecto.</li>';
-        return;
-    }
-    files.forEach(f => {
-        const li = document.createElement('li');
-        li.innerHTML = `<span>${escapeHtml(f)}</span><button class="btn-insert-code" onclick="copyFigureCode('${escapeHtml(f)}', this)">📋 Copiar</button>`;
-        list.appendChild(li);
-    });
-}
-
-function ensureGraphicxPackage() {
-    if (!codeEditor.value.includes('{graphicx}')) {
-        if (codeEditor.value.includes('\\begin{document}')) {
-            codeEditor.value = codeEditor.value.replace('\\begin{document}', '\\usepackage{graphicx}\n\\begin{document}');
-        } else if (codeEditor.value.includes('\\documentclass')) {
-            codeEditor.value = codeEditor.value.replace(/(\\documentclass[^\n]*\n)/, '$1\\usepackage{graphicx}\n');
-        } else {
-            codeEditor.value = '\\usepackage{graphicx}\n' + codeEditor.value;
-        }
-    }
-}
-
-window.insertImageCode = function(filename) {
-    // 1. Asegurar que \usepackage{graphicx} esté en el preámbulo
-    ensureGraphicxPackage();
-
-    // 2. Limpiar nombre para la etiqueta label
-    const labelClean = filename.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
-
-    // 3. Generar el entorno figure completo
-    const snippet = `\n\\begin{figure}[h]\n  \\centering\n  \\includegraphics[width=0.7\\linewidth]{${filename}}\n  \\caption{Descripción de la figura}\n  \\label{fig:${labelClean}}\n\\end{figure}\n`;
-    
-    // 4. Insertar en la posición actual del cursor o al final
-    const start = codeEditor.selectionStart !== undefined ? codeEditor.selectionStart : codeEditor.value.length;
-    const end = codeEditor.selectionEnd !== undefined ? codeEditor.selectionEnd : start;
-
-    codeEditor.value = codeEditor.value.substring(0, start) + snippet + codeEditor.value.substring(end);
-    codeEditor.selectionStart = codeEditor.selectionEnd = start + snippet.length;
-    codeEditor.focus();
-
-    updateLineNumbers();
-    triggerAutoSave();
-
-    // Feedback visual amigable
-    editorStatus.innerText = `¡Figura "${filename}" insertada! ✓`;
-    editorStatus.style.color = '#FF6B35';
-    setTimeout(() => {
-        editorStatus.innerText = 'Guardado automático ✓';
-        editorStatus.style.color = '#10B981';
-    }, 2500);
-
-    const mUpload = document.getElementById('modalUpload');
-    if (mUpload) mUpload.classList.add('hidden');
-};
-
-async function renameGalleryAsset(filename, project) {
-    const proj = project || currentProject;
-    const isEn = currentLanguage === 'en';
-    const newName = prompt(isEn ? `New name for image "${filename}":` : `Nuevo nombre para la imagen "${filename}":`, filename);
-    if (!newName || newName.trim() === '' || newName.trim() === filename) return;
-
-    try {
-        const res = await fetch('/api/project/asset/rename', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                project: proj,
-                old_name: filename,
-                new_name: newName.trim()
-            })
-        });
-        const data = await res.json();
-        if (data.success) {
-            editorStatus.innerText = isEn ? `Renamed to "${data.new_name}" ✓` : `¡Renombrado a "${data.new_name}"! ✓`;
-            editorStatus.style.color = '#10B981';
-            if (proj === currentProject) {
-                loadProjectCode(currentProject);
-            }
-            refreshGalleryModal();
-        } else {
-            alert((isEn ? 'Could not rename image: ' : 'No se pudo renombrar la imagen: ') + (data.error || ''));
-        }
-    } catch (err) {
-        alert('Error: ' + err.message);
-    }
-}
-
-async function deleteGalleryAsset(filename, project) {
-    const proj = project || currentProject;
-    const isEn = currentLanguage === 'en';
-    if (!confirm(isEn ? `Delete image "${filename}" from project?` : `¿Eliminar la imagen "${filename}" del proyecto?`)) return;
-    try {
-        const res = await fetch('/api/project/asset/delete', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                project: proj,
-                filename: filename
-            })
-        });
-        const data = await res.json();
-        if (data.success) {
-            editorStatus.innerText = `Imagen "${filename}" eliminada ✓`;
-            editorStatus.style.color = '#10B981';
-            if (proj === currentProject) {
-                loadProjectCode(currentProject);
-            }
-            refreshGalleryModal();
-        } else {
-            alert((isEn ? 'Could not delete image: ' : 'No se pudo eliminar la imagen: ') + (data.error || ''));
-        }
-    } catch (err) {
-        alert('Error: ' + err.message);
-    }
-}
-
-let allGalleryImages = [];
-
-async function openGalleryModal() {
-    const modal = document.getElementById('modalUpload');
-    if (!modal) return;
-    modal.classList.remove('hidden');
-    await refreshGalleryModal();
-}
-
-async function refreshGalleryModal() {
-    const grid = document.getElementById('galleryModalGrid');
-    const filterSelect = document.getElementById('galleryProjectFilter');
-    if (!grid) return;
-
-    const isEn = currentLanguage === 'en';
-    grid.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);"><span style="font-size:24px;">⏳</span><p>${isEn ? 'Loading gallery...' : 'Cargando galería...'}</p></div>`;
-
-    try {
-        const res = await fetch('/api/gallery/all');
-        const data = await res.json();
-        allGalleryImages = data.images || [];
-
-        if (filterSelect) {
-            const currentSelected = filterSelect.value || 'all';
-            const projects = Array.from(new Set(allGalleryImages.map(img => img.project)));
-            filterSelect.innerHTML = `<option value="all">${isEn ? 'All projects' : 'Todos los proyectos'}</option>`;
-            projects.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p;
-                opt.textContent = p.replace(/_/g, ' ');
-                if (p === currentSelected) opt.selected = true;
-                filterSelect.appendChild(opt);
-            });
-            filterSelect.onchange = () => renderGalleryGrid(filterSelect.value);
-        }
-
-        renderGalleryGrid(filterSelect ? filterSelect.value : 'all');
-    } catch (e) {
-        console.error('Error cargando galería:', e);
-        grid.innerHTML = `<p style="color:#ef4444; padding:20px; text-align:center;">${isEn ? 'Error loading images.' : 'Error al cargar las imágenes.'}</p>`;
-    }
-}
-
-function renderGalleryGrid(filterProject) {
-    const grid = document.getElementById('galleryModalGrid');
-    if (!grid) return;
-
-    const isEn = currentLanguage === 'en';
-    const filtered = (filterProject && filterProject !== 'all')
-        ? allGalleryImages.filter(img => img.project === filterProject)
-        : allGalleryImages;
-
-    if (filtered.length === 0) {
-        grid.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align:center; padding: 40px 10px; color: var(--text-muted);">
-                <div style="font-size: 38px; margin-bottom: 8px;">🖼️</div>
-                <strong style="color:var(--text-main); font-size:14px;">${isEn ? 'No images uploaded yet' : 'No hay imágenes subidas aún'}</strong>
-                <p style="margin-top: 6px; font-size: 12.5px;">${isEn ? 'Drag and drop or upload an image above to use it in your documents.' : 'Arrastra o sube una imagen arriba para verla aquí y usarla en tus documentos.'}</p>
-            </div>
-        `;
-        return;
-    }
-
-    grid.innerHTML = '';
-    filtered.forEach(img => {
-        const card = document.createElement('div');
-        card.className = 'gallery-modal-card';
-
-        const sizeKb = Math.round(img.size / 1024);
-        const baseName = img.filename.replace(/\.[^/.]+$/, "");
-        const latexSnippet = `\\begin{figure}[htbp]\n    \\centering\n    \\includegraphics[width=0.7\\textwidth]{${img.filename}}\n    \\caption{${img.filename.replace(/_/g, ' ')}}\n    \\label{fig:${baseName}}\n\\end{figure}`;
-
-        card.innerHTML = `
-            <div class="gallery-modal-thumb-box" title="${isEn ? 'Click to copy LaTeX code' : 'Clic para copiar código LaTeX'}">
-                <img src="${img.url}&t=${Date.now()}" alt="${escapeHtml(img.filename)}" loading="lazy">
-            </div>
-            <div class="gallery-modal-meta">
-                <span class="gallery-modal-filename" title="${escapeHtml(img.filename)}">${escapeHtml(img.filename)}</span>
-                <span class="gallery-modal-project-tag">📁 ${escapeHtml(img.project.replace(/_/g, ' '))} · ${sizeKb} KB</span>
-            </div>
-            <div class="gallery-modal-btn-row">
-                <button class="gallery-modal-btn-action btn-copy-latex" title="${isEn ? 'Copy LaTeX block' : 'Copiar bloque LaTeX completo'}">
-                    📋 ${isEn ? 'LaTeX' : 'Copiar'}
-                </button>
-                <button class="gallery-modal-btn-action btn-rename-img" title="${isEn ? 'Rename file' : 'Renombrar archivo'}">
-                    ✏️
-                </button>
-                <button class="gallery-modal-btn-action gallery-modal-btn-danger btn-del-img" title="${isEn ? 'Delete file' : 'Eliminar archivo'}">
-                    🗑️
-                </button>
-            </div>
-        `;
-
-        const thumb = card.querySelector('.gallery-modal-thumb-box');
-        const btnCopy = card.querySelector('.btn-copy-latex');
-        const btnRename = card.querySelector('.btn-rename-img');
-        const btnDel = card.querySelector('.btn-del-img');
-
-        const doCopy = () => {
-            navigator.clipboard.writeText(latexSnippet).then(() => {
-                const originalText = btnCopy.innerHTML;
-                btnCopy.innerHTML = isEn ? '✓ Copied' : '✓ Copiado';
-                btnCopy.style.background = '#10B981';
-                btnCopy.style.color = '#fff';
-                setTimeout(() => {
-                    btnCopy.innerHTML = originalText;
-                    btnCopy.style.background = '';
-                    btnCopy.style.color = '';
-                }, 1800);
-            }).catch(() => {
-                prompt(isEn ? 'Copy LaTeX code:' : 'Copia el código LaTeX:', latexSnippet);
-            });
-        };
-
-        if (thumb) thumb.onclick = doCopy;
-        if (btnCopy) btnCopy.onclick = doCopy;
-        if (btnRename) btnRename.onclick = () => renameGalleryAsset(img.filename, img.project);
-        if (btnDel) btnDel.onclick = () => deleteGalleryAsset(img.filename, img.project);
-
-        grid.appendChild(card);
-    });
-}
-
-function handleFileUpload(file) {
-    if (!file) return;
-    editorStatus.innerText = `Subiendo "${file.name}"...`;
-    editorStatus.style.color = '#FF6B35';
-
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-        const b64 = e.target.result;
-        try {
-            const res = await fetch('/api/project/upload_base64', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    project: currentProject,
-                    filename: file.name,
-                    data: b64
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                editorStatus.innerText = `¡${file.name} subido con éxito! ✓`;
-                editorStatus.style.color = '#10B981';
-                loadProjectCode(currentProject);
-                refreshGalleryModal();
-            } else {
-                alert(`Error al subir: ${data.error || 'Desconocido'}`);
-            }
-        } catch (err) {
-            alert(`Error de conexión al subir imagen: ${err.message}`);
-        }
-    };
-    reader.readAsDataURL(file);
-}
-
-// Gemini AI Chat
 async function sendAIMessage(promptText) {
     const input = document.getElementById('aiInput');
     const msg = promptText || input.value.trim();
@@ -1451,9 +608,10 @@ async function sendAIMessage(promptText) {
         typingMsg.remove();
 
         if (data.success) {
+            if (data.provider) updateAiBadge(data.provider);
             appendChatMessage('ai', data.response);
         } else {
-            appendChatMessage('ai', `⚠️ ${data.error || 'No se pudo conectar con Gemini. Revisa tu clave en Ajustes.'}`);
+            appendChatMessage('ai', `⚠️ ${data.error || 'No se pudo conectar con el proveedor de IA. Revisa tu configuración en Ajustes.'}`);
         }
     } catch (err) {
         typingMsg.remove();
@@ -1471,13 +629,6 @@ function appendChatMessage(sender, text) {
     return msgDiv;
 }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.innerText = text;
-    return div.innerHTML;
-}
-
-// Event Listeners
 function setupEventListeners() {
     btnCompile.onclick = compileDocument;
     
@@ -1496,8 +647,8 @@ function setupEventListeners() {
     const gallerySidebar = document.getElementById('gallerySidebar');
     const btnToggleGallery = document.getElementById('btnToggleGallery');
     const btnCollapseGallery = document.getElementById('btnCollapseGallery');
-    const btnSidebarUpload = document.getElementById('btnSidebarUpload');
-    const sidebarFileInput = document.getElementById('sidebarFileInput');
+    const btnSidebarUpload = document.getElementById('btnGallerySidebarUpload') || document.getElementById('btnSidebarUpload');
+    const sidebarFileInput = document.getElementById('gallerySidebarFileInput') || document.getElementById('sidebarFileInput');
     const sidebarDropzone = document.getElementById('sidebarDropzone');
 
     if (btnToggleGallery && gallerySidebar) {
@@ -1569,7 +720,12 @@ function setupEventListeners() {
 
     // Settings
     const btnSettings = document.getElementById('btnSettings');
-    if (btnSettings) btnSettings.onclick = () => modalSettings.classList.remove('hidden');
+    if (btnSettings) {
+        btnSettings.onclick = () => {
+            loadConfigFromServer();
+            modalSettings.classList.remove('hidden');
+        };
+    }
     const btnCloseSettings = document.getElementById('btnCloseSettings');
     if (btnCloseSettings) btnCloseSettings.onclick = () => modalSettings.classList.add('hidden');
 
@@ -1592,21 +748,39 @@ function setupEventListeners() {
     if (btnLangEn) btnLangEn.onclick = () => applyLanguage('en');
 
     document.getElementById('btnSaveApiKey').onclick = async () => {
-        const key = document.getElementById('inputApiKey').value.trim();
+        const provider = document.getElementById('selectAiProvider') ? document.getElementById('selectAiProvider').value : 'gemini';
+        const geminiKey = document.getElementById('inputApiKey') ? document.getElementById('inputApiKey').value.trim() : '';
+        const openaiKey = document.getElementById('inputApiKeyOpenai') ? document.getElementById('inputApiKeyOpenai').value.trim() : '';
+        const claudeKey = document.getElementById('inputApiKeyClaude') ? document.getElementById('inputApiKeyClaude').value.trim() : '';
+        const nvidiaKey = document.getElementById('inputApiKeyNvidia') ? document.getElementById('inputApiKeyNvidia').value.trim() : '';
+        const customUrl = document.getElementById('inputCustomUrl') ? document.getElementById('inputCustomUrl').value.trim() : '';
+        const customKey = document.getElementById('inputCustomApiKey') ? document.getElementById('inputCustomApiKey').value.trim() : '';
+        const aiModel = document.getElementById('inputAiModel') ? document.getElementById('inputAiModel').value.trim() : '';
         const autoCheck = document.getElementById('chkAutoCheckUpdates') ? document.getElementById('chkAutoCheckUpdates').checked : true;
-        localStorage.setItem('natex_gemini_key', key);
+
+        localStorage.setItem('natex_ai_provider', provider);
+        localStorage.setItem('natex_gemini_key', geminiKey);
         localStorage.setItem('natex_auto_update', autoCheck ? 'true' : 'false');
+
         await fetch('/api/config', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                gemini_api_key: key,
+                ai_provider: provider,
+                gemini_api_key: geminiKey,
+                openai_api_key: openaiKey,
+                claude_api_key: claudeKey,
+                nvidia_api_key: nvidiaKey,
+                custom_api_url: customUrl,
+                custom_api_key: customKey,
+                ai_model: aiModel,
                 theme: currentTheme,
                 custom_color: currentCustomColor,
                 language: currentLanguage,
                 auto_check_updates: autoCheck
             })
         });
+        updateAiBadge(provider);
         alert(currentLanguage === 'en' ? 'Settings saved successfully!' : '¡Ajustes guardados correctamente!');
         modalSettings.classList.add('hidden');
     };
@@ -1639,11 +813,31 @@ function setupEventListeners() {
     };
 
     document.getElementById('btnDownloadPdf').onclick = () => {
-        window.open(`/api/pdf?name=${encodeURIComponent(currentProject)}`, '_blank');
+        const pdfFile = currentOpenFile && currentOpenFile.endsWith('.tex') ? currentOpenFile.slice(0, -4) + '.pdf' : 'main.pdf';
+        window.open(`/api/pdf?name=${encodeURIComponent(currentProject)}&file=${encodeURIComponent(pdfFile)}`, '_blank');
     };
+
+    const btnOpenPdfTab = document.getElementById('btnOpenPdfNewTab');
+    if (btnOpenPdfTab) {
+        btnOpenPdfTab.onclick = openPdfInNewTab;
+    }
 
     // Inicializar manejadores para todos los botones de cerrar (X)
     initModalCloseHandlers();
+}
+
+async function openPdfInNewTab() {
+    const pdfFile = currentOpenFile && currentOpenFile.endsWith('.tex') ? currentOpenFile.slice(0, -4) + '.pdf' : 'main.pdf';
+    const pdfUrl = `/api/pdf?name=${encodeURIComponent(currentProject)}&file=${encodeURIComponent(pdfFile)}&t=${Date.now()}`;
+    try {
+        const res = await fetch(`/api/system/open_browser?path=${encodeURIComponent(pdfUrl)}`);
+        const data = await res.json();
+        if (!data || !data.success) {
+            window.open(pdfUrl, '_blank');
+        }
+    } catch (e) {
+        window.open(pdfUrl, '_blank');
+    }
 }
 
 // Manejador Universal y Robusto para Cerrar Modales y Ventanas Flotantes
@@ -1666,6 +860,7 @@ function initModalCloseHandlers() {
         { btnId: 'btnCloseTemplates', modalId: 'modalTemplates' },
         { btnId: 'btnCloseUpload', modalId: 'modalUpload' },
         { btnId: 'btnCloseSettings', modalId: 'modalSettings' },
+        { btnId: 'btnCloseTableModal', modalId: 'modalTableBuilder' },
         { btnId: 'btnCloseAI', drawerId: 'aiDrawer' }
     ];
 
@@ -1746,10 +941,19 @@ function initDropdownMenus() {
     if (itemSaveTpl) itemSaveTpl.onclick = saveAsTemplatePrompt;
 
     const itemDownPdf = document.getElementById('menuItemDownloadPdf');
-    if (itemDownPdf) itemDownPdf.onclick = () => window.open(`/api/pdf?name=${encodeURIComponent(currentProject)}`, '_blank');
+    if (itemDownPdf) itemDownPdf.onclick = () => {
+        const pdfFile = currentOpenFile && currentOpenFile.endsWith('.tex') ? currentOpenFile.slice(0, -4) + '.pdf' : 'main.pdf';
+        window.open(`/api/pdf?name=${encodeURIComponent(currentProject)}&file=${encodeURIComponent(pdfFile)}`, '_blank');
+    };
+
+    const itemOpenPdfTab = document.getElementById('menuItemOpenPdfTab');
+    if (itemOpenPdfTab) itemOpenPdfTab.onclick = openPdfInNewTab;
 
     const itemDownTex = document.getElementById('menuItemDownloadTex');
-    if (itemDownTex) itemDownTex.onclick = () => window.open(`/api/project/download_tex?name=${encodeURIComponent(currentProject)}`, '_blank');
+    if (itemDownTex) itemDownTex.onclick = () => {
+        const texFile = currentOpenFile || 'main.tex';
+        window.open(`/api/project/download_tex?name=${encodeURIComponent(currentProject)}&file=${encodeURIComponent(texFile)}`, '_blank');
+    };
 
     const itemMath = document.getElementById('menuItemMathKeyboard');
     if (itemMath) itemMath.onclick = () => openMathModal();
@@ -1795,52 +999,6 @@ function initDropdownMenus() {
 
     const btnQuickVoice = document.getElementById('btnQuickVoice');
     if (btnQuickVoice) btnQuickVoice.onclick = () => openVoiceDictateModal();
-}
-
-function openMathModal() {
-    if (!modalMathKeyboard) return;
-    modalMathKeyboard.classList.remove('hidden');
-    renderQuickRibbonKaTeX();
-    if (typeof window.renderMathFormulaLive === 'function') {
-        window.renderMathFormulaLive();
-    }
-    const input = document.getElementById('mathFormulaInput');
-    if (input) input.focus();
-}
-
-function renderQuickRibbonKaTeX() {
-    const quickRibbon = document.getElementById('mathQuickRibbon');
-    if (!quickRibbon || !window.katex) return;
-    const quickKaTeX = {
-        "\\frac{a}{b}": "\\frac{a}{b}",
-        "\\sqrt{x}": "\\sqrt{x}",
-        "\\sqrt[n]{x}": "\\sqrt[n]{x}",
-        "x^{n}": "x^n",
-        "x_{i}": "x_i",
-        "\\int_{a}^{b} f(x) \, dx": "\\int_a^b",
-        "\\frac{\\partial f}{\\partial x}": "\\frac{\\partial}{\\partial x}",
-        "\\sum_{i=1}^{n}": "\\sum",
-        "\\lim_{x \\to a}": "\\lim",
-        "\\left( x \\right)": "( \\cdot )",
-        "\\left[ x \\right]": "[ \\cdot ]",
-        "\\left\\{ x \\right\\}": "\\{ \\cdot \\}",
-        "\\left| x \\right|": "| x |",
-        "|\\psi\\rangle": "|\\psi\\rangle",
-        "\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}": "\\begin{pmatrix} \\cdot & \\cdot \\\\ \\cdot & \\cdot \\end{pmatrix}",
-        "\\pm": "\\pm",
-        "\\alpha": "\\alpha",
-        "\\pi": "\\pi",
-        "\\infty": "\\infty"
-    };
-
-    quickRibbon.querySelectorAll('.math-quick-btn').forEach(btn => {
-        const code = btn.getAttribute('data-code');
-        if (quickKaTeX[code]) {
-            try {
-                btn.innerHTML = window.katex.renderToString(quickKaTeX[code], { displayMode: false, throwOnError: false });
-            } catch (e) {}
-        }
-    });
 }
 
 async function createNewProjectPrompt() {
@@ -2342,405 +1500,6 @@ mathDatabase.matrices = mathDatabase.matrices;
 mathDatabase.griegas = mathDatabase.griegas;
 
 // Controlador del Constructor y Editor de Ecuaciones
-function initMathKeyboard() {
-    const modal = document.getElementById('modalMathKeyboard');
-    const btnClose = document.getElementById('btnCloseMath');
-    const btnCloseSecondary = document.getElementById('btnCloseMathSecondary');
-    const tabsContainer = document.getElementById('mathCategoryTabs');
-    const bodyContainer = document.getElementById('mathBody');
-    const searchInput = document.getElementById('mathSearchInput');
-    const formulaInput = document.getElementById('mathFormulaInput');
-    const formulaPreview = document.getElementById('mathFormulaPreview');
-    const renderStatus = document.getElementById('mathRenderStatus');
-    const btnClear = document.getElementById('btnMathClear');
-    const btnUndo = document.getElementById('btnMathUndo');
-    const btnRedo = document.getElementById('btnMathRedo');
-    const modeSwitch = document.getElementById('mathModeSwitch');
-    const btnCopy = document.getElementById('btnCopyMathCode');
-    const btnInsert = document.getElementById('btnInsertMathCode');
-    const quickRibbon = document.getElementById('mathQuickRibbon');
-
-    let currentCategory = 'algebra';
-    let currentMode = 'inline'; // 'inline' | 'display' | 'equation'
-    let historyStack = [];
-    let historyIndex = -1;
-
-    function recordHistory() {
-        if (!formulaInput) return;
-        if (historyIndex < historyStack.length - 1) {
-            historyStack = historyStack.slice(0, historyIndex + 1);
-        }
-        historyStack.push(formulaInput.value);
-        historyIndex++;
-        if (historyStack.length > 50) {
-            historyStack.shift();
-            historyIndex--;
-        }
-    }
-
-    function renderFormulaLive() {
-        if (!formulaPreview || !formulaInput) return;
-        const code = formulaInput.value.trim();
-
-        if (!code) {
-            formulaPreview.innerHTML = '<span class="math-preview-empty-hint">✨ Haz clic en los símbolos o escribe para ver la vista previa en vivo...</span>';
-            if (renderStatus) {
-                renderStatus.innerText = 'KaTeX ✓';
-                renderStatus.style.color = 'var(--success)';
-            }
-            return;
-        }
-
-        if (window.katex) {
-            try {
-                window.katex.render(code, formulaPreview, {
-                    displayMode: currentMode !== 'inline',
-                    throwOnError: false,
-                    errorColor: '#EF4444'
-                });
-                if (renderStatus) {
-                    renderStatus.innerText = 'KaTeX ✓';
-                    renderStatus.style.color = 'var(--success)';
-                }
-            } catch (e) {
-                if (renderStatus) {
-                    renderStatus.innerText = 'Escribiendo...';
-                    renderStatus.style.color = 'var(--fox-orange)';
-                }
-            }
-        } else {
-            // Fallback si KaTeX no está cargado
-            formulaPreview.innerHTML = `<code>${escapeHtml(code)}</code>`;
-        }
-    }
-
-    function insertIntoFormula(codeSnippet, cursorOffset) {
-        if (!formulaInput) return;
-        recordHistory();
-
-        const start = formulaInput.selectionStart;
-        const end = formulaInput.selectionEnd;
-        const val = formulaInput.value;
-        const before = val.substring(0, start);
-        const after = val.substring(end);
-
-        // Añadir espacio de separación si es necesario
-        const needsSpaceBefore = before.length > 0 && 
-            !before.endsWith(' ') && 
-            !before.endsWith('{') && 
-            !before.endsWith('(') && 
-            !before.endsWith('[') && 
-            !before.endsWith('^') && 
-            !before.endsWith('_') && 
-            !codeSnippet.startsWith('^') && 
-            !codeSnippet.startsWith('_');
-
-        const insertion = (needsSpaceBefore ? ' ' : '') + codeSnippet;
-        formulaInput.value = before + insertion + after;
-
-        const offset = cursorOffset !== undefined ? (needsSpaceBefore ? 1 : 0) + cursorOffset : insertion.length;
-        const newPos = start + offset;
-
-        formulaInput.focus();
-        formulaInput.setSelectionRange(newPos, newPos);
-
-        renderFormulaLive();
-    }
-
-    function renderCategory(cat, query = '') {
-        currentCategory = cat;
-        bodyContainer.innerHTML = '';
-        const q = query.trim().toLowerCase();
-        
-        let targetKey = cat;
-        if (cat === 'calculo' || cat === 'calculus' || cat === 'cálculo') targetKey = 'calculus';
-        if (cat === 'algebra' || cat === 'álgebra' || cat === 'basico') targetKey = 'algebra';
-        if (cat === 'cuantica' || cat === 'cuántica' || cat === 'fisica') targetKey = 'cuantica';
-        if (cat === 'matrices' || cat === 'matriz') targetKey = 'matrices';
-        if (cat === 'griegas' || cat === 'simbolos' || cat === 'logica') targetKey = 'griegas';
-
-        // Si hay término de búsqueda, buscar en toda la base matemática; si no, en la categoría actual
-        let sections = [];
-        if (q) {
-            const visited = new Set();
-            Object.keys(mathDatabase).forEach(c => {
-                const arr = mathDatabase[c];
-                if (Array.isArray(arr) && !visited.has(arr)) {
-                    visited.add(arr);
-                    sections = sections.concat(arr);
-                }
-            });
-        } else {
-            sections = mathDatabase[targetKey] || mathDatabase[cat] || [];
-        }
-
-        sections.forEach(sec => {
-            const filteredItems = sec.items.filter(item => {
-                if (!q) return true;
-                return item.label.toLowerCase().includes(q) ||
-                       item.code.toLowerCase().includes(q) ||
-                       item.display.toLowerCase().includes(q);
-            });
-
-            if (filteredItems.length > 0) {
-                const secDiv = document.createElement('div');
-                secDiv.className = 'math-section';
-                secDiv.innerHTML = `<div class="math-section-title">${sec.title}</div>`;
-
-                const grid = document.createElement('div');
-                grid.className = 'math-grid';
-
-                filteredItems.forEach(item => {
-                    const btn = document.createElement('button');
-                    btn.className = 'math-btn';
-                    btn.type = 'button';
-                    btn.title = item.code + ' (' + item.label + ')';
-                    btn.innerHTML = `
-                        <span>${escapeHtml(item.display)}</span>
-                        <span class="math-btn-label">${escapeHtml(item.label)}</span>
-                    `;
-
-                    btn.onclick = (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        insertIntoFormula(item.code, item.cursorOffset);
-                    };
-
-                    grid.appendChild(btn);
-                });
-
-                secDiv.appendChild(grid);
-                bodyContainer.appendChild(secDiv);
-            }
-        });
-
-        if (bodyContainer.children.length === 0) {
-            bodyContainer.innerHTML = '<p class="text-muted" style="text-align:center; padding:20px; font-size:13px;">No se encontraron símbolos para esa búsqueda.</p>';
-        }
-    }
-
-    // Inicializar Ribbon Rápido con render KaTeX
-    if (quickRibbon) {
-        renderQuickRibbonKaTeX();
-        quickRibbon.querySelectorAll('.math-quick-btn').forEach(btn => {
-            const code = btn.getAttribute('data-code');
-            btn.onclick = (e) => {
-                e.preventDefault();
-                if (code) insertIntoFormula(code);
-            };
-        });
-    }
-
-    // Pestañas de categoría
-    if (tabsContainer) {
-        tabsContainer.querySelectorAll('.math-cat-btn').forEach(btn => {
-            btn.onclick = () => {
-                tabsContainer.querySelectorAll('.math-cat-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                if (searchInput) searchInput.value = '';
-                renderCategory(btn.getAttribute('data-cat'));
-            };
-        });
-    }
-
-    // Búsqueda en tiempo real
-    if (searchInput) {
-        searchInput.oninput = (e) => {
-            renderCategory(currentCategory, e.target.value);
-        };
-    }
-
-    // Eventos de edición manual en el textarea de fórmula
-    if (formulaInput) {
-        formulaInput.oninput = () => {
-            renderFormulaLive();
-        };
-
-        formulaInput.onkeydown = (e) => {
-            if (e.ctrlKey && e.key === 'Enter') {
-                e.preventDefault();
-                if (btnInsert) btnInsert.click();
-            } else if (e.ctrlKey && (e.key === 'z' || e.key === 'Z')) {
-                e.preventDefault();
-                if (btnUndo) btnUndo.click();
-            } else if (e.ctrlKey && (e.key === 'y' || e.key === 'Y')) {
-                e.preventDefault();
-                if (btnRedo) btnRedo.click();
-            }
-        };
-    }
-
-    // Botones Limpiar, Deshacer, Rehacer
-    if (btnClear) {
-        btnClear.onclick = () => {
-            if (!formulaInput.value) return;
-            recordHistory();
-            formulaInput.value = '';
-            renderFormulaLive();
-            formulaInput.focus();
-        };
-    }
-
-    if (btnUndo) {
-        btnUndo.onclick = () => {
-            if (historyIndex > 0) {
-                historyIndex--;
-                formulaInput.value = historyStack[historyIndex];
-                renderFormulaLive();
-            }
-        };
-    }
-
-    if (btnRedo) {
-        btnRedo.onclick = () => {
-            if (historyIndex < historyStack.length - 1) {
-                historyIndex++;
-                formulaInput.value = historyStack[historyIndex];
-                renderFormulaLive();
-            }
-        };
-    }
-
-    // Selector de modo de formato
-    if (modeSwitch) {
-        modeSwitch.querySelectorAll('.math-mode-btn').forEach(btn => {
-            btn.onclick = () => {
-                modeSwitch.querySelectorAll('.math-mode-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentMode = btn.getAttribute('data-mode') || 'inline';
-                renderFormulaLive();
-            };
-        });
-    }
-
-    // Cerrar modal
-    if (btnClose && modal) btnClose.onclick = () => modal.classList.add('hidden');
-    if (btnCloseSecondary && modal) btnCloseSecondary.onclick = () => modal.classList.add('hidden');
-
-    // Botón Copiar
-    if (btnCopy) {
-        btnCopy.onclick = async () => {
-            const code = formulaInput.value.trim();
-            if (!code) return;
-            let formatted = code;
-            if (currentMode === 'inline') {
-                formatted = `$${code}$`;
-            } else if (currentMode === 'display') {
-                formatted = `\\[\n  ${code}\n\\]`;
-            } else if (currentMode === 'equation') {
-                formatted = `\\begin{equation}\n  ${code}\n\\end{equation}`;
-            }
-
-            await fallbackCopyText(formatted);
-            const orig = btnCopy.innerHTML;
-            btnCopy.innerHTML = '✓ ¡Copiado!';
-            btnCopy.style.color = '#10B981';
-            setTimeout(() => { 
-                btnCopy.innerHTML = orig; 
-                btnCopy.style.color = '';
-            }, 1500);
-        };
-    }
-
-    // Botón Insertar en Documento
-    if (btnInsert) {
-        btnInsert.onclick = () => {
-            const code = formulaInput.value.trim();
-            if (!code) {
-                alert('Escribe o selecciona alguna fórmula primero.');
-                return;
-            }
-            let formatted = code;
-            if (currentMode === 'inline') {
-                formatted = `$${code}$`;
-            } else if (currentMode === 'display') {
-                formatted = `\n\\[\n    ${code}\n\\]\n`;
-            } else if (currentMode === 'equation') {
-                formatted = `\n\\begin{equation}\n    ${code}\n\\end{equation}\n`;
-            }
-
-            // Inserción en el documento principal (codeEditor)
-            insertAtCursor(formatted, formatted.length);
-            
-            modal.classList.add('hidden');
-
-            const dict = i18n[currentLanguage] || i18n.es;
-            if (editorStatus) {
-                editorStatus.innerText = dict.status_math_inserted || '✓ Ecuación insertada';
-                editorStatus.style.color = '#10B981';
-                setTimeout(() => {
-                    editorStatus.innerText = dict.status_auto_saved || 'Guardado automático ✓';
-                    editorStatus.style.color = '';
-                }, 2500);
-            }
-        };
-    }
-
-    // Atajo Alt + M y Escape
-    document.addEventListener('keydown', (e) => {
-        if (e.altKey && (e.key === 'm' || e.key === 'M')) {
-            e.preventDefault();
-            modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) {
-                renderFormulaLive();
-                if (formulaInput) formulaInput.focus();
-            }
-        } else if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-            modal.classList.add('hidden');
-        }
-    });
-
-    // Cargar categoría inicial y estado inicial
-    renderCategory('algebra');
-    if (formulaInput && !formulaInput.value) {
-        formulaInput.value = '\\int_{a}^{b} f(x) \\, dx';
-        recordHistory();
-    }
-    renderFormulaLive();
-    window.renderMathFormulaLive = renderFormulaLive;
-}
-
-// Controlador SyncTeX
-function initSyncTeX() {
-    const btnSync = document.getElementById('btnSyncToPdf');
-    if (btnSync) {
-        btnSync.onclick = () => syncEditorToPdf();
-    }
-}
-
-async function syncEditorToPdf() {
-    const cursor = codeEditor.selectionStart;
-    const textBefore = codeEditor.value.substring(0, cursor);
-    const currentLine = textBefore.split('\n').length;
-
-    try {
-        const res = await fetch(`/api/synctex/forward?project=${encodeURIComponent(currentProject)}&line=${currentLine}`);
-        const data = await res.json();
-        if (data.success && data.page) {
-            const pageNum = data.page;
-            const currentSrc = pdfViewer.src.split('#')[0];
-            pdfViewer.src = `${currentSrc}#page=${pageNum}`;
-
-            const dict = i18n[currentLanguage] || i18n.es;
-            editorStatus.innerText = `📍 Línea ${currentLine} -> Pág. ${pageNum} ✓`;
-            editorStatus.style.color = '#10B981';
-            setTimeout(() => {
-                editorStatus.innerText = dict.status_auto_saved;
-            }, 2500);
-        } else {
-            alert('Compila primero el documento (Ctrl+S) para generar los datos de sincronización SyncTeX.');
-        }
-    } catch (e) {
-        console.error('Error SyncTeX:', e);
-    }
-}
-
-// ==========================================
-// Dictáfono Inteligente de Clases & Túnel P2P
-// ==========================================
-let voiceQrInstance = null;
-let shareQrInstance = null;
-
 function initVoiceDictate() {
     const btnCloseVoice = document.getElementById('btnCloseVoiceModal');
     if (btnCloseVoice) {

@@ -606,6 +606,26 @@
         const serverPill = document.getElementById('serverPill');
         const classTitleInput = document.getElementById('classTitleInput');
 
+        function showVoiceToast(message, type = 'info') {
+            let toast = document.getElementById('voiceToastBanner');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'voiceToastBanner';
+                toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(10px); z-index:99999; padding:12px 18px; border-radius:10px; font-size:13.5px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,0.45); transition:all 0.25s ease; opacity:0; pointer-events:none; max-width:90vw; text-align:center;';
+                document.body.appendChild(toast);
+            }
+            toast.style.background = type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#1e293b';
+            toast.style.color = '#ffffff';
+            toast.textContent = (type === 'success' ? '✓ ' : type === 'error' ? '⚠️ ' : 'ℹ️ ') + message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            clearTimeout(window._voiceToastTimer);
+            window._voiceToastTimer = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(10px)';
+            }, 3500);
+        }
+
         // Comprobar estado del servidor y clave Gemini
         async function checkServerStatus() {
             try {
@@ -628,7 +648,7 @@
 
         btnSaveKey.onclick = async () => {
             const key = inputVoiceApiKey.value.trim();
-            if (!key) return alert('Por favor ingresa una clave válida.');
+            if (!key) return showVoiceToast('Por favor ingresa una clave válida.', 'error');
             try {
                 const res = await fetch('/api/config', {
                     method: 'POST',
@@ -637,10 +657,10 @@
                 });
                 if (res.ok) {
                     apiKeyBanner.style.display = 'none';
-                    alert('¡Clave de Gemini guardada correctamente!');
+                    showVoiceToast('¡Clave de Gemini guardada correctamente!', 'success');
                 }
             } catch (e) {
-                alert('Error al guardar la clave: ' + e);
+                showVoiceToast('Error al guardar la clave: ' + e, 'error');
             }
         };
 
@@ -737,7 +757,7 @@
                 btnProcessVoice.classList.add('hidden');
                 uploadAlternative.classList.add('hidden');
             } catch (err) {
-                alert('No se pudo acceder al micrófono. Asegúrate de dar permisos o usar una conexión HTTPS / Local: ' + err.message);
+                showVoiceToast('No se pudo acceder al micrófono. Da permisos o usa conexión HTTPS/Local: ' + err.message, 'error');
             }
         }
 
@@ -783,7 +803,7 @@
 
         // Procesar audio con Gemini y compilar a LaTeX
         btnProcessVoice.onclick = async () => {
-            if (!base64Audio) return alert('Por favor graba o sube un audio primero.');
+            if (!base64Audio) return showVoiceToast('Por favor graba o sube un audio primero.', 'error');
             
             const title = classTitleInput.value.trim();
             const geminiKey = inputVoiceApiKey.value.trim();
@@ -820,7 +840,7 @@
                 const data = await response.json();
 
                 if (!data.success) {
-                    alert('Error: ' + data.error);
+                    showVoiceToast('Error: ' + data.error, 'error');
                     resetRecorder();
                     return;
                 }
@@ -849,7 +869,7 @@
                 }, 800);
 
             } catch (err) {
-                alert('Error al conectar con el servidor: ' + err.message);
+                showVoiceToast('Error al conectar con el servidor: ' + err.message, 'error');
                 resetRecorder();
             }
         };

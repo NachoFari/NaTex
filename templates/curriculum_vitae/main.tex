@@ -1,0 +1,78 @@
+\documentclass[10pt, letterpaper]{article}
+
+\usepackage[margin=1.5cm]{geometry}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+
+\definecolor{primary}{RGB}{255, 107, 53}
+\definecolor{darkblue}{RGB}{15, 23, 42}
+\definecolor{lightgray}{RGB}{100, 116, 139}
+
+\titleformat{\section}{\large\bfseries\color{primary}}{}{0em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+\setlist[itemize]{noitemsep, topsep=2pt, leftmargin=1.5em}
+
+\begin{document}
+\pagestyle{empty}
+
+% ENCABEZADO
+\begin{center}
+  {\Huge \bfseries \color{darkblue} NOMBRE Y APELLIDO}\\[0.2cm]
+  {\Large \color{primary} Ingeniero de Software \& Investigador Científico}\\[0.3cm]
+  {\small \color{lightgray}
+    Ciudad, País \quad $\bullet$ \quad
+    \texttt{contacto@ejemplo.com} \quad $\bullet$ \quad
+    +56 9 0000 0000 \quad $\bullet$ \quad
+    \href{https://github.com/usuario}{github.com/usuario} \quad $\bullet$ \quad
+    \href{https://linkedin.com}{linkedin.com/in/usuario}
+  }
+\end{center}
+
+\vspace{0.2cm}
+
+\section{Perfil Profesional}
+Profesional con sólida experiencia en desarrollo de software, modelamiento matemático, computación científica y tecnologías web de alto rendimiento. Apasionado por la optimización de algoritmos, el desarrollo de herramientas abiertas y la redacción académica.
+
+\section{Experiencia Laboral}
+
+\textbf{Líder de Desarrollo de Software} \hfill \textit{2024 -- Presente} \\
+\textit{Laboratorio de Tecnologías Computacionales} \hfill \textit{Ciudad, País}
+\begin{itemize}
+  \item Diseñó e implementó sistemas de compilación local multiplataforma y procesamiento en tiempo real.
+  \item Desarrolló arquitecturas distribuidas y sincronización colaborativa cliente-servidor.
+  \item Automatizó flujos de trabajo e integró interfaces gráficas avanzadas.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Ingeniero de Software e Investigación} \hfill \textit{2022 -- 2024} \\
+\textit{Centro de Computación Científica} \hfill \textit{Ciudad, País}
+\begin{itemize}
+  \item Optimizó algoritmos numéricos en C++ y Python, reduciendo los tiempos de ejecución en un 40\%.
+  \item Colaboró en la redacción y publicación de artículos técnicos presentados en conferencias internacionales.
+  \item Implementó pipelines de integración continua (CI/CD) para generación automatizada de reportes.
+\end{itemize}
+
+\section{Educación}
+
+\textbf{Licenciatura / Ingeniería en Informática} \hfill \textit{2019 -- 2024} \\
+\textit{Universidad Nacional} \hfill \textit{Distinción de Honor} \\
+$\bullet$ Memoria de grado: \textit{Diseño e Implementación de Entornos Locales para Tipografía Científica}.
+
+\section{Habilidades Técnicas}
+
+\begin{itemize}
+  \item \textbf{Lenguajes:} Python, C/C++, JavaScript / TypeScript, Rust, SQL, LaTeX.
+  \item \textbf{Herramientas y Entornos:} Git, Docker, Linux/POSIX, Windows API, Servidores Web.
+  \item \textbf{Computación Científica:} NumPy, SciPy, Matplotlib, PyTorch, Optimización Matemática.
+  \item \textbf{Idiomas:} Español (Nativo), Inglés (Avanzado / Profesional).
+\end{itemize}
+
+\section{Proyectos Destacados}
+
+\textbf{NaTex Studio:} Entorno visual de edición y compilación científica en tiempo real para Windows. (\href{https://github.com/NachoFari/NaTex}{\texttt{github.com/NachoFari/NaTex}}) \\
+\textbf{FastMath Engine:} Biblioteca de álgebra lineal con vectorización numérica para simulaciones físicas.
+
+\end{document}

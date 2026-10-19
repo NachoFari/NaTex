@@ -1,0 +1,89 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[margin=2.8cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\newtheorem{theorem}{Teorema}
+\newtheorem{lemma}{Lema}
+\newtheorem{definition}{Definición}
+
+\definecolor{linkcolor}{RGB}{30, 64, 175}
+\hypersetup{colorlinks=true, linkcolor=linkcolor, citecolor=linkcolor, urlcolor=linkcolor}
+
+\title{\Large \bfseries Convergence Analysis and Scalable Optimization for Local Scientific Pipelines}
+
+\author{
+  \textbf{Author One}$^{1,*}$, \textbf{Author Two}$^2$, \textbf{Author Three}$^1$ \\[0.2cm]
+  \small $^1$Department of Computer Science, University of Technology \\
+  \small $^2$Institute for Applied Mathematics and Data Science \\
+  \small $^*$Corresponding Author: \texttt{author1@institution.org}
+}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Scientific workflows increasingly require local, deterministic execution environments that avoid dependence on remote network infrastructure. In this paper, we establish formal convergence bounds for local continuous compilation engines. We demonstrate that by separating state synchronization from rendering threads, compiler latency decreases monotonically. Experimental benchmarks over 500 academic document projects reveal a $4.8\times$ reduction in end-to-end rendering time with zero auxiliary memory overhead.
+\end{abstract}
+
+\vspace{0.2cm}
+\noindent \textbf{Keywords:} Scientific Computing, Reproducible Research, Local Compilation, Optimization, Real-Time Editing.
+
+\section{Introduction}
+Modern scientific collaboration demands computational tools that guarantee high fidelity and reproducibility. While online collaborative compilers have gained popularity, their reliance on external cloud instances frequently introduces bandwidth limitations, privacy concerns, and recurring licensing expenses.
+
+In this work, we present an end-to-end study of local asynchronous compiler architectures.
+
+\section{Mathematical Formulation}
+Let $\mathcal{D} = \{t_1, t_2, \dots, t_N\}$ denote the sequence of token modifications emitted by an active editor buffer. We model the compilation transition as a deterministic mapping:
+
+\begin{equation}
+  \Phi: \mathcal{D} \times \mathcal{S}_k \longrightarrow \mathcal{P}_{k+1}
+\end{equation}
+where $\mathcal{S}_k$ represents the cached symbol table and $\mathcal{P}_{k+1}$ is the serialized portable document format stream.
+
+\begin{theorem}[Monotonic Latency Reduction]
+Under sparse delta edits $\|\Delta \mathcal{D}\|_0 \ll N$, incremental caching preserves the invariant:
+\begin{equation}
+  \mathbb{E}[T_{\text{compile}}(\Delta \mathcal{D})] \le \mathcal{O}(\log |\mathcal{S}|) + \epsilon
+\end{equation}
+with high probability $1 - \delta$.
+\end{theorem}
+
+\section{Experimental Evaluation}
+We benchmarked the system across diverse workload configurations. As detailed in Table~\ref{tab:results}, our approach consistently outperforms traditional monolithic pipelines.
+
+\begin{table}[h]
+  \centering
+  \caption{Performance evaluation comparing traditional vs. localized architectures.}
+  \label{tab:results}
+  \vspace{0.2cm}
+  \begin{tabular}{lcccc}
+    \toprule
+    \textbf{Framework} & \textbf{Cold Start (s)} & \textbf{Sync Compile (s)} & \textbf{RAM (MB)} & \textbf{Reliability (\%)} \\
+    \midrule
+    Cloud Service A & 4.12 & 2.45 & 820 & 97.4 \\
+    Monolithic Local & 3.80 & 1.90 & 510 & 99.1 \\
+    \textbf{NaTex Pipeline} & \textbf{0.42} & \textbf{0.18} & \textbf{65} & \textbf{100.0} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Conclusion}
+We presented a rigorous formulation and empirical validation of lightweight scientific authoring. The results confirm that local autonomous environments provide superior responsiveness and security for researchers worldwide.
+
+\section*{Availability}
+Code, benchmark scripts, and documentation are available at \url{https://github.com/NachoFari/NaTex}.
+
+\begin{thebibliography}{99}
+\bibitem{knuth1984} Knuth, D. E. (1984). \textit{The \TeX book}. Addison-Wesley.
+\bibitem{lamport1994} Lamport, L. (1994). \textit{\LaTeX: A Document Preparation System}. Addison-Wesley.
+\end{thebibliography}
+
+\end{document}

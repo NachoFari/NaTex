@@ -1,0 +1,123 @@
+\documentclass[9pt, letterpaper, landscape]{article}
+
+\usepackage[margin=0.8cm]{geometry}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{tcolorbox}
+\usepackage{microtype}
+
+\definecolor{primary}{RGB}{255, 107, 53}
+\definecolor{darkblue}{RGB}{15, 23, 42}
+\definecolor{accent}{RGB}{6, 182, 212}
+
+\tcbset{
+  colback=white,
+  colframe=darkblue,
+  fonttitle=\bfseries\small,
+  coltitle=white,
+  boxrule=1pt,
+  arc=1.5mm,
+  top=1mm, bottom=1mm, left=2mm, right=2mm,
+  before=\vspace{0.15cm}, after=\vspace{0.15cm}
+}
+
+\begin{document}
+\pagestyle{empty}
+
+\begin{center}
+  {\large \bfseries \color{primary} HOJA RESUMEN DE MATEMÁTICAS, CÁLCULO Y FÍSICA} \quad
+  {\small \color{gray} NaTex Studio -- Guía Rápida de Fórmulas y Teoremas Fundamentales}
+\end{center}
+
+\setlength{\columnsep}{0.6cm}
+\begin{multicols*}{3}
+
+  % CAJA 1: ÁLGEBRA Y TRIGONOMETRÍA
+  \begin{tcolorbox}[title=Álgebra e Identidades Fundamentales, colframe=primary]
+    \textbf{Binomios y Factorización:}
+    \begin{align*}
+      (a \pm b)^2 &= a^2 \pm 2ab + b^2 \\
+      (a + b)^3 &= a^3 + 3a^2b + 3ab^2 + b^3 \\
+      a^2 - b^2 &= (a - b)(a + b)
+    \end{align*}
+    \textbf{Identidades Trigonométricas:}
+    \begin{align*}
+      \sin^2 \theta + \cos^2 \theta &= 1, \quad 1 + \tan^2 \theta = \sec^2 \theta \\
+      \sin(2\theta) &= 2\sin\theta\cos\theta \\
+      \cos(2\theta) &= \cos^2\theta - \sin^2\theta = 2\cos^2\theta - 1
+    \end{align*}
+  \end{tcolorbox}
+
+  % CAJA 2: DERIVADAS
+  \begin{tcolorbox}[title=Reglas de Derivación, colframe=darkblue]
+    \textbf{Propiedades Operacionales:}
+    \begin{align*}
+      (cf)' &= c f' \\
+      (f \cdot g)' &= f'g + fg' \\
+      \left(\frac{f}{g}\right)' &= \frac{f'g - fg'}{g^2} \\
+      (f(g(x)))' &= f'(g(x)) \cdot g'(x) \quad \text{(Cadena)}
+    \end{align*}
+    \textbf{Derivadas Estándar:}
+    \begin{align*}
+      \frac{d}{dx} x^n &= n x^{n-1}, \quad \frac{d}{dx} e^x = e^x \\
+      \frac{d}{dx} \ln x &= \frac{1}{x}, \quad \frac{d}{dx} \sin x = \cos x \\
+      \frac{d}{dx} \cos x &= -\sin x, \quad \frac{d}{dx} \tan x = \sec^2 x \\
+      \frac{d}{dx} \arctan x &= \frac{1}{1 + x^2}
+    \end{align*}
+  \end{tcolorbox}
+
+  % CAJA 3: INTEGRALES
+  \begin{tcolorbox}[title=Integrales Indefinidas y Métodos, colframe=accent]
+    \textbf{Integración por Partes:}
+    \begin{equation*}
+      \int u \, dv = u v - \int v \, du
+    \end{equation*}
+    \textbf{Integrales Inmediatas:}
+    \begin{align*}
+      \int x^n \, dx &= \frac{x^{n+1}}{n+1} + C \quad (n \ne -1) \\
+      \int \frac{1}{x} \, dx &= \ln|x| + C \\
+      \int e^{ax} \, dx &= \frac{1}{a} e^{ax} + C \\
+      \int \frac{dx}{a^2 + x^2} &= \frac{1}{a} \arctan\left(\frac{x}{a}\right) + C \\
+      \int \frac{dx}{\sqrt{a^2 - x^2}} &= \arcsin\left(\frac{x}{a}\right) + C
+    \end{align*}
+  \end{tcolorbox}
+
+  % CAJA 4: CÁLCULO VECTORIAL
+  \begin{tcolorbox}[title=Operadores Diferenciales y Vectorial, colframe=darkblue]
+    \textbf{Gradiente:} $\nabla f = \frac{\partial f}{\partial x}\mathbf{i} + \frac{\partial f}{\partial y}\mathbf{j} + \frac{\partial f}{\partial z}\mathbf{k}$ \\
+    \textbf{Divergencia:} $\nabla \cdot \mathbf{F} = \frac{\partial F_x}{\partial x} + \frac{\partial F_y}{\partial y} + \frac{\partial F_z}{\partial z}$ \\
+    \textbf{Rotor:} $\nabla \times \mathbf{F} = \det\begin{pmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ \partial_x & \partial_y & \partial_z \\ F_x & F_y & F_z \end{pmatrix}$ \\
+    \textbf{Teorema de Green:}
+    \begin{equation*}
+      \oint_C (P dx + Q dy) = \iint_D \left(\frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}\right) dA
+    \end{equation*}
+  \end{tcolorbox}
+
+  % CAJA 5: SERIES Y LÍMITES
+  \begin{tcolorbox}[title=Series de Taylor y Límites Notables, colframe=primary]
+    \textbf{Series de Maclaurin ($x \approx 0$):}
+    \begin{align*}
+      e^x &= \sum_{n=0}^{\infty} \frac{x^n}{n!} = 1 + x + \frac{x^2}{2} + \dots \\
+      \sin x &= \sum_{n=0}^{\infty} \frac{(-1)^n x^{2n+1}}{(2n+1)!} = x - \frac{x^3}{6} + \dots \\
+      \cos x &= \sum_{n=0}^{\infty} \frac{(-1)^n x^{2n}}{(2n)!} = 1 - \frac{x^2}{2} + \dots
+    \end{align*}
+    \textbf{Límites Notables:}
+    \begin{equation*}
+      \lim_{x \to 0} \frac{\sin x}{x} = 1, \quad \lim_{x \to \infty} \left(1 + \frac{1}{x}\right)^x = e
+    \end{equation*}
+  \end{tcolorbox}
+
+  % CAJA 6: CONSTANTES Y FÍSICA
+  \begin{tcolorbox}[title=Constantes Físicas Universales, colframe=darkblue]
+    Velocidad de la luz: $c \approx 2.998 \times 10^8\text{ m/s}$ \\
+    Constante de Planck: $h \approx 6.626 \times 10^{-34}\text{ J}\cdot\text{s}$ \\
+    Gravitación universal: $G \approx 6.674 \times 10^{-11}\text{ N}\cdot\text{m}^2/\text{kg}^2$ \\
+    Carga elemental: $e \approx 1.602 \times 10^{-19}\text{ C}$ \\
+    Permitividad de vacío: $\varepsilon_0 \approx 8.854 \times 10^{-12}\text{ F/m}$ \\
+    Aceleración gravitatoria: $g \approx 9.807\text{ m/s}^2$
+  \end{tcolorbox}
+
+\end{multicols*}
+
+\end{document}

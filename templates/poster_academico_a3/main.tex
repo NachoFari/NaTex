@@ -1,0 +1,92 @@
+\documentclass[11pt]{article}
+\usepackage[a3paper, landscape, margin=1.8cm]{geometry}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{tcolorbox}
+\usepackage{graphicx}
+
+\definecolor{foxorange}{RGB}{255, 107, 53}
+\definecolor{nightblue}{RGB}{14, 20, 32}
+\definecolor{mintgreen}{RGB}{16, 185, 129}
+\definecolor{cardbg}{RGB}{250, 252, 255}
+
+\tcbset{
+  colback=cardbg,
+  colframe=foxorange,
+  fonttitle=\large\bfseries,
+  coltitle=white,
+  boxrule=2pt,
+  arc=3mm,
+  left=8mm, right=8mm, top=6mm, bottom=6mm
+}
+
+\begin{document}
+\pagestyle{empty}
+
+% ENCABEZADO
+\begin{tcolorbox}[colback=nightblue, colframe=foxorange, boxrule=2.5pt, arc=4mm]
+  \centering
+  \vspace{0.2cm}
+  {\Huge \bfseries \color{white} ANÁLISIS DE SISTEMAS ENERGÉTICOS Y EFICIENCIA TÉRMICA}\\[0.4cm]
+  {\Large \color{foxorange} \textbf{Autor: Nombre del Investigador}} \quad 
+  {\large \color{gray!30} | \quad Facultad de Ingeniería y Ciencias Aplicadas}\\[0.2cm]
+  {\normalsize \color{gray!40} Asignatura: Termodinámica Avanzada \quad $\bullet$ \quad Profesor Guía: Dr. R. Silva \quad $\bullet$ \quad 2026}
+  \vspace{0.2cm}
+\end{tcolorbox}
+
+\vspace{0.5cm}
+
+\setlength{\columnsep}{1.6cm}
+\begin{multicols}{2}
+
+  \begin{tcolorbox}[title=1. Resumen y Justificación del Proyecto]
+    La optimización de ciclos termodinámicos mediante fluidos orgánicos de bajo impacto ambiental representa una solución viable para la generación descentralizada de energía limpia.
+    \begin{itemize}
+      \item \textbf{Problema:} Pérdida de calor residual en plantas térmicas industriales.
+      \item \textbf{Propuesta:} Ciclo Rankine Orgánico (ORC) con mezcla zeotrópica.
+      \item \textbf{Meta:} Incrementar la eficiencia neta en más de un 12\%.
+    \end{itemize}
+  \end{tcolorbox}
+
+  \vspace{0.4cm}
+
+  \begin{tcolorbox}[title=2. Formulación y Balance de Energía]
+    El balance de primera y segunda ley de la termodinámica para el evaporador y la turbina se define como:
+    \begin{equation*}
+      \eta_{\text{térmica}} = \frac{\dot{W}_{\text{turbina}} - \dot{W}_{\text{bomba}}}{\dot{Q}_{\text{in}}} = 1 - \frac{h_4 - h_1}{h_3 - h_2}
+    \end{equation*}
+    Donde $h_i$ son las entalpías específicas calculadas en cada estado de saturación.
+  \end{tcolorbox}
+
+  \vspace{0.4cm}
+
+  \begin{tcolorbox}[title=3. Simulación y Curvas de Rendimiento]
+    Se realizaron simulaciones iterativas variando la presión de condensación $P_c \in [1.2, 3.5]\text{ bar}$:
+    \begin{center}
+      \begin{tabular}{|l|c|c|c|}
+        \hline
+        \textbf{Configuración} & \textbf{Potencia (kW)} & \textbf{Eficiencia $\eta$} & \textbf{Emisiones} \\
+        \hline
+        Ciclo Tradicional & 45.2 & 14.3\% & Alta \\
+        Flujo R134a & 58.7 & 18.9\% & Media \\
+        \textbf{Propuesta Zeotrópica} & \textbf{72.4} & \textbf{23.1\%} & \textbf{Cero ODP} \\
+        \hline
+      \end{tabular}
+    \end{center}
+  \end{tcolorbox}
+
+  \vspace{0.4cm}
+
+  \begin{tcolorbox}[title=4. Conclusiones y Aplicabilidad]
+    \begin{enumerate}
+      \item La mezcla propuesta permite aprovechar fuentes térmicas de baja entalpía ($T < 140^\circ\text{C}$).
+      \item El retorno de inversión estimado para una planta de mediana escala es inferior a 2.4 años.
+    \end{enumerate}
+    \vspace{0.2cm}
+    \color{gray} \footnotesize Repositorio del modelo y código de simulación disponible en GitHub con licencia abierta.
+  \end{tcolorbox}
+
+\end{multicols}
+
+\end{document}

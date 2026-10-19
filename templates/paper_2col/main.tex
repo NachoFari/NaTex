@@ -1,0 +1,87 @@
+\documentclass[10pt, twocolumn, letterpaper]{article}
+
+\usepackage[margin=1.8cm, columnsep=0.6cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{hyperref}
+
+\definecolor{ieeeblue}{RGB}{0, 102, 153}
+
+\title{\Huge \bfseries Ultra-Fast Collaborative LaTeX Compilation Architecture for Real-Time Scientific Authoring}
+
+\author{
+  \textbf{Primer Autor}$^1$, \textbf{Segundo Autor}$^2$, \textbf{Tercer Autor}$^1$ \\
+  $^1$Departamento de Informática y Telecomunicaciones \\
+  $^2$Centro de Computación Científica \\
+  Emails: \texttt{\{primer.autor, tercer.autor\}@universidad.edu}, \texttt{segundo.autor@instituto.org}
+}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\textbf{\textit{Abstract}---Modern academic documentation demands real-time feedback and cross-device collaboration. In this paper, we introduce NaTex, a high-performance local document environment that integrates instantaneous local engine execution with WebRTC-based multi-user synchronization. By removing cloud intermediaries, the proposed model eliminates operational subscriptions and enables full document generation in under 400 milliseconds. We evaluate throughput, sync latency, and system overhead under concurrent multi-peer editing workloads.}
+\end{abstract}
+
+\vspace{0.15cm}
+\noindent \textbf{\textit{Index Terms}---Real-time collaboration, LaTeX compilation, Tectonic engine, Cloudflare tunnels, Scientific writing.}
+
+\section{Introduction}
+Scientific document production relies heavily on the LaTeX typesetting system due to its unmatched quality in mathematical typesetting and bibliographic cross-referencing \cite{knuth84}. However, modern students and researchers face a dilemma: choose between cumbersome command-line setups or proprietary web platforms that charge monthly fees for collaboration features.
+
+NaTex bridges this gap by unifying a local, portable compilation core with transparent tunnel sharing.
+
+\section{System Architecture}
+The core architecture consists of three interconnected layers:
+\begin{enumerate}
+  \item \textbf{Local Web Service:} An asynchronous Python backend running zero-dependency native HTTP threads.
+  \item \textbf{Compilation Core:} The embedded Tectonic engine, leveraging XeTeX algorithms to process packages on demand without giant distributions.
+  \item \textbf{Ad-Hoc Collaboration Tunnel:} An encrypted tunnel exposing the local port via Cloudflare's global edge, enabling guests to collaborate without account registration.
+\end{enumerate}
+
+\section{Mathematical Model}
+The latency model for synchronous multi-editor packet propagation is governed by:
+
+\begin{equation}
+  \tau_{\text{total}} = \tau_{\text{net}} + \tau_{\text{AST}} + \tau_{\text{render}}
+\end{equation}
+
+Where the rendering latency $\tau_{\text{render}}$ satisfies:
+\begin{equation}
+  \tau_{\text{render}}(k) = \alpha \cdot N_{\text{pages}} + \beta \sum_{j=1}^{M} \log(E_j + 1)
+\end{equation}
+with $\alpha \approx 12\text{ ms/page}$ and $E_j$ denoting the number of complex math environments.
+
+\section{Experimental Results}
+We measured end-to-end performance over 20 test projects ranging from 2 to 45 pages:
+
+\begin{table}[h]
+  \centering
+  \caption{Performance Benchmarks Across Test Workloads.}
+  \label{tab:benchmarks}
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{Metric} & \textbf{Cloud LaTeX} & \textbf{Traditional TeX} & \textbf{NaTex (Ours)} \\
+    \midrule
+    Compile (2 pág) & 1.84 s & 1.20 s & \textbf{0.32 s} \\
+    Compile (20 pág) & 6.40 s & 4.10 s & \textbf{1.15 s} \\
+    RAM Footprint & 450 MB & 310 MB & \textbf{52 MB} \\
+    Monthly Cost & \$15 USD & \$0 USD & \textbf{\$0 USD} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Conclusion}
+NaTex provides an open-source, highly responsive scientific editor. By combining local speed with seamless tunnel sharing, it delivers an ideal solution for academic research teams.
+
+\begin{thebibliography}{1}
+\bibitem{knuth84} D. E. Knuth, ``The TeXbook,'' Addison-Wesley, Reading, MA, 1984.
+\bibitem{overleaf} J. Hammersley et al., ``Collaborative Scientific Authoring at Scale,'' \textit{Proc. ACM Digital Publishing}, 2018.
+\end{thebibliography}
+
+\end{document}

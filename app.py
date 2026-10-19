@@ -993,8 +993,9 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             if not is_guest:
                 with heartbeat_lock:
                     last_heartbeat_time = time.time()
+                    server_shutting_down = False
             self.send_json({
-                'status': 'shutting_down' if server_shutting_down else 'alive',
+                'status': 'shutting_down' if (server_shutting_down and is_guest) else 'alive',
                 'is_guest': is_guest,
                 'project': shared_project
             })
@@ -1191,13 +1192,16 @@ class NaTexHandler(http.server.SimpleHTTPRequestHandler):
             if is_guest:
                 self.send_json({'status': 'guest_bye'})
                 return
-            global server_shutting_down
-            server_shutting_down = True
+            if native_window is not None:
+                self.send_json({'status': 'native_alive'})
+                return
             goodbye_time = time.time()
             def shutdown_soon():
+                global server_shutting_down
                 time.sleep(3.0)
                 with heartbeat_lock:
                     if last_heartbeat_time < goodbye_time:
+                        server_shutting_down = True
                         cleanup_tunnel()
                         os._exit(0)
             threading.Thread(target=shutdown_soon, daemon=True).start()

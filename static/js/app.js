@@ -193,8 +193,6 @@ function handleHeartbeatFailure() {
 
     if (isExternal && consecutiveHeartbeatFailures >= 2) {
         showHostDisconnectedModal();
-    } else if (consecutiveHeartbeatFailures >= 3) {
-        showHostDisconnectedModal();
     }
 }
 
@@ -211,7 +209,7 @@ function initHeartbeat() {
                     return;
                 }
                 const data = await res.json().catch(() => null);
-                if (data && data.status === 'shutting_down') {
+                if (isExternal && data && data.status === 'shutting_down') {
                     consecutiveHeartbeatFailures = 2;
                     showHostDisconnectedModal();
                     return;
@@ -370,6 +368,20 @@ function initSettings() {
     loadConfigFromServer();
 }
 
+function isStrictlyNewerVersion(latestTag, installedTag = 'v1.0') {
+    const parseParts = (str) => String(str || '').replace(/^v/i, '').split('.').map(n => parseInt(n, 10) || 0);
+    const l = parseParts(latestTag);
+    const c = parseParts(installedTag);
+    const len = Math.max(l.length, c.length);
+    for (let i = 0; i < len; i++) {
+        const lv = l[i] || 0;
+        const cv = c[i] || 0;
+        if (lv > cv) return true;
+        if (lv < cv) return false;
+    }
+    return false;
+}
+
 function initUpdateChecker() {
     const btnCheck = document.getElementById('btnCheckUpdates');
     const resultBox = document.getElementById('updateResultBox');
@@ -394,7 +406,9 @@ function initUpdateChecker() {
                 return;
             }
 
-            if (data.has_update) {
+            const reallyHasUpdate = Boolean(data.has_update && isStrictlyNewerVersion(data.latest_version, 'v1.0'));
+
+            if (reallyHasUpdate) {
                 let html = `
                     <div style="color:#10B981; font-weight:600; margin-bottom:6px;">
                         🎉 ${isEn ? 'New version available:' : '¡Nueva versión disponible:'} ${escapeHtml(data.latest_version)}
@@ -458,7 +472,7 @@ function initUpdateChecker() {
             if (!isAuto) return;
             const res = await fetch('/api/system/check_update');
             const data = await res.json();
-            if (data.success && data.has_update) {
+            if (data.success && data.has_update && isStrictlyNewerVersion(data.latest_version, 'v1.0')) {
                 showUpdateBanner(data);
             }
         } catch (_) {}

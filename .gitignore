@@ -29,3 +29,7 @@ dist_installer/
 .idea/
 Thumbs.db
 Desktop.ini
+
+# Scripts de desarrollo local
+Probar_NaTex_Desktop.bat
+subir_a_github.bat

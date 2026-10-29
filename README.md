@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🦊 NaTex Studio v1.0
+# 🦊 NaTex Studio
 
-**El entorno de escritorio LaTeX rápido, visual, libre y colaborativo.**
+**El entorno de edición LaTeX rápido, visual, libre y colaborativo.**
 
 [![Descargar](https://img.shields.io/badge/📥_DESCARGAR-NATEX--SETUP--V1.3.0.EXE-2ea44f?style=for-the-badge)](https://github.com/NachoFari/NaTex/releases/latest/download/NaTex-Setup-v1.3.0.exe)
 
@@ -24,7 +24,7 @@
 2. Haz doble clic para instalar (no requiere permisos de administrador).
 3. ¡Listo! Crea automáticamente un acceso directo en tu Escritorio y Menú Inicio.
 
-### 👉 Opción 2: Desde Código Fuente
+### Opción Alternativa: Código Fuente Portable
 1. Clona el repositorio:
    ```bash
    git clone https://github.com/NachoFari/NaTex.git

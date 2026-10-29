@@ -1,0 +1,858 @@
+/**
+ * NaTex Studio - 20-Theme Color Engine & Design Tokens
+ * Responsive themes with dark/light modes and backwards-compatible aliases
+ */
+
+/* ==========================================================================
+   DEFINICIÓN DE VARIABLES CSS POR TEMA (20 TEMAS + ALIASES)
+   ========================================================================== */
+
+/* 1. Fox - Zorro Clásico (Dark / Default) & Alias 'dark' */
+[data-theme="fox"],
+[data-theme="dark"] {
+    --bg-dark: #101116;
+    --bg-surface: #181a24;
+    --bg-elevated: #222533;
+    --border-color: #2a2e40;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --fox-orange: #FF6B35;
+    --fox-orange-hover: #ff7e4a;
+    --fox-orange-glow: rgba(255, 107, 53, 0.3);
+    --text-main: #f3f4f8;
+    --text-muted: #9499ad;
+}
+
+/* 2. Rabbit - Conejo Algodón (Light / Algodón) & Alias 'light' */
+[data-theme="rabbit"],
+[data-theme="light"] {
+    --bg-dark: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-elevated: #f1f5f9;
+    --border-color: #e2e8f0;
+    --border-subtle: rgba(0, 0, 0, 0.06);
+    --fox-orange: #EC4899;
+    --fox-orange-hover: #f472b6;
+    --fox-orange-glow: rgba(236, 72, 153, 0.28);
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+}
+
+/* 3. Sakura - Flor de Cerezo (Light / Pastel Floral) */
+[data-theme="sakura"] {
+    --bg-dark: #fdf8f9;
+    --bg-surface: #ffffff;
+    --bg-elevated: #fce7ed;
+    --border-color: #fbcfe8;
+    --border-subtle: rgba(244, 114, 182, 0.15);
+    --fox-orange: #F472B6;
+    --fox-orange-hover: #fb7185;
+    --fox-orange-glow: rgba(244, 114, 182, 0.3);
+    --text-main: #2d2329;
+    --text-muted: #83677b;
+}
+
+/* 4. Unicorn - Unicornio Pastel (Light / Mágico) */
+[data-theme="unicorn"] {
+    --bg-dark: #faf7ff;
+    --bg-surface: #ffffff;
+    --bg-elevated: #f3e8ff;
+    --border-color: #e9d5ff;
+    --border-subtle: rgba(168, 85, 247, 0.14);
+    --fox-orange: #A855F7;
+    --fox-orange-hover: #c084fc;
+    --fox-orange-glow: rgba(168, 85, 247, 0.3);
+    --text-main: #2e1065;
+    --text-muted: #7e69ab;
+}
+
+/* 5. Coffee - Café de Otoño (Dark / Sepia Cálido) */
+[data-theme="coffee"] {
+    --bg-dark: #1a1412;
+    --bg-surface: #251c19;
+    --bg-elevated: #342722;
+    --border-color: #48352e;
+    --border-subtle: rgba(217, 119, 6, 0.12);
+    --fox-orange: #D97706;
+    --fox-orange-hover: #f59e0b;
+    --fox-orange-glow: rgba(217, 119, 6, 0.3);
+    --text-main: #fdf6ed;
+    --text-muted: #aa9486;
+}
+
+/* 6. Mushroom - Bosque Cottagecore (Dark / Terracota Carmesí) */
+[data-theme="mushroom"] {
+    --bg-dark: #161214;
+    --bg-surface: #211a1f;
+    --bg-elevated: #2e242b;
+    --border-color: #42323e;
+    --border-subtle: rgba(239, 68, 68, 0.12);
+    --fox-orange: #EF4444;
+    --fox-orange-hover: #f87171;
+    --fox-orange-glow: rgba(239, 68, 68, 0.3);
+    --text-main: #fbf0f4;
+    --text-muted: #ad94a4;
+}
+
+/* 7. Owl - Búho Académico (Dark / Midnight Navy) */
+[data-theme="owl"] {
+    --bg-dark: #0c1222;
+    --bg-surface: #131d33;
+    --bg-elevated: #1b2847;
+    --border-color: #27385e;
+    --border-subtle: rgba(251, 191, 36, 0.12);
+    --fox-orange: #FBBF24;
+    --fox-orange-hover: #fcd34d;
+    --fox-orange-glow: rgba(251, 191, 36, 0.3);
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+}
+
+/* 8. Frog - Ranita Matcha Zen (Dark / Bosque Matcha) */
+[data-theme="frog"] {
+    --bg-dark: #0d1713;
+    --bg-surface: #14241e;
+    --bg-elevated: #1b3329;
+    --border-color: #27493b;
+    --border-subtle: rgba(16, 185, 129, 0.12);
+    --fox-orange: #10B981;
+    --fox-orange-hover: #34d399;
+    --fox-orange-glow: rgba(16, 185, 129, 0.3);
+    --text-main: #e6f9f0;
+    --text-muted: #7fa996;
+}
+
+/* 9. Penguin - Pingüino Glaciar (Dark / Glaciar Cyan) */
+[data-theme="penguin"] {
+    --bg-dark: #0e141a;
+    --bg-surface: #141e26;
+    --bg-elevated: #1b2833;
+    --border-color: #253746;
+    --border-subtle: rgba(6, 182, 212, 0.12);
+    --fox-orange: #06B6D4;
+    --fox-orange-hover: #22d3ee;
+    --fox-orange-glow: rgba(6, 182, 212, 0.3);
+    --text-main: #edf8fa;
+    --text-muted: #8ca5b5;
+}
+
+/* 10. Panda - Panda Bambú (Dark / Slate Bambú) */
+[data-theme="panda"] {
+    --bg-dark: #121612;
+    --bg-surface: #192019;
+    --bg-elevated: #222d22;
+    --border-color: #2f3e2f;
+    --border-subtle: rgba(132, 204, 22, 0.12);
+    --fox-orange: #84CC16;
+    --fox-orange-hover: #a3e635;
+    --fox-orange-glow: rgba(132, 204, 22, 0.3);
+    --text-main: #f2f8ed;
+    --text-muted: #8fa58b;
+}
+
+/* 11. Bee - Abejita Dorada (Dark / Carbón Dorado) */
+[data-theme="bee"] {
+    --bg-dark: #14130e;
+    --bg-surface: #1f1d15;
+    --bg-elevated: #2c281c;
+    --border-color: #3e3826;
+    --border-subtle: rgba(245, 158, 11, 0.12);
+    --fox-orange: #F59E0B;
+    --fox-orange-hover: #fbbf24;
+    --fox-orange-glow: rgba(245, 158, 11, 0.3);
+    --text-main: #fdfbf1;
+    --text-muted: #a49e8a;
+}
+
+/* 12. Wolf - Lobo Ártico (Dark / Slate Blue) */
+[data-theme="wolf"] {
+    --bg-dark: #0f141e;
+    --bg-surface: #161e2c;
+    --bg-elevated: #1f2b3e;
+    --border-color: #2c3c56;
+    --border-subtle: rgba(96, 165, 250, 0.12);
+    --fox-orange: #60A5FA;
+    --fox-orange-hover: #93c5fd;
+    --fox-orange-glow: rgba(96, 165, 250, 0.3);
+    --text-main: #f0f6ff;
+    --text-muted: #91a4c0;
+}
+
+/* 13. Lion - León Solar (Dark / Ámbar Solar) */
+[data-theme="lion"] {
+    --bg-dark: #19150b;
+    --bg-surface: #251f10;
+    --bg-elevated: #342c16;
+    --border-color: #483c1e;
+    --border-subtle: rgba(234, 179, 8, 0.12);
+    --fox-orange: #EAB308;
+    --fox-orange-hover: #facc15;
+    --fox-orange-glow: rgba(234, 179, 8, 0.3);
+    --text-main: #fefce8;
+    --text-muted: #a9a07e;
+}
+
+/* 14. Octopus - Pulpo Synthwave (Dark / Magenta Neón) */
+[data-theme="octopus"] {
+    --bg-dark: #140d1c;
+    --bg-surface: #1e132a;
+    --bg-elevated: #291a39;
+    --border-color: #3d2556;
+    --border-subtle: rgba(232, 121, 249, 0.12);
+    --fox-orange: #E879F9;
+    --fox-orange-hover: #f0abfc;
+    --fox-orange-glow: rgba(232, 121, 249, 0.3);
+    --text-main: #fdf4ff;
+    --text-muted: #b196c6;
+}
+
+/* 15. Whale - Océano Abisal (Dark / Azul Abisal) */
+[data-theme="whale"] {
+    --bg-dark: #0a131a;
+    --bg-surface: #101e29;
+    --bg-elevated: #162838;
+    --border-color: #1f3950;
+    --border-subtle: rgba(56, 189, 248, 0.12);
+    --fox-orange: #38BDF8;
+    --fox-orange-hover: #7dd3fc;
+    --fox-orange-glow: rgba(56, 189, 248, 0.3);
+    --text-main: #f0f9ff;
+    --text-muted: #84a6c0;
+}
+
+/* 16. Cosmos - Cosmos Estelar (Dark / Violeta Nebulosa) */
+[data-theme="cosmos"] {
+    --bg-dark: #100e1f;
+    --bg-surface: #18152e;
+    --bg-elevated: #221d41;
+    --border-color: #322b5e;
+    --border-subtle: rgba(139, 92, 246, 0.12);
+    --fox-orange: #8B5CF6;
+    --fox-orange-hover: #a78bfa;
+    --fox-orange-glow: rgba(139, 92, 246, 0.3);
+    --text-main: #f5f3ff;
+    --text-muted: #9e97cb;
+}
+
+/* 17. Bat - Murciélago Gótico (Dark / Terciopelo Rosa) */
+[data-theme="bat"] {
+    --bg-dark: #14090d;
+    --bg-surface: #200f15;
+    --bg-elevated: #2d151f;
+    --border-color: #401d2c;
+    --border-subtle: rgba(225, 29, 72, 0.12);
+    --fox-orange: #E11D48;
+    --fox-orange-hover: #f43f5e;
+    --fox-orange-glow: rgba(225, 29, 72, 0.3);
+    --text-main: #fff1f2;
+    --text-muted: #af8b96;
+}
+
+/* 18. Dino - Dino Matrix Retro (Dark / Verde Terminal) */
+[data-theme="dino"] {
+    --bg-dark: #0a140d;
+    --bg-surface: #102015;
+    --bg-elevated: #162c1d;
+    --border-color: #213f2a;
+    --border-subtle: rgba(34, 197, 94, 0.12);
+    --fox-orange: #22C55E;
+    --fox-orange-hover: #4ade80;
+    --fox-orange-glow: rgba(34, 197, 94, 0.3);
+    --text-main: #dcfce7;
+    --text-muted: #7ca988;
+}
+
+/* 19. Maple - Hoja de Otoño (Dark / Terracota) */
+[data-theme="maple"] {
+    --bg-dark: #18110d;
+    --bg-surface: #241812;
+    --bg-elevated: #322119;
+    --border-color: #462d22;
+    --border-subtle: rgba(234, 88, 12, 0.12);
+    --fox-orange: #EA580C;
+    --fox-orange-hover: #f97316;
+    --fox-orange-glow: rgba(234, 88, 12, 0.3);
+    --text-main: #fff7ed;
+    --text-muted: #b19888;
+}
+
+/* 20. Panther - Pantera OLED (True Black / Acero Platino) */
+[data-theme="panther"] {
+    --bg-dark: #000000;
+    --bg-surface: #0a0a0d;
+    --bg-elevated: #131317;
+    --border-color: #212128;
+    --border-subtle: rgba(255, 255, 255, 0.07);
+    --fox-orange: #94A3B8;
+    --fox-orange-hover: #cbd5e1;
+    --fox-orange-glow: rgba(148, 163, 184, 0.25);
+    --text-main: #f8fafc;
+    --text-muted: #7f899b;
+}
+
+/* ==========================================================================
+   REGLAS PARA TEMAS CLAROS (Light, Rabbit, Sakura, Unicorn)
+   ========================================================================== */
+[data-theme="light"] #codeEditor,
+[data-theme="rabbit"] #codeEditor,
+[data-theme="sakura"] #codeEditor,
+[data-theme="unicorn"] #codeEditor {
+    background-color: var(--bg-surface) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="light"] #lineNumbers,
+[data-theme="rabbit"] #lineNumbers,
+[data-theme="sakura"] #lineNumbers,
+[data-theme="unicorn"] #lineNumbers {
+    background-color: var(--bg-elevated) !important;
+    color: var(--text-muted) !important;
+    border-right: 1px solid var(--border-color) !important;
+}
+
+[data-theme="light"] #lineNumbers .line-num,
+[data-theme="rabbit"] #lineNumbers .line-num,
+[data-theme="sakura"] #lineNumbers .line-num,
+[data-theme="unicorn"] #lineNumbers .line-num {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="light"] .modal-content,
+[data-theme="rabbit"] .modal-content,
+[data-theme="sakura"] .modal-content,
+[data-theme="unicorn"] .modal-content,
+[data-theme="light"] .ai-drawer,
+[data-theme="rabbit"] .ai-drawer,
+[data-theme="sakura"] .ai-drawer,
+[data-theme="unicorn"] .ai-drawer,
+[data-theme="light"] .gallery-sidebar,
+[data-theme="rabbit"] .gallery-sidebar,
+[data-theme="sakura"] .gallery-sidebar,
+[data-theme="unicorn"] .gallery-sidebar,
+[data-theme="light"] .math-modal-content,
+[data-theme="rabbit"] .math-modal-content,
+[data-theme="sakura"] .math-modal-content,
+[data-theme="unicorn"] .math-modal-content,
+[data-theme="light"] .dropdown-content,
+[data-theme="rabbit"] .dropdown-content,
+[data-theme="sakura"] .dropdown-content,
+[data-theme="unicorn"] .dropdown-content {
+    background-color: var(--bg-surface) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .dropdown-item,
+[data-theme="rabbit"] .dropdown-item,
+[data-theme="sakura"] .dropdown-item,
+[data-theme="unicorn"] .dropdown-item {
+    color: var(--text-main) !important;
+}
+
+[data-theme="light"] .dropdown-item:hover,
+[data-theme="rabbit"] .dropdown-item:hover,
+[data-theme="sakura"] .dropdown-item:hover,
+[data-theme="unicorn"] .dropdown-item:hover {
+    background: var(--fox-orange) !important;
+    color: #ffffff !important;
+}
+
+[data-theme="light"] .dropdown-item kbd,
+[data-theme="rabbit"] .dropdown-item kbd,
+[data-theme="sakura"] .dropdown-item kbd,
+[data-theme="unicorn"] .dropdown-item kbd {
+    background: var(--bg-elevated) !important;
+    color: var(--text-muted) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="light"] .menu-btn,
+[data-theme="rabbit"] .menu-btn,
+[data-theme="sakura"] .menu-btn,
+[data-theme="unicorn"] .menu-btn {
+    color: var(--text-main);
+}
+
+[data-theme="light"] .menu-btn:hover,
+[data-theme="rabbit"] .menu-btn:hover,
+[data-theme="sakura"] .menu-btn:hover,
+[data-theme="unicorn"] .menu-btn:hover {
+    background: var(--bg-elevated);
+    color: var(--fox-orange);
+}
+
+[data-theme="light"] .btn-secondary-compact,
+[data-theme="rabbit"] .btn-secondary-compact,
+[data-theme="sakura"] .btn-secondary-compact,
+[data-theme="unicorn"] .btn-secondary-compact {
+    background: var(--bg-elevated);
+    color: var(--text-main);
+    border-color: var(--border-color);
+}
+
+[data-theme="light"] input,
+[data-theme="rabbit"] input,
+[data-theme="sakura"] input,
+[data-theme="unicorn"] input,
+[data-theme="light"] select,
+[data-theme="rabbit"] select,
+[data-theme="sakura"] select,
+[data-theme="unicorn"] select,
+[data-theme="light"] textarea,
+[data-theme="rabbit"] textarea,
+[data-theme="sakura"] textarea,
+[data-theme="unicorn"] textarea {
+    background-color: var(--bg-surface) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="light"] .btn-ghost,
+[data-theme="rabbit"] .btn-ghost,
+[data-theme="sakura"] .btn-ghost,
+[data-theme="unicorn"] .btn-ghost,
+[data-theme="light"] .btn-secondary,
+[data-theme="rabbit"] .btn-secondary,
+[data-theme="sakura"] .btn-secondary,
+[data-theme="unicorn"] .btn-secondary {
+    background: var(--bg-elevated);
+    color: var(--text-main);
+    border-color: var(--border-color);
+}
+
+[data-theme="light"] .btn-ghost:hover,
+[data-theme="rabbit"] .btn-ghost:hover,
+[data-theme="sakura"] .btn-ghost:hover,
+[data-theme="unicorn"] .btn-ghost:hover,
+[data-theme="light"] .btn-secondary:hover,
+[data-theme="rabbit"] .btn-secondary:hover,
+[data-theme="sakura"] .btn-secondary:hover,
+[data-theme="unicorn"] .btn-secondary:hover {
+    background: var(--border-color);
+    color: var(--text-main);
+}
+
+[data-theme="light"] .project-card,
+[data-theme="rabbit"] .project-card,
+[data-theme="sakura"] .project-card,
+[data-theme="unicorn"] .project-card,
+[data-theme="light"] .quick-card,
+[data-theme="rabbit"] .quick-card,
+[data-theme="sakura"] .quick-card,
+[data-theme="unicorn"] .quick-card,
+[data-theme="light"] .template-card,
+[data-theme="rabbit"] .template-card,
+[data-theme="sakura"] .template-card,
+[data-theme="unicorn"] .template-card,
+[data-theme="light"] .math-section,
+[data-theme="rabbit"] .math-section,
+[data-theme="sakura"] .math-section,
+[data-theme="unicorn"] .math-section {
+    background-color: var(--bg-surface) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="light"] .hero-card,
+[data-theme="rabbit"] .hero-card,
+[data-theme="sakura"] .hero-card,
+[data-theme="unicorn"] .hero-card {
+    background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-elevated) 100%) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="light"] .hero-snippet,
+[data-theme="rabbit"] .hero-snippet,
+[data-theme="sakura"] .hero-snippet,
+[data-theme="unicorn"] .hero-snippet,
+[data-theme="light"] .hero-preview,
+[data-theme="rabbit"] .hero-preview,
+[data-theme="sakura"] .hero-preview,
+[data-theme="unicorn"] .hero-preview {
+    background: rgba(255, 255, 255, 0.88) !important;
+    border: 1px solid var(--border-color) !important;
+    border-left: 3px solid var(--fox-orange) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="light"] .modal-close,
+[data-theme="rabbit"] .modal-close,
+[data-theme="sakura"] .modal-close,
+[data-theme="unicorn"] .modal-close,
+[data-theme="light"] .btn-close,
+[data-theme="rabbit"] .btn-close,
+[data-theme="sakura"] .btn-close,
+[data-theme="unicorn"] .btn-close {
+    color: var(--text-muted);
+}
+
+[data-theme="light"] .modal-close:hover,
+[data-theme="rabbit"] .modal-close:hover,
+[data-theme="sakura"] .modal-close:hover,
+[data-theme="unicorn"] .modal-close:hover,
+[data-theme="light"] .btn-close:hover,
+[data-theme="rabbit"] .btn-close:hover,
+[data-theme="sakura"] .btn-close:hover,
+[data-theme="unicorn"] .btn-close:hover {
+    color: var(--text-main);
+    background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .math-toolbar-top,
+[data-theme="rabbit"] .math-toolbar-top,
+[data-theme="sakura"] .math-toolbar-top,
+[data-theme="unicorn"] .math-toolbar-top,
+[data-theme="light"] .math-quick-btn,
+[data-theme="rabbit"] .math-quick-btn,
+[data-theme="sakura"] .math-quick-btn,
+[data-theme="unicorn"] .math-quick-btn,
+[data-theme="light"] .math-body,
+[data-theme="rabbit"] .math-body,
+[data-theme="sakura"] .math-body,
+[data-theme="unicorn"] .math-body,
+[data-theme="light"] .math-formula-textarea,
+[data-theme="rabbit"] .math-formula-textarea,
+[data-theme="sakura"] .math-formula-textarea,
+[data-theme="unicorn"] .math-formula-textarea,
+[data-theme="light"] .math-live-preview-box,
+[data-theme="rabbit"] .math-live-preview-box,
+[data-theme="sakura"] .math-live-preview-box,
+[data-theme="unicorn"] .math-live-preview-box,
+[data-theme="light"] .math-search-input,
+[data-theme="rabbit"] .math-search-input,
+[data-theme="sakura"] .math-search-input,
+[data-theme="unicorn"] .math-search-input {
+    background: var(--bg-surface) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="light"] .top-bar,
+[data-theme="rabbit"] .top-bar,
+[data-theme="sakura"] .top-bar,
+[data-theme="unicorn"] .top-bar,
+[data-theme="light"] .pane-header,
+[data-theme="rabbit"] .pane-header,
+[data-theme="sakura"] .pane-header,
+[data-theme="unicorn"] .pane-header {
+    background-color: var(--bg-surface);
+    border-color: var(--border-color);
+}
+
+[data-theme="light"] .pane-title,
+[data-theme="rabbit"] .pane-title,
+[data-theme="sakura"] .pane-title,
+[data-theme="unicorn"] .pane-title,
+[data-theme="light"] #editorCurrentFileTitle,
+[data-theme="rabbit"] #editorCurrentFileTitle,
+[data-theme="sakura"] #editorCurrentFileTitle,
+[data-theme="unicorn"] #editorCurrentFileTitle {
+    color: var(--text-main);
+}
+
+[data-theme="light"] .editor-status,
+[data-theme="rabbit"] .editor-status,
+[data-theme="sakura"] .editor-status,
+[data-theme="unicorn"] .editor-status {
+    background: var(--bg-elevated);
+    border-color: var(--border-color);
+    color: var(--text-muted);
+}
+
+[data-theme="light"] .project-sidebar,
+[data-theme="rabbit"] .project-sidebar,
+[data-theme="sakura"] .project-sidebar,
+[data-theme="unicorn"] .project-sidebar {
+    background-color: var(--bg-dark);
+    border-color: var(--border-color);
+}
+
+[data-theme="light"] .sidebar-header,
+[data-theme="rabbit"] .sidebar-header,
+[data-theme="sakura"] .sidebar-header,
+[data-theme="unicorn"] .sidebar-header,
+[data-theme="light"] .sidebar-section-header,
+[data-theme="rabbit"] .sidebar-section-header,
+[data-theme="sakura"] .sidebar-section-header,
+[data-theme="unicorn"] .sidebar-section-header {
+    border-color: var(--border-color);
+}
+
+[data-theme="light"] .file-tree-item,
+[data-theme="rabbit"] .file-tree-item,
+[data-theme="sakura"] .file-tree-item,
+[data-theme="unicorn"] .file-tree-item {
+    color: var(--text-main);
+}
+
+[data-theme="light"] .file-tree-item:hover,
+[data-theme="rabbit"] .file-tree-item:hover,
+[data-theme="sakura"] .file-tree-item:hover,
+[data-theme="unicorn"] .file-tree-item:hover {
+    background: var(--bg-elevated);
+}
+
+[data-theme="light"] .file-tree-item.active,
+[data-theme="rabbit"] .file-tree-item.active,
+[data-theme="sakura"] .file-tree-item.active,
+[data-theme="unicorn"] .file-tree-item.active {
+    background: var(--bg-elevated);
+    color: var(--fox-orange);
+}
+
+[data-theme="light"] .editor-find-bar,
+[data-theme="rabbit"] .editor-find-bar,
+[data-theme="sakura"] .editor-find-bar,
+[data-theme="unicorn"] .editor-find-bar,
+[data-theme="light"] .editor-autocomplete-popup,
+[data-theme="rabbit"] .editor-autocomplete-popup,
+[data-theme="sakura"] .editor-autocomplete-popup,
+[data-theme="unicorn"] .editor-autocomplete-popup {
+    background: var(--bg-surface) !important;
+    border-color: var(--border-color) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* ==========================================================================
+   MASCOTAS VECTORIALES Y SELECTOR DE TEMAS
+   ========================================================================== */
+.theme-mascot-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    line-height: 1;
+    min-width: 22px;
+    min-height: 22px;
+    color: var(--fox-orange);
+    filter: drop-shadow(0 2px 8px var(--fox-orange-glow));
+}
+
+.theme-mascot-icon svg,
+.theme-mascot-icon .pixel-mascot-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
+}
+
+.pixel-mascot-img {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.math-quick-ribbon {
+    scrollbar-width: none;
+}
+.math-quick-ribbon::-webkit-scrollbar {
+    display: none;
+}
+
+.theme-card-option .theme-card-icon svg,
+.theme-card-option .theme-card-mascot svg,
+.theme-card-option .theme-card-icon .pixel-mascot-img,
+.theme-card-option .theme-card-mascot .pixel-mascot-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
+}
+
+.fox-illustration {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fox-illustration svg,
+.fox-illustration .pixel-mascot-img {
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    color: var(--fox-orange);
+    filter: drop-shadow(0 6px 18px var(--fox-orange-glow));
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease, color 0.3s ease;
+}
+
+.fox-illustration:hover svg,
+.fox-illustration:hover .pixel-mascot-img {
+    transform: scale(1.08) rotate(3deg);
+}
+
+/* Cuadrícula responsiva de selección de temas (20 temas + custom) */
+.theme-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+    gap: 10px;
+    padding: 6px 2px;
+    margin-bottom: 8px;
+}
+
+.theme-card-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    border-radius: 10px;
+    background: var(--bg-surface);
+    border: 1.5px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    user-select: none;
+    gap: 6px;
+    text-align: center;
+}
+
+.theme-card-option:hover {
+    border-color: var(--fox-orange);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.theme-card-option.active {
+    border-color: var(--fox-orange);
+    background: var(--bg-elevated);
+    box-shadow: 0 0 0 2px var(--fox-orange-glow);
+    color: var(--fox-orange);
+}
+
+.theme-card-mascot,
+.theme-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--bg-dark);
+    margin-bottom: 4px;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-card-option:hover .theme-card-mascot,
+.theme-card-option:hover .theme-card-icon {
+    transform: scale(1.1);
+}
+
+.theme-card-option:hover .theme-card-mascot {
+    transform: scale(1.12);
+}
+
+.theme-card-name {
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-main);
+    display: block;
+    word-break: break-word;
+}
+
+.theme-card-option.active .theme-card-name {
+    color: var(--fox-orange);
+}
+
+.theme-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.theme-card-badge {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 6px currentColor;
+}
+
+.theme-card-mode {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   32x32 PIXEL-ART THEME ATMOSPHERE EFFECTS (DETRÁS DEL TEXTO Y TARJETAS)
+   ========================================================================== */
+#natexThemeEffectsCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.45;
+    transition: opacity 0.4s ease;
+}
+
+#natexThemeEffectsCanvas.hidden {
+    display: none !important;
+}
+
+/* Capas de interfaz por encima del lienzo de ambiente (z-index > 0) para que
+   las hojas/pétalos pasen siempre por detrás de las letras y controles */
+.top-bar {
+    position: relative;
+    z-index: 20;
+    background-color: color-mix(in srgb, var(--bg-surface) 88%, transparent) !important;
+}
+
+.home-dashboard {
+    z-index: 10;
+    background-color: transparent !important;
+}
+
+.home-dashboard .project-card,
+.home-dashboard .quick-card {
+    background-color: color-mix(in srgb, var(--bg-surface) 85%, transparent) !important;
+}
+
+.workspace {
+    position: relative;
+    z-index: 5;
+    background-color: transparent !important;
+}
+
+.editor-pane,
+.editor-wrapper,
+#codeEditor,
+[data-theme="light"] #codeEditor,
+[data-theme="rabbit"] #codeEditor,
+[data-theme="sakura"] #codeEditor,
+[data-theme="unicorn"] #codeEditor {
+    background-color: transparent !important;
+}
+
+.line-numbers,
+#lineNumbers,
+[data-theme="light"] #lineNumbers,
+.project-sidebar,
+[data-theme="light"] .project-sidebar,
+.gallery-sidebar,
+[data-theme="light"] .gallery-sidebar {
+    background-color: color-mix(in srgb, var(--bg-surface) 76%, transparent) !important;
+}
+
+.pane-header,
+[data-theme="light"] .pane-header {
+    background-color: color-mix(in srgb, var(--bg-surface) 86%, transparent) !important;
+}
+
+.preview-pane,
+.preview-content,
+.pdf-custom-viewer {
+    background-color: color-mix(in srgb, var(--bg-elevated) 72%, transparent) !important;
+}

@@ -1,5 +1,5 @@
 #define MyAppName "NaTex Studio"
-#define MyAppVersion "0.2"
+#define MyAppVersion "1.3.0"
 #define MyAppPublisher "NaTex Team"
 #define MyAppURL "https://github.com/NachoFari/NaTex"
 #define MyAppExeName "NaTex.exe"
@@ -15,7 +15,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={userappdata}\{#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir=dist_installer
-OutputBaseFilename=NaTex-Setup-v0.2
+OutputBaseFilename=NaTex-Setup-v1.3.0
 SetupIconFile=natex.ico
 Compression=lzma2/max
 SolidCompression=yes
@@ -30,7 +30,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "NaTex.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "dist\NaTex.exe"; DestDir: "{app}"; DestName: "NaTex.exe"; Flags: ignoreversion
 Source: "iniciar_natex.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "config.example.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
@@ -40,6 +40,10 @@ Source: "tools\*"; DestDir: "{app}\tools"; Flags: ignoreversion recursesubdirs c
 Source: "projects\Mi_Primer_Documento\*"; DestDir: "{app}\projects\Mi_Primer_Documento"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "templates\*"; DestDir: "{app}\templates"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "static\*"; DestDir: "{app}\static"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "core\*"; DestDir: "{app}\core"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "services\*"; DestDir: "{app}\services"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "server\*"; DestDir: "{app}\server"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "app.py"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\natex.ico"

@@ -82,7 +82,11 @@ function initProjectSidebar() {
     if (btnNewFile) {
         btnNewFile.onclick = async () => {
             const isEn = currentLanguage === 'en';
-            const filename = prompt(isEn ? 'Name for new file (e.g. chapter1.tex, refs.bib):' : 'Nombre del nuevo archivo (ej. capitulo1.tex, referencias.bib):');
+            const filename = await showAppPrompt({
+                title: isEn ? 'New File' : 'Nuevo Archivo',
+                message: isEn ? 'Name for new file (e.g. chapter1.tex, refs.bib):' : 'Nombre del nuevo archivo (ej. capitulo1.tex, referencias.bib):',
+                placeholder: 'capitulo1.tex'
+            });
             if (!filename || !filename.trim()) return;
             let clean = filename.trim().replace(/\\/g, '/').replace(/\s+/g, '_');
             if (!clean.includes('.')) {
@@ -116,10 +120,10 @@ function initProjectSidebar() {
                 if (data.success) {
                     await loadProjectCode(currentProject, clean);
                 } else {
-                    alert(data.error || 'Error al crear archivo');
+                    showToast(data.error || 'Error al crear archivo', 'error');
                 }
             } catch (err) {
-                alert(String(err));
+                showToast(String(err), 'error');
             }
         };
     }
@@ -128,7 +132,11 @@ function initProjectSidebar() {
     if (btnNewFolder) {
         btnNewFolder.onclick = async () => {
             const isEn = currentLanguage === 'en';
-            const foldername = prompt(isEn ? 'Name for new folder (e.g. images):' : 'Nombre de la nueva carpeta (ej. imagenes):');
+            const foldername = await showAppPrompt({
+                title: isEn ? 'New Folder' : 'Nueva Carpeta',
+                message: isEn ? 'Name for new folder (e.g. images):' : 'Nombre de la nueva carpeta (ej. imagenes):',
+                placeholder: 'imagenes'
+            });
             if (!foldername || !foldername.trim()) return;
             const clean = foldername.trim().replace(/\\/g, '/').replace(/\s+/g, '_');
 
@@ -144,10 +152,10 @@ function initProjectSidebar() {
                     saveExpandedFolders();
                     await loadProjectCode(currentProject, currentOpenFile);
                 } else {
-                    alert(data.error || 'Error al crear carpeta');
+                    showToast(data.error || 'Error al crear carpeta', 'error');
                 }
             } catch (err) {
-                alert(String(err));
+                showToast(String(err), 'error');
             }
         };
     }
@@ -169,6 +177,7 @@ function initProjectSidebar() {
     // Soporte Drag and Drop sobre la barra lateral
     if (sidebar) {
         sidebar.addEventListener('dragover', (e) => {
+            if (e.target.closest('.file-tree-container') || e.target.closest('.file-tree-item')) return;
             e.preventDefault();
             sidebar.style.borderColor = 'var(--fox-orange)';
         });
@@ -176,6 +185,7 @@ function initProjectSidebar() {
             sidebar.style.borderColor = '';
         });
         sidebar.addEventListener('drop', async (e) => {
+            if (e.target.closest('.file-tree-container') || e.target.closest('.file-tree-item')) return;
             e.preventDefault();
             sidebar.style.borderColor = '';
             if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
@@ -188,28 +198,31 @@ function initProjectSidebar() {
     }
 }
 
-async function uploadFileToProject(file) {
+async function uploadFileToProject(file, targetFolder = '') {
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = async (event) => {
             const base64Data = event.target.result;
+            const destFilename = targetFolder ? `${targetFolder}/${file.name}` : file.name;
             try {
                 const res = await fetch('/api/project/upload_base64', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         project: currentProject,
-                        filename: file.name,
+                        filename: destFilename,
                         data: base64Data
                     })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    editorStatus.innerText = `¡${file.name} subido con éxito! ✓`;
-                    editorStatus.style.color = '#10B981';
+                    showToast((currentLanguage === 'en' ? 'Uploaded ' : '¡Subido: ') + file.name + ' ✓', 'success');
+                } else {
+                    showToast(data.error || 'Error uploading file', 'error');
                 }
             } catch (err) {
                 console.error('Error al subir archivo:', err);
+                showToast(String(err), 'error');
             }
             resolve();
         };
@@ -222,6 +235,91 @@ function saveExpandedFolders() {
     try {
         localStorage.setItem('natex_expanded_folders', JSON.stringify([...expandedFolders]));
     } catch(e) {}
+}
+
+let draggedItemPath = null;
+
+async function moveTreeItem(srcPath, destFolder = '') {
+    if (!srcPath || srcPath === 'main.tex') {
+        showToast(currentLanguage === 'en' ? 'Cannot move main.tex' : 'No se puede mover el archivo principal main.tex', 'error');
+        return;
+    }
+    const cleanSrc = srcPath.replace(/\\/g, '/');
+    const cleanDest = (destFolder || '').replace(/\\/g, '/');
+    const lastSlash = cleanSrc.lastIndexOf('/');
+    const currentFolder = lastSlash === -1 ? '' : cleanSrc.substring(0, lastSlash);
+    if (currentFolder === cleanDest) {
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/project/file/move', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                name: currentProject,
+                src: cleanSrc,
+                dest_folder: cleanDest
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            const isEn = currentLanguage === 'en';
+            showToast(isEn ? 'Moved successfully! ✓' : '¡Movido con éxito! ✓', 'success');
+            if (cleanDest) {
+                expandedFolders.add(cleanDest);
+                saveExpandedFolders();
+            }
+            if (currentOpenFile === cleanSrc) {
+                currentOpenFile = data.new_path || (cleanDest ? `${cleanDest}/${cleanSrc.split('/').pop()}` : cleanSrc.split('/').pop());
+            } else if (currentOpenFile && currentOpenFile.startsWith(cleanSrc + '/')) {
+                const sub = currentOpenFile.substring(cleanSrc.length);
+                currentOpenFile = (data.new_path || cleanDest) + sub;
+            }
+            await loadProjectCode(currentProject, currentOpenFile);
+        } else {
+            showToast(data.error || (currentLanguage === 'en' ? 'Error moving item' : 'Error al mover elemento'), 'error');
+        }
+    } catch (err) {
+        showToast(String(err), 'error');
+    }
+}
+
+function setupTreeContainerDnD() {
+    const treeContainer = document.getElementById('fileTreeContainer');
+    if (!treeContainer || treeContainer._hasDnD) return;
+    treeContainer._hasDnD = true;
+
+    treeContainer.addEventListener('dragover', (e) => {
+        if (e.target.closest('.folder-item')) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        treeContainer.classList.add('drag-over');
+    });
+
+    treeContainer.addEventListener('dragleave', (e) => {
+        if (!treeContainer.contains(e.relatedTarget)) {
+            treeContainer.classList.remove('drag-over');
+        }
+    });
+
+    treeContainer.addEventListener('drop', async (e) => {
+        if (e.target.closest('.folder-item')) return;
+        e.preventDefault();
+        treeContainer.classList.remove('drag-over');
+
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            for (let file of e.dataTransfer.files) {
+                await uploadFileToProject(file, '');
+            }
+            await loadProjectCode(currentProject, currentOpenFile);
+            return;
+        }
+
+        const srcPath = draggedItemPath || e.dataTransfer.getData('text/plain');
+        if (!srcPath || srcPath === 'main.tex') return;
+        await moveTreeItem(srcPath, '');
+    });
 }
 
 function renderFileTree(files) {
@@ -270,6 +368,57 @@ function renderFileTree(files) {
                 </div>
                 <button class="file-more-btn" title="Opciones">⋮</button>
             `;
+
+            // Drag and Drop para carpetas
+            folderRow.setAttribute('draggable', 'true');
+            folderRow.addEventListener('dragstart', (e) => {
+                draggedItemPath = nodePath;
+                e.dataTransfer.setData('text/plain', nodePath);
+                e.dataTransfer.effectAllowed = 'move';
+                folderRow.classList.add('is-dragging');
+            });
+            folderRow.addEventListener('dragend', () => {
+                draggedItemPath = null;
+                folderRow.classList.remove('is-dragging');
+            });
+
+            folderRow.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.dataTransfer.dropEffect = 'move';
+                folderRow.classList.add('drag-over');
+            });
+            folderRow.addEventListener('dragleave', (e) => {
+                if (!folderRow.contains(e.relatedTarget)) {
+                    folderRow.classList.remove('drag-over');
+                }
+            });
+            folderRow.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                folderRow.classList.remove('drag-over');
+
+                // Archivos externos de Windows
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    for (let file of e.dataTransfer.files) {
+                        await uploadFileToProject(file, nodePath);
+                    }
+                    expandedFolders.add(nodePath);
+                    saveExpandedFolders();
+                    await loadProjectCode(currentProject, currentOpenFile);
+                    return;
+                }
+
+                // Mover archivo/carpeta interno
+                const srcPath = draggedItemPath || e.dataTransfer.getData('text/plain');
+                if (!srcPath || srcPath === nodePath || srcPath === 'main.tex') return;
+                if (nodePath.startsWith(srcPath + '/')) {
+                    showToast(currentLanguage === 'en' ? 'Cannot move folder into itself' : 'No puedes mover una carpeta dentro de sí misma', 'error');
+                    return;
+                }
+
+                await moveTreeItem(srcPath, nodePath);
+            });
 
             const childrenContainer = document.createElement('div');
             childrenContainer.className = 'folder-children';
@@ -339,6 +488,21 @@ function renderFileTree(files) {
                 ${nodePath !== 'main.tex' ? `<button class="file-more-btn" title="Opciones">⋮</button>` : ''}
             `;
 
+            // Drag and Drop para archivos
+            if (nodePath !== 'main.tex') {
+                fileRow.setAttribute('draggable', 'true');
+                fileRow.addEventListener('dragstart', (e) => {
+                    draggedItemPath = nodePath;
+                    e.dataTransfer.setData('text/plain', nodePath);
+                    e.dataTransfer.effectAllowed = 'move';
+                    fileRow.classList.add('is-dragging');
+                });
+                fileRow.addEventListener('dragend', () => {
+                    draggedItemPath = null;
+                    fileRow.classList.remove('is-dragging');
+                });
+            }
+
             fileRow.onclick = async (e) => {
                 if (e.target.closest('.file-more-btn')) {
                     e.stopPropagation();
@@ -378,6 +542,7 @@ function renderFileTree(files) {
     fileList.forEach(node => {
         container.appendChild(createNodeElement(node, true));
     });
+    setupTreeContainerDnD();
 }
 
 function closeAllFileContextMenus() {
@@ -402,7 +567,11 @@ function openFolderContextMenu(folder, event) {
     btnNewFile.onclick = async (e) => {
         e.stopPropagation();
         closeAllFileContextMenus();
-        const fname = prompt(isEn ? `New file name in ${folder.name}/:` : `Nombre del nuevo archivo en ${folder.name}/:`);
+        const fname = await showAppPrompt({
+            title: isEn ? 'New File' : 'Nuevo Archivo',
+            message: isEn ? `New file name in ${folder.name}/:` : `Nombre del nuevo archivo en ${folder.name}/:`,
+            placeholder: 'capitulo.tex'
+        });
         if (!fname || !fname.trim()) return;
         let clean = fname.trim().replace(/\s+/g, '_');
         if (!clean.includes('.')) clean += '.tex';
@@ -419,9 +588,9 @@ function openFolderContextMenu(folder, event) {
                 saveExpandedFolders();
                 await loadProjectCode(currentProject, fullRelPath);
             } else {
-                alert(data.error || 'Error al crear archivo');
+                showToast(data.error || 'Error al crear archivo', 'error');
             }
-        } catch (err) { alert(String(err)); }
+        } catch (err) { showToast(String(err), 'error'); }
     };
 
     // 2. Nueva subcarpeta aquí
@@ -431,7 +600,11 @@ function openFolderContextMenu(folder, event) {
     btnNewSubfolder.onclick = async (e) => {
         e.stopPropagation();
         closeAllFileContextMenus();
-        const subname = prompt(isEn ? `New subfolder in ${folder.name}/:` : `Nombre de la subcarpeta en ${folder.name}/:`);
+        const subname = await showAppPrompt({
+            title: isEn ? 'New Subfolder' : 'Nueva Subcarpeta',
+            message: isEn ? `New subfolder in ${folder.name}/:` : `Nombre de la subcarpeta en ${folder.name}/:`,
+            placeholder: 'secciones'
+        });
         if (!subname || !subname.trim()) return;
         const clean = subname.trim().replace(/\s+/g, '_');
         const fullRelPath = `${folderPath}/${clean}`;
@@ -448,9 +621,9 @@ function openFolderContextMenu(folder, event) {
                 saveExpandedFolders();
                 await loadProjectCode(currentProject, currentOpenFile);
             } else {
-                alert(data.error || 'Error al crear subcarpeta');
+                showToast(data.error || 'Error al crear subcarpeta', 'error');
             }
-        } catch (err) { alert(String(err)); }
+        } catch (err) { showToast(String(err), 'error'); }
     };
 
     // 3. Renombrar carpeta
@@ -460,7 +633,11 @@ function openFolderContextMenu(folder, event) {
     btnRename.onclick = async (e) => {
         e.stopPropagation();
         closeAllFileContextMenus();
-        const newName = prompt(isEn ? 'New folder name:' : 'Nuevo nombre para la carpeta:', folder.name);
+        const newName = await showAppPrompt({
+            title: isEn ? 'Rename Folder' : 'Renombrar Carpeta',
+            message: isEn ? 'New folder name:' : 'Nuevo nombre para la carpeta:',
+            defaultValue: folder.name
+        });
         if (!newName || !newName.trim() || newName === folder.name) return;
         const cleanName = newName.trim().replace(/\s+/g, '_');
         try {
@@ -480,9 +657,9 @@ function openFolderContextMenu(folder, event) {
                 saveExpandedFolders();
                 await loadProjectCode(currentProject, currentOpenFile);
             } else {
-                alert(data.error || 'Error al renombrar carpeta');
+                showToast(data.error || 'Error al renombrar carpeta', 'error');
             }
-        } catch (err) { alert(String(err)); }
+        } catch (err) { showToast(String(err), 'error'); }
     };
 
     // 4. Eliminar carpeta
@@ -492,7 +669,12 @@ function openFolderContextMenu(folder, event) {
     btnDelete.onclick = async (e) => {
         e.stopPropagation();
         closeAllFileContextMenus();
-        if (!confirm(isEn ? `Are you sure you want to delete folder "${folder.name}" and all its contents?` : `¿Estás seguro de que deseas eliminar la carpeta "${folder.name}" y todos sus contenidos?`)) return;
+        const ok = await showAppConfirm({
+            title: isEn ? 'Delete Folder' : 'Eliminar Carpeta',
+            message: isEn ? `Are you sure you want to delete folder "${folder.name}" and all its contents?` : `¿Estás seguro de que deseas eliminar la carpeta "${folder.name}" y todos sus contenidos?`,
+            confirmText: isEn ? 'Delete' : 'Eliminar'
+        });
+        if (!ok) return;
         try {
             const res = await fetch('/api/project/file/delete', {
                 method: 'POST',
@@ -511,9 +693,9 @@ function openFolderContextMenu(folder, event) {
                 }
                 await loadProjectCode(currentProject, currentOpenFile);
             } else {
-                alert(data.error || 'Error al eliminar carpeta');
+                showToast(data.error || 'Error al eliminar carpeta', 'error');
             }
-        } catch (err) { alert(String(err)); }
+        } catch (err) { showToast(String(err), 'error'); }
     };
 
     menu.appendChild(btnNewFile);
@@ -551,7 +733,11 @@ function openFileContextMenu(file, event) {
     btnRename.onclick = async (e) => {
         e.stopPropagation();
         closeAllFileContextMenus();
-        const newName = prompt(isEn ? 'New file name:' : 'Nuevo nombre para el archivo:', file.name);
+        const newName = await showAppPrompt({
+            title: isEn ? 'Rename File' : 'Renombrar Archivo',
+            message: isEn ? 'New file name:' : 'Nuevo nombre para el archivo:',
+            defaultValue: file.name
+        });
         if (!newName || !newName.trim() || newName === file.name) return;
         const cleanName = newName.trim().replace(/\s+/g, '_');
         try {
@@ -570,10 +756,10 @@ function openFileContextMenu(file, event) {
                 if (currentOpenFile === filePath) currentOpenFile = updatedPath;
                 await loadProjectCode(currentProject, currentOpenFile);
             } else {
-                alert(data.error || 'Error al renombrar archivo');
+                showToast(data.error || 'Error al renombrar archivo', 'error');
             }
         } catch (err) {
-            alert('Error de conexión al renombrar');
+            showToast('Error de conexión al renombrar', 'error');
         }
     };
 
@@ -584,11 +770,7 @@ function openFileContextMenu(file, event) {
         e.stopPropagation();
         closeAllFileContextMenus();
         navigator.clipboard.writeText(filePath);
-        if (typeof showToast === 'function') {
-            showToast(isEn ? 'Path copied to clipboard!' : '¡Ruta copiada al portapapeles!');
-        } else {
-            alert(isEn ? `Path copied: ${filePath}` : `Ruta copiada: ${filePath}`);
-        }
+        showToast(isEn ? 'Path copied to clipboard!' : '¡Ruta copiada al portapapeles!', 'success');
     };
 
     const btnDelete = document.createElement('button');
@@ -597,8 +779,12 @@ function openFileContextMenu(file, event) {
     btnDelete.onclick = async (e) => {
         e.stopPropagation();
         closeAllFileContextMenus();
-        const isEn = currentLanguage === 'en';
-        if (!confirm(isEn ? `Are you sure you want to delete "${file.name}"?` : `¿Estás seguro de que deseas eliminar "${file.name}"?`)) return;
+        const ok = await showAppConfirm({
+            title: isEn ? 'Delete File' : 'Eliminar Archivo',
+            message: isEn ? `Are you sure you want to delete "${file.name}"?` : `¿Estás seguro de que deseas eliminar "${file.name}"?`,
+            confirmText: isEn ? 'Delete' : 'Eliminar'
+        });
+        if (!ok) return;
         try {
             const res = await fetch('/api/project/file/delete', {
                 method: 'POST',
@@ -613,10 +799,10 @@ function openFileContextMenu(file, event) {
                 if (currentOpenFile === filePath) currentOpenFile = 'main.tex';
                 await loadProjectCode(currentProject, currentOpenFile);
             } else {
-                alert(data.error || 'Error al eliminar archivo');
+                showToast(data.error || 'Error al eliminar archivo', 'error');
             }
         } catch (err) {
-            alert('Error de conexión al eliminar');
+            showToast('Error de conexión al eliminar', 'error');
         }
     };
 
@@ -796,8 +982,15 @@ function jumpToLine(lineNumber) {
     codeEditor.focus();
     codeEditor.setSelectionRange(charPos, charPos + lines[lineNumber - 1].length);
 
-    const lineHeight = 21;
-    const targetScroll = Math.max(0, (lineNumber - 6) * lineHeight);
+    let targetScroll = 0;
+    const lineElem = lineNumbers && lineNumbers.children && lineNumbers.children[lineNumber - 1];
+    if (lineElem && typeof lineElem.offsetTop === 'number') {
+        targetScroll = Math.max(0, lineElem.offsetTop - 115);
+    } else {
+        const lineHeight = 23;
+        targetScroll = Math.max(0, (lineNumber - 6) * lineHeight);
+    }
+
     codeEditor.scrollTo({ top: targetScroll, behavior: 'smooth' });
     if (lineNumbers) lineNumbers.scrollTop = targetScroll;
 
@@ -808,6 +1001,6 @@ function jumpToLine(lineNumber) {
 }
 
 // ==========================================================================
-// CREADOR VISUAL DE TABLAS (MINI-EXCEL)
+// EDITOR VISUAL DE TABLAS / VISUAL TABLE STUDIO
 // ==========================================================================
 

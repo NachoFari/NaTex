@@ -1,4 +1,4 @@
-﻿# Python
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -13,6 +13,8 @@ config.json
 projects/*
 !projects/Mi_Primer_Documento/
 projects/Mi_Primer_Documento/*.synctex.gz
+projects/Mi_Primer_Documento/.history/
+.history/
 
 # Empaquetado y Releases
 build/

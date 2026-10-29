@@ -1,0 +1,82 @@
+# -*- coding: utf-8 -*-
+"""NaTex Services package."""
+
+from services.compiler_service import (
+    extract_compiler_error_line,
+    detect_compile_target,
+    compile_project_file,
+    compile_simple_document,
+)
+from services.synctex_service import (
+    parse_synctex_file,
+    synctex_forward,
+    synctex_inverse,
+)
+from services.project_service import (
+    resolve_safe_project_path,
+    save_project_snapshot,
+    list_project_snapshots,
+    get_project_snapshot,
+    scan_project_files,
+    get_project_details_list,
+    load_project_file,
+    save_project_file,
+    create_project_file,
+    delete_project_file,
+    rename_project_file,
+    move_project_file,
+    create_project,
+    list_templates,
+    apply_template,
+    save_user_template,
+    export_project_zip,
+    import_project_zip,
+    get_gallery_images,
+    upload_base64_asset,
+    delete_asset,
+    rename_asset,
+    import_cli_path,
+)
+from services.ai_service import call_ai_service, process_voice_dictation
+from services.tunnel_service import cleanup_tunnel, start_tunnel_thread, restart_tunnel
+from services.updater_service import check_github_update, apply_git_update
+
+__all__ = [
+    'extract_compiler_error_line',
+    'detect_compile_target',
+    'compile_project_file',
+    'compile_simple_document',
+    'parse_synctex_file',
+    'synctex_forward',
+    'synctex_inverse',
+    'resolve_safe_project_path',
+    'save_project_snapshot',
+    'list_project_snapshots',
+    'get_project_snapshot',
+    'scan_project_files',
+    'get_project_details_list',
+    'load_project_file',
+    'save_project_file',
+    'create_project_file',
+    'delete_project_file',
+    'rename_project_file',
+    'move_project_file',
+    'create_project',
+    'list_templates',
+    'apply_template',
+    'save_user_template',
+    'export_project_zip',
+    'import_project_zip',
+    'get_gallery_images',
+    'upload_base64_asset',
+    'delete_asset',
+    'rename_asset',
+    'import_cli_path',
+    'call_ai_service',
+    'process_voice_dictation',
+    'cleanup_tunnel',
+    'start_tunnel_thread',
+    'restart_tunnel',
+    'check_github_update',
+    'apply_git_update',
+]

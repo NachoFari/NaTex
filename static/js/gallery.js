@@ -189,7 +189,11 @@ function updateFilesList(files) {
 async function renameGalleryAsset(filename, project) {
     const proj = project || currentProject;
     const isEn = currentLanguage === 'en';
-    const newName = prompt(isEn ? `New name for image "${filename}":` : `Nuevo nombre para la imagen "${filename}":`, filename);
+    const newName = await showAppPrompt({
+        title: isEn ? 'Rename Image' : 'Renombrar Imagen',
+        message: isEn ? `New name for image "${filename}":` : `Nuevo nombre para la imagen "${filename}":`,
+        defaultValue: filename
+    });
     if (!newName || newName.trim() === '' || newName.trim() === filename) return;
 
     try {
@@ -211,17 +215,22 @@ async function renameGalleryAsset(filename, project) {
             }
             refreshGalleryModal();
         } else {
-            alert((isEn ? 'Could not rename image: ' : 'No se pudo renombrar la imagen: ') + (data.error || ''));
+            showToast((isEn ? 'Could not rename image: ' : 'No se pudo renombrar la imagen: ') + (data.error || ''), 'error');
         }
     } catch (err) {
-        alert('Error: ' + err.message);
+        showToast('Error: ' + err.message, 'error');
     }
 }
 
 async function deleteGalleryAsset(filename, project) {
     const proj = project || currentProject;
     const isEn = currentLanguage === 'en';
-    if (!confirm(isEn ? `Delete image "${filename}" from project?` : `¿Eliminar la imagen "${filename}" del proyecto?`)) return;
+    const ok = await showAppConfirm({
+        title: isEn ? 'Delete Image' : 'Eliminar Imagen',
+        message: isEn ? `Delete image "${filename}" from project?` : `¿Eliminar la imagen "${filename}" del proyecto?`,
+        confirmText: isEn ? 'Delete' : 'Eliminar'
+    });
+    if (!ok) return;
     try {
         const res = await fetch('/api/project/asset/delete', {
             method: 'POST',
@@ -240,10 +249,10 @@ async function deleteGalleryAsset(filename, project) {
             }
             refreshGalleryModal();
         } else {
-            alert((isEn ? 'Could not delete image: ' : 'No se pudo eliminar la imagen: ') + (data.error || ''));
+            showToast((isEn ? 'Could not delete image: ' : 'No se pudo eliminar la imagen: ') + (data.error || ''), 'error');
         }
     } catch (err) {
-        alert('Error: ' + err.message);
+        showToast('Error: ' + err.message, 'error');
     }
 }
 
@@ -357,7 +366,8 @@ function renderGalleryGrid(filterProject) {
                     btnCopy.style.color = '';
                 }, 1800);
             }).catch(() => {
-                prompt(isEn ? 'Copy LaTeX code:' : 'Copia el código LaTeX:', latexSnippet);
+                fallbackCopyText(latexSnippet);
+                showToast(isEn ? 'LaTeX code copied to clipboard!' : '¡Código LaTeX copiado al portapapeles!', 'success');
             });
         };
 
@@ -395,10 +405,10 @@ function handleFileUpload(file) {
                 loadProjectCode(currentProject);
                 refreshGalleryModal();
             } else {
-                alert(`Error al subir: ${data.error || 'Desconocido'}`);
+                showToast(`Error al subir: ${data.error || 'Desconocido'}`, 'error');
             }
         } catch (err) {
-            alert(`Error de conexión al subir imagen: ${err.message}`);
+            showToast(`Error de conexión al subir imagen: ${err.message}`, 'error');
         }
     };
     reader.readAsDataURL(file);

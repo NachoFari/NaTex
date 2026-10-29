@@ -471,6 +471,53 @@
         </div>
     </div>
 
+    <!-- Guía y Tutorial de Uso / Recomendaciones -->
+    <div class="card" id="cardTutorial" style="background: linear-gradient(145deg, rgba(30, 30, 36, 0.95), rgba(22, 22, 26, 0.95)); border: 1px solid rgba(255, 107, 53, 0.3);">
+        <div class="card-title" style="cursor: pointer; user-select: none; margin-bottom: 0;" onclick="toggleTutorial()">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span>💡</span>
+                <span>Tutorial de Uso y Recomendaciones</span>
+            </div>
+            <span id="tutorialToggleIcon" style="font-size: 13px; color: var(--fox-orange); transition: transform 0.25s ease;">▼</span>
+        </div>
+        <div id="tutorialContent" style="margin-top: 14px;">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 10px; font-size: 13px; line-height: 1.5; color: var(--text-muted);">
+                <div style="display: flex; gap: 10px; align-items: flex-start; background: rgba(255, 255, 255, 0.03); padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="font-size: 18px;">🔑</div>
+                    <div>
+                        <strong style="color: var(--text-main);">1. Clave de Google Gemini (Gratuita):</strong> Se obtiene en <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--fox-orange); text-decoration: underline;">Google AI Studio</a>. Se almacena localmente en tu equipo sin intermediarios.
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: flex-start; background: rgba(255, 255, 255, 0.03); padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="font-size: 18px;">🎙️</div>
+                    <div>
+                        <strong style="color: var(--text-main);">2. Grabar en vivo o Subir archivo:</strong> Puedes tocar el micrófono para grabar la clase o subir notas de voz ya existentes (formatos <code>.mp3</code>, <code>.m4a</code>, <code>.wav</code>, <code>.webm</code>, <code>.ogg</code>).
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: flex-start; background: rgba(255, 255, 255, 0.03); padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="font-size: 18px;">⏱️</div>
+                    <div>
+                        <strong style="color: var(--text-main);">3. Duración ideal (15 a 60 minutos):</strong> Optimizado para bloques de cátedra. Para clases de más de 90 minutos, se recomienda pausar y grabar en dos bloques para un procesamiento más veloz y seguro.
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: flex-start; background: rgba(255, 255, 255, 0.03); padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="font-size: 18px;">📄</div>
+                    <div>
+                        <strong style="color: var(--text-main);">4. Apunte automático y PDF:</strong> Al finalizar, NaTex genera el código LaTeX (con fórmulas en <code>$...$</code> y entornos matemáticos) y compila de inmediato el PDF con Tectonic.
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 12px; padding: 9px 12px; border-radius: var(--radius-sm); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); font-size: 12px; color: var(--success); display: flex; align-items: center; gap: 8px;">
+                <span>🔒</span>
+                <span><strong>Privacidad garantizada:</strong> El audio viaja directo desde tu equipo/celular a la API de Google Gemini. NaTex no guarda audios en servidores externos ni cobra mensualidades.</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Tarjeta de Título del Apunte -->
     <div class="card" id="cardMetadata">
         <div class="card-title">📚 Asignatura / Título de la Clase</div>
@@ -606,6 +653,35 @@
         const serverPill = document.getElementById('serverPill');
         const classTitleInput = document.getElementById('classTitleInput');
 
+        function showVoiceToast(message, type = 'info') {
+            let toast = document.getElementById('voiceToastBanner');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'voiceToastBanner';
+                toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(10px); z-index:99999; padding:12px 18px; border-radius:10px; font-size:13.5px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,0.45); transition:all 0.25s ease; opacity:0; pointer-events:none; max-width:90vw; text-align:center;';
+                document.body.appendChild(toast);
+            }
+            toast.style.background = type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#1e293b';
+            toast.style.color = '#ffffff';
+            toast.textContent = (type === 'success' ? '✓ ' : type === 'error' ? '⚠️ ' : 'ℹ️ ') + message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            clearTimeout(window._voiceToastTimer);
+            window._voiceToastTimer = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(10px)';
+            }, 3500);
+        }
+
+        function toggleTutorial() {
+            const content = document.getElementById('tutorialContent');
+            const icon = document.getElementById('tutorialToggleIcon');
+            if (!content) return;
+            const isHidden = content.style.display === 'none';
+            content.style.display = isHidden ? 'block' : 'none';
+            if (icon) icon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(-90deg)';
+        }
+
         // Comprobar estado del servidor y clave Gemini
         async function checkServerStatus() {
             try {
@@ -628,7 +704,7 @@
 
         btnSaveKey.onclick = async () => {
             const key = inputVoiceApiKey.value.trim();
-            if (!key) return alert('Por favor ingresa una clave válida.');
+            if (!key) return showVoiceToast('Por favor ingresa una clave válida.', 'error');
             try {
                 const res = await fetch('/api/config', {
                     method: 'POST',
@@ -637,10 +713,10 @@
                 });
                 if (res.ok) {
                     apiKeyBanner.style.display = 'none';
-                    alert('¡Clave de Gemini guardada correctamente!');
+                    showVoiceToast('¡Clave de Gemini guardada correctamente!', 'success');
                 }
             } catch (e) {
-                alert('Error al guardar la clave: ' + e);
+                showVoiceToast('Error al guardar la clave: ' + e, 'error');
             }
         };
 
@@ -737,7 +813,7 @@
                 btnProcessVoice.classList.add('hidden');
                 uploadAlternative.classList.add('hidden');
             } catch (err) {
-                alert('No se pudo acceder al micrófono. Asegúrate de dar permisos o usar una conexión HTTPS / Local: ' + err.message);
+                showVoiceToast('No se pudo acceder al micrófono. Da permisos o usa conexión HTTPS/Local: ' + err.message, 'error');
             }
         }
 
@@ -783,7 +859,7 @@
 
         // Procesar audio con Gemini y compilar a LaTeX
         btnProcessVoice.onclick = async () => {
-            if (!base64Audio) return alert('Por favor graba o sube un audio primero.');
+            if (!base64Audio) return showVoiceToast('Por favor graba o sube un audio primero.', 'error');
             
             const title = classTitleInput.value.trim();
             const geminiKey = inputVoiceApiKey.value.trim();
@@ -820,7 +896,7 @@
                 const data = await response.json();
 
                 if (!data.success) {
-                    alert('Error: ' + data.error);
+                    showVoiceToast('Error: ' + data.error, 'error');
                     resetRecorder();
                     return;
                 }
@@ -849,7 +925,7 @@
                 }, 800);
 
             } catch (err) {
-                alert('Error al conectar con el servidor: ' + err.message);
+                showVoiceToast('Error al conectar con el servidor: ' + err.message, 'error');
                 resetRecorder();
             }
         };

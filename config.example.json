@@ -1,7 +1,18 @@
-﻿{
+{
+  "ai_provider": "gemini",
   "gemini_api_key": "",
+  "openai_api_key": "",
+  "claude_api_key": "",
+  "nvidia_api_key": "",
+  "ai_model": "",
+  "custom_api_url": "http://localhost:11434/v1/chat/completions",
+  "custom_api_key": "",
   "last_project": "Mi_Primer_Documento",
-  "theme": "dark",
+  "theme": "fox",
   "custom_color": "#FF6B35",
-  "language": "es"
+  "language": "es",
+  "auto_check_updates": true,
+  "word_wrap": true,
+  "theme_effects": true,
+  "theme_effects_frequency": 100
 }

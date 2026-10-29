@@ -1,0 +1,242 @@
+/* ==========================================================================
+   NaTex Studio - Riot-Client-style Startup Splash Animation
+   Adapts 100% to active theme CSS variables: --bg-dark, --bg-surface,
+   --bg-elevated, --fox-orange, --text-main, --text-muted
+   ========================================================================== */
+
+#natexSplashIntro {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-dark);
+    overflow: hidden;
+    user-select: none;
+    transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.45s ease;
+}
+
+#natexSplashIntro.splash-closing {
+    opacity: 0;
+    transform: scale(1.06);
+    filter: blur(8px);
+    pointer-events: none;
+}
+
+#natexSplashIntro.hidden {
+    display: none !important;
+}
+
+/* Efectos de fondo ambiental */
+.splash-ambient-glow {
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--fox-orange) 26%, transparent) 0%, transparent 70%);
+    animation: splashPulseGlow 2.4s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+.splash-ring {
+    border: 1px solid color-mix(in srgb, var(--fox-orange) 20%, transparent);
+    border-radius: 50%;
+    position: absolute;
+    pointer-events: none;
+    animation: splashRingExpand 9s linear infinite;
+}
+
+.splash-ring-1 {
+    width: 260px;
+    height: 260px;
+}
+
+.splash-ring-2 {
+    width: 380px;
+    height: 380px;
+    animation-duration: 14s;
+    animation-direction: reverse;
+}
+
+/* Escenario central */
+.splash-center-stage {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.splash-mascot-frame {
+    width: 112px;
+    height: 112px;
+    border-radius: 26px;
+    background: linear-gradient(145deg, var(--bg-surface), var(--bg-elevated));
+    border: 2px solid color-mix(in srgb, var(--fox-orange) 65%, transparent);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 32px color-mix(in srgb, var(--fox-orange) 35%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    animation: splashMascotPop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.splash-mascot-frame::after {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.22) 50%, transparent 100%);
+    transform: rotate(25deg);
+    animation: splashShimmer 2.2s infinite ease-in-out;
+    pointer-events: none;
+}
+
+.splash-mascot-frame .pixel-mascot-img,
+.splash-mascot-frame svg {
+    width: 76px;
+    height: 76px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+    display: block;
+}
+
+.splash-title-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    animation: splashFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+.splash-brand-name {
+    font-size: 46px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    color: var(--fox-orange);
+    text-shadow: 0 0 24px color-mix(in srgb, var(--fox-orange) 40%, transparent);
+    line-height: 1;
+}
+
+.splash-brand-sub {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    line-height: 1.1;
+}
+
+/* Barra de carga inferior estilo Riot Client (sin texto debajo) */
+.splash-loader-container {
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    animation: splashFadeUp 0.55s ease 0.25s both;
+}
+
+.splash-progress-track {
+    width: 100%;
+    height: 4px;
+    background: color-mix(in srgb, var(--text-muted) 20%, transparent);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+}
+
+.splash-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--fox-orange);
+    border-radius: 99px;
+    box-shadow: 0 0 12px var(--fox-orange);
+    transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Firma Pixel Art sutil ("Creado por NachoFari") casi del color del fondo */
+.splash-author-watermark {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    color: color-mix(in srgb, var(--text-main) 14%, var(--bg-dark));
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.splash-pixel-credit-svg {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* Keyframes de animación */
+@keyframes splashPulseGlow {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+}
+
+@keyframes splashRingExpand {
+    0% {
+        transform: scale(0.95) rotate(0deg);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.05) rotate(180deg);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(0.95) rotate(360deg);
+        opacity: 0.3;
+    }
+}
+
+@keyframes splashMascotPop {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes splashShimmer {
+    0% {
+        transform: translateX(-150%) rotate(25deg);
+    }
+    100% {
+        transform: translateX(250%) rotate(25deg);
+    }
+}
+
+@keyframes splashFadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

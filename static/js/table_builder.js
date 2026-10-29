@@ -29,6 +29,7 @@ function initTableBuilder() {
         renderTableGrid();
         updateTablePreview();
     }
+    window.openTableBuilder = openTableBuilder;
 
     if (btnMenu) btnMenu.onclick = openTableBuilder;
     if (btnQuick) btnQuick.onclick = openTableBuilder;

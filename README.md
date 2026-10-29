@@ -34,6 +34,25 @@
 
 ---
 
+## 📸 Galería Visual de la Aplicación
+
+### 🏠 Pantalla de Inicio (Dashboard) con Distintos Temas
+| Tema Zorro Clásico (Oscuro) | Tema Flor de Cerezo (Sakura Claro) | Tema Dino Jade (Oscuro) |
+| :---: | :---: | :---: |
+| [![Inicio Fox](docs/screenshots/showcase_home_fox.png)](docs/screenshots/showcase_home_fox.png) | [![Inicio Sakura](docs/screenshots/showcase_home_sakura.png)](docs/screenshots/showcase_home_sakura.png) | [![Inicio Dino](docs/screenshots/showcase_home_dino.png)](docs/screenshots/showcase_home_dino.png) |
+
+### 📝 Editor LaTeX con Visor PDF en Vivo
+| Modo Clásico (Partículas de Fondo) | Modo Claro (Sakura Aesthetic) | Modo Verde (Ranita Matcha Zen) |
+| :---: | :---: | :---: |
+| [![Editor Fox](docs/screenshots/showcase_editor_fox.png)](docs/screenshots/showcase_editor_fox.png) | [![Editor Sakura](docs/screenshots/showcase_editor_sakura.png)](docs/screenshots/showcase_editor_sakura.png) | [![Editor Frog](docs/screenshots/showcase_editor_frog.png)](docs/screenshots/showcase_editor_frog.png) |
+
+### 🛠️ Herramientas Científicas y Personalización
+| 🎨 Catálogo de 21 Temas & Efectos | 📐 Constructor Matemático (KaTeX) | 📊 Editor Visual de Tablas |
+| :---: | :---: | :---: |
+| [![Catálogo Temas](docs/screenshots/showcase_theme_catalog.png)](docs/screenshots/showcase_theme_catalog.png) | [![Constructor Matemático](docs/screenshots/showcase_math_keyboard.png)](docs/screenshots/showcase_math_keyboard.png) | [![Editor Tablas](docs/screenshots/showcase_table_builder.png)](docs/screenshots/showcase_table_builder.png) |
+
+---
+
 ## 🚀 Novedades Principales de la Versión v1.3
 
 ### ✨ Efectos de Ambiente con Control de Frecuencia y Profundidad

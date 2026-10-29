@@ -53,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (urlParams.get('modal') === 'math' && typeof openMathModal === 'function') {
         setTimeout(() => openMathModal(), 300);
+    } else if (urlParams.get('modal') === 'table' && typeof window.openTableBuilder === 'function') {
+        setTimeout(() => window.openTableBuilder(), 300);
     } else if (urlParams.get('modal') === 'settings') {
         const initialTab = urlParams.get('tab') || 'config';
         openSettingsModal(initialTab);
@@ -212,88 +214,6 @@ async function loadConfigFromServer() {
         const effectsFreq = parseInt(localStorage.getItem('natex_theme_effects_freq') || String(data.theme_effects_frequency || 100), 10);
         if (typeof setThemeEffectsFrequency === 'function' && !isNaN(effectsFreq)) {
             setThemeEffectsFrequency(effectsFreq);
-        }
-    } catch (e) {
-        console.warn("No se pudo cargar la configuración:", e);
-    }
-}
-
-function updateAiBadge(provider) {
-    const badge = document.getElementById('aiActiveProviderBadge');
-    if (!badge) return;
-    const names = {
-        'gemini': 'Gemini',
-        'openai': 'OpenAI',
-        'claude': 'Claude',
-        'nvidia': 'NVIDIA NIM',
-        'custom': 'Local / Custom'
-    };
-    badge.textContent = names[provider] || provider || 'IA';
-}
-
-function updateAiProviderPanels(provider) {
-    const panels = {
-        'gemini': document.getElementById('aiPanelGemini'),
-        'openai': document.getElementById('aiPanelOpenai'),
-        'claude': document.getElementById('aiPanelClaude'),
-        'nvidia': document.getElementById('aiPanelNvidia'),
-        'custom': document.getElementById('aiPanelCustom')
-    };
-    for (const [key, panel] of Object.entries(panels)) {
-        if (panel) {
-            if (key === provider) {
-                panel.classList.remove('hidden');
-            } else {
-                panel.classList.add('hidden');
-            }
-        }
-    }
-}
-
-async function loadConfigFromServer() {
-    try {
-        const res = await fetch('/api/config');
-        if (!res.ok) return;
-        const data = await res.json();
-
-        const prov = data.ai_provider || 'gemini';
-        const sel = document.getElementById('selectAiProvider');
-        if (sel) sel.value = prov;
-        updateAiProviderPanels(prov);
-        updateAiBadge(prov);
-
-        if (document.getElementById('inputApiKey') && data.gemini_api_key) {
-            document.getElementById('inputApiKey').value = data.gemini_api_key;
-        }
-        if (document.getElementById('inputApiKeyOpenai') && data.openai_api_key) {
-            document.getElementById('inputApiKeyOpenai').value = data.openai_api_key;
-        }
-        if (document.getElementById('inputApiKeyClaude') && data.claude_api_key) {
-            document.getElementById('inputApiKeyClaude').value = data.claude_api_key;
-        }
-        if (document.getElementById('inputApiKeyNvidia') && data.nvidia_api_key) {
-            document.getElementById('inputApiKeyNvidia').value = data.nvidia_api_key;
-        }
-        if (document.getElementById('inputCustomUrl') && data.custom_api_url) {
-            document.getElementById('inputCustomUrl').value = data.custom_api_url;
-        }
-        if (document.getElementById('inputCustomApiKey') && data.custom_api_key) {
-            document.getElementById('inputCustomApiKey').value = data.custom_api_key;
-        }
-        if (document.getElementById('inputAiModel') && data.ai_model) {
-            document.getElementById('inputAiModel').value = data.ai_model;
-        }
-
-        if (data.theme && !localStorage.getItem('natex_theme')) {
-            applyTheme(data.theme, data.custom_color);
-        }
-        if (data.language && !localStorage.getItem('natex_language')) {
-            applyLanguage(data.language);
-        }
-        const chkAuto = document.getElementById('chkAutoCheckUpdates');
-        if (chkAuto && data.auto_check_updates !== undefined && localStorage.getItem('natex_auto_update') === null) {
-            chkAuto.checked = !!data.auto_check_updates;
-            localStorage.setItem('natex_auto_update', data.auto_check_updates ? 'true' : 'false');
         }
     } catch (e) {
         console.warn("No se pudo cargar la configuración:", e);

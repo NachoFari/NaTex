@@ -6,6 +6,42 @@ let acTriggerInfo = null; // { type, replaceStart, replaceEnd, prefix }
 let findMatches = [];
 let findCurrentIdx = -1;
 let findCaseSensitive = false;
+let isWordWrapEnabled = (localStorage.getItem('natex_word_wrap') !== 'false');
+
+function setWordWrap(enabled, saveToStorage = true) {
+    isWordWrapEnabled = !!enabled;
+    if (saveToStorage) {
+        localStorage.setItem('natex_word_wrap', isWordWrapEnabled ? 'true' : 'false');
+    }
+    const editor = document.getElementById('codeEditor');
+    if (editor) {
+        if (isWordWrapEnabled) {
+            editor.classList.remove('no-wrap');
+        } else {
+            editor.classList.add('no-wrap');
+        }
+    }
+    const btnYes = document.getElementById('btnSettingWrapYes');
+    const btnNo = document.getElementById('btnSettingWrapNo');
+    if (btnYes && btnNo) {
+        if (isWordWrapEnabled) {
+            btnYes.classList.add('active');
+            btnYes.style.background = 'var(--fox-orange)';
+            btnYes.style.color = '#ffffff';
+            btnNo.classList.remove('active');
+            btnNo.style.background = 'transparent';
+            btnNo.style.color = 'var(--text-muted)';
+        } else {
+            btnNo.classList.add('active');
+            btnNo.style.background = 'var(--fox-orange)';
+            btnNo.style.color = '#ffffff';
+            btnYes.classList.remove('active');
+            btnYes.style.background = 'transparent';
+            btnYes.style.color = 'var(--text-muted)';
+        }
+    }
+    updateLineNumbers();
+}
 
 const LATEX_ENVIRONMENTS = [
     { name: 'itemize', desc: 'Lista con viñetas (\\item)', body: '    \\item ' },
@@ -196,6 +232,17 @@ function initEditor() {
                 triggerAutoSave();
             }
         }
+
+        // Atajo Alt+Z para conmutar Word Wrap (ajuste de texto al recuadro)
+        if (e.altKey && (e.key === 'z' || e.key === 'Z')) {
+            e.preventDefault();
+            setWordWrap(!isWordWrapEnabled, true);
+            const isEn = typeof currentLanguage !== 'undefined' && currentLanguage === 'en';
+            showToast(isWordWrapEnabled ? 
+                (isEn ? 'Word wrap: ON' : 'Ajuste de texto: ACTIVADO') : 
+                (isEn ? 'Word wrap: OFF' : 'Ajuste de texto: DESACTIVADO'), 'info');
+            return;
+        }
     });
 
     // Atajos globales para compilar (Ctrl+S, F5) y Buscar/Reemplazar (Ctrl+F, Ctrl+H)
@@ -237,7 +284,35 @@ function initEditor() {
                 return false;
             }
         }
+
+        // Alt+Z -> Conmutar Word Wrap (si estamos en vista editor)
+        if (e.altKey && (e.key === 'z' || e.key === 'Z')) {
+            if (!document.body.classList.contains('view-home')) {
+                e.preventDefault();
+                e.stopPropagation();
+                setWordWrap(!isWordWrapEnabled, true);
+                const isEn = typeof currentLanguage !== 'undefined' && currentLanguage === 'en';
+                showToast(isWordWrapEnabled ? 
+                    (isEn ? 'Word wrap: ON' : 'Ajuste de texto: ACTIVADO') : 
+                    (isEn ? 'Word wrap: OFF' : 'Ajuste de texto: DESACTIVADO'), 'info');
+                return false;
+            }
+        }
     }, true);
+
+    // Inicializar estado de Word Wrap y observar cambios de tamaño del contenedor
+    setWordWrap(isWordWrapEnabled, false);
+    if (window.ResizeObserver && codeEditor) {
+        let wrapResizeTimer = null;
+        const ro = new ResizeObserver(() => {
+            if (!isWordWrapEnabled) return;
+            clearTimeout(wrapResizeTimer);
+            wrapResizeTimer = setTimeout(() => {
+                updateLineNumbers();
+            }, 35);
+        });
+        ro.observe(codeEditor);
+    }
 }
 
 // =========================================================================
@@ -408,8 +483,14 @@ function navigateFindMatch(delta) {
 function highlightFindMatch(match, focusEditor = false) {
     if (!match) return;
     const lineNum = codeEditor.value.substring(0, match.start).split('\n').length;
-    const lineHeight = 22.4;
-    const targetScroll = Math.max(0, (lineNum - 5) * lineHeight);
+    let targetScroll = 0;
+    const lineElem = lineNumbers && lineNumbers.children && lineNumbers.children[lineNum - 1];
+    if (lineElem && typeof lineElem.offsetTop === 'number') {
+        targetScroll = Math.max(0, lineElem.offsetTop - 115);
+    } else {
+        const lineHeight = 23;
+        targetScroll = Math.max(0, (lineNum - 5) * lineHeight);
+    }
     codeEditor.scrollTop = targetScroll;
     lineNumbers.scrollTop = targetScroll;
     if (focusEditor) codeEditor.focus();
@@ -746,12 +827,70 @@ function setupCollaborationPolling() {
 }
 
 function updateLineNumbers() {
-    const lines = codeEditor.value.split('\n').length;
-    let numbers = '';
-    for (let i = 1; i <= lines; i++) {
-        numbers += i + '\n';
+    if (!codeEditor || !lineNumbers) return;
+    const lines = codeEditor.value.split('\n');
+    const lineCount = lines.length;
+
+    if (!isWordWrapEnabled) {
+        let numbers = '';
+        for (let i = 1; i <= lineCount; i++) {
+            numbers += i + '\n';
+        }
+        lineNumbers.innerText = numbers;
+        updateEditorMetrics();
+        return;
     }
-    lineNumbers.innerText = numbers;
+
+    // Word Wrap Activado: sincronización visual exacta de líneas partidas (Overleaf style)
+    const measureBox = document.getElementById('editorLineMeasure');
+    // clientWidth del textarea excluye scrollbars pero incluye padding (padding izq 16px + dcha 16px = 32px)
+    const editorWidth = Math.max(80, (codeEditor.clientWidth || codeEditor.offsetWidth || 400) - 32);
+
+    if (measureBox) {
+        measureBox.style.width = editorWidth + 'px';
+        const charWrapThreshold = Math.max(10, Math.floor(editorWidth / 8.5));
+
+        let hasAnyLongLine = false;
+        for (let i = 0; i < lineCount; i++) {
+            if (lines[i].length > charWrapThreshold) {
+                hasAnyLongLine = true;
+                break;
+            }
+        }
+
+        if (!hasAnyLongLine) {
+            let numsHtml = '';
+            for (let i = 1; i <= lineCount; i++) {
+                numsHtml += `<div class="line-num" style="height:23px; line-height:23px;">${i}</div>`;
+            }
+            lineNumbers.innerHTML = numsHtml;
+            updateEditorMetrics();
+            return;
+        }
+
+        let measureHtml = '';
+        for (let i = 0; i < lineCount; i++) {
+            const line = lines[i];
+            const escaped = line ? line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '&#8203;';
+            measureHtml += `<div class="m-line">${escaped}</div>`;
+        }
+        measureBox.innerHTML = measureHtml;
+
+        const measuredLines = measureBox.children;
+        let numsHtml = '';
+        for (let i = 0; i < lineCount; i++) {
+            const h = measuredLines[i] ? Math.max(23, measuredLines[i].offsetHeight) : 23;
+            numsHtml += `<div class="line-num" style="height:${h}px; line-height:23px;">${i + 1}</div>`;
+        }
+        lineNumbers.innerHTML = numsHtml;
+    } else {
+        let numsHtml = '';
+        for (let i = 1; i <= lineCount; i++) {
+            numsHtml += `<div class="line-num" style="height:23px; line-height:23px;">${i}</div>`;
+        }
+        lineNumbers.innerHTML = numsHtml;
+    }
+
     updateEditorMetrics();
 }
 
@@ -974,8 +1113,13 @@ async function syncEditorToPdf() {
         const data = await res.json();
         if (data.success && data.page) {
             const pageNum = data.page;
-            const currentSrc = pdfViewer.src.split('#')[0];
-            pdfViewer.src = `${currentSrc}#page=${pageNum}`;
+            const customViewer = document.getElementById('pdfCustomViewer');
+            if (customViewer && !customViewer.classList.contains('hidden') && typeof scrollToPdfPage === 'function') {
+                scrollToPdfPage(pageNum, true);
+            } else if (typeof pdfViewer !== 'undefined' && pdfViewer) {
+                const currentSrc = pdfViewer.src.split('#')[0];
+                pdfViewer.src = `${currentSrc}#page=${pageNum}`;
+            }
 
             const dict = i18n[currentLanguage] || i18n.es;
             editorStatus.innerText = `📍 Línea ${currentLine} -> Pág. ${pageNum} ✓`;
@@ -990,11 +1134,4 @@ async function syncEditorToPdf() {
         console.error('Error SyncTeX:', e);
     }
 }
-
-// ==========================================
-// Dictáfono Inteligente de Clases & Túnel P2P
-// ==========================================
-let voiceQrInstance = null;
-let shareQrInstance = null;
-
 

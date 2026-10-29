@@ -8,20 +8,70 @@
     <link rel="stylesheet" href="/static/vendor/katex/katex.min.css">
     <link rel="icon" href="/static/img/logo.jpg">
     <script src="/static/vendor/katex/katex.min.js"></script>
+    <script src="/static/vendor/pdfjs/pdf.min.js"></script>
 </head>
 <body class="view-home">
+    <script>
+        (function() {
+            try {
+                var p = new URLSearchParams(window.location.search);
+                var t = p.get('theme') || localStorage.getItem('natex_theme') || 'fox';
+                if (t === 'dark') t = 'fox';
+                if (t === 'light') t = 'rabbit';
+                document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {}
+        })();
+    </script>
+    <!-- Riot-Client-style Startup Splash Screen -->
+    <div id="natexSplashIntro">
+        <script>
+            (function() {
+                try {
+                    var p = new URLSearchParams(window.location.search);
+                    if (p.get('nosplash') === '1' || (sessionStorage.getItem('natex_splash_shown') === '1' && p.get('splash') !== '1')) {
+                        document.getElementById('natexSplashIntro').classList.add('hidden');
+                    }
+                } catch (e) {}
+            })();
+        </script>
+        <div class="splash-ambient-glow"></div>
+        <div class="splash-ring splash-ring-1"></div>
+        <div class="splash-ring splash-ring-2"></div>
+        <div class="splash-center-stage">
+            <div class="splash-mascot-frame">
+                <div id="splashMascotIcon">
+                    <img class="pixel-mascot-img" src="/static/img/logo.jpg" alt="NaTex Mascot" draggable="false">
+                </div>
+            </div>
+            <div class="splash-title-stack">
+                <span class="splash-brand-name">NaTex</span>
+                <span class="splash-brand-sub" id="splashBrandSub">Estudio</span>
+            </div>
+            <div class="splash-loader-container">
+                <div class="splash-progress-track">
+                    <div class="splash-progress-fill" id="splashProgressFill"></div>
+                </div>
+            </div>
+        </div>
+        <div class="splash-author-watermark" aria-label="Creado por NachoFari">
+            <svg class="splash-pixel-credit-svg" viewBox="0 0 139 7" width="208" height="10" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M0,0h1v1h-1zM6,0h1v1h-1zM0,1h1v1h-1zM1,1h1v1h-1zM5,1h1v1h-1zM6,1h1v1h-1zM0,2h1v1h-1zM1,2h1v1h-1zM2,2h1v1h-1zM3,2h1v1h-1zM4,2h1v1h-1zM5,2h1v1h-1zM6,2h1v1h-1zM0,3h1v1h-1zM2,3h1v1h-1zM3,3h1v1h-1zM4,3h1v1h-1zM6,3h1v1h-1zM0,4h1v1h-1zM1,4h1v1h-1zM2,4h1v1h-1zM3,4h1v1h-1zM4,4h1v1h-1zM5,4h1v1h-1zM6,4h1v1h-1zM1,5h1v1h-1zM2,5h1v1h-1zM4,5h1v1h-1zM5,5h1v1h-1zM2,6h1v1h-1zM3,6h1v1h-1zM4,6h1v1h-1zM13,0h1v1h-1zM14,0h1v1h-1zM15,0h1v1h-1zM12,1h1v1h-1zM16,1h1v1h-1zM12,2h1v1h-1zM12,3h1v1h-1zM12,4h1v1h-1zM12,5h1v1h-1zM16,5h1v1h-1zM13,6h1v1h-1zM14,6h1v1h-1zM15,6h1v1h-1zM18,0h1v1h-1zM19,0h1v1h-1zM20,0h1v1h-1zM21,0h1v1h-1zM18,1h1v1h-1zM22,1h1v1h-1zM18,2h1v1h-1zM22,2h1v1h-1zM18,3h1v1h-1zM19,3h1v1h-1zM20,3h1v1h-1zM21,3h1v1h-1zM18,4h1v1h-1zM20,4h1v1h-1zM18,5h1v1h-1zM21,5h1v1h-1zM18,6h1v1h-1zM22,6h1v1h-1zM24,0h1v1h-1zM25,0h1v1h-1zM26,0h1v1h-1zM27,0h1v1h-1zM28,0h1v1h-1zM24,1h1v1h-1zM24,2h1v1h-1zM24,3h1v1h-1zM25,3h1v1h-1zM26,3h1v1h-1zM27,3h1v1h-1zM24,4h1v1h-1zM24,5h1v1h-1zM24,6h1v1h-1zM25,6h1v1h-1zM26,6h1v1h-1zM27,6h1v1h-1zM28,6h1v1h-1zM31,0h1v1h-1zM32,0h1v1h-1zM33,0h1v1h-1zM30,1h1v1h-1zM34,1h1v1h-1zM30,2h1v1h-1zM34,2h1v1h-1zM30,3h1v1h-1zM31,3h1v1h-1zM32,3h1v1h-1zM33,3h1v1h-1zM34,3h1v1h-1zM30,4h1v1h-1zM34,4h1v1h-1zM30,5h1v1h-1zM34,5h1v1h-1zM30,6h1v1h-1zM34,6h1v1h-1zM36,0h1v1h-1zM37,0h1v1h-1zM38,0h1v1h-1zM39,0h1v1h-1zM36,1h1v1h-1zM40,1h1v1h-1zM36,2h1v1h-1zM40,2h1v1h-1zM36,3h1v1h-1zM40,3h1v1h-1zM36,4h1v1h-1zM40,4h1v1h-1zM36,5h1v1h-1zM40,5h1v1h-1zM36,6h1v1h-1zM37,6h1v1h-1zM38,6h1v1h-1zM39,6h1v1h-1zM43,0h1v1h-1zM44,0h1v1h-1zM45,0h1v1h-1zM42,1h1v1h-1zM46,1h1v1h-1zM42,2h1v1h-1zM46,2h1v1h-1zM42,3h1v1h-1zM46,3h1v1h-1zM42,4h1v1h-1zM46,4h1v1h-1zM42,5h1v1h-1zM46,5h1v1h-1zM43,6h1v1h-1zM44,6h1v1h-1zM45,6h1v1h-1zM52,0h1v1h-1zM53,0h1v1h-1zM54,0h1v1h-1zM55,0h1v1h-1zM52,1h1v1h-1zM56,1h1v1h-1zM52,2h1v1h-1zM56,2h1v1h-1zM52,3h1v1h-1zM53,3h1v1h-1zM54,3h1v1h-1zM55,3h1v1h-1zM52,4h1v1h-1zM52,5h1v1h-1zM52,6h1v1h-1zM59,0h1v1h-1zM60,0h1v1h-1zM61,0h1v1h-1zM58,1h1v1h-1zM62,1h1v1h-1zM58,2h1v1h-1zM62,2h1v1h-1zM58,3h1v1h-1zM62,3h1v1h-1zM58,4h1v1h-1zM62,4h1v1h-1zM58,5h1v1h-1zM62,5h1v1h-1zM59,6h1v1h-1zM60,6h1v1h-1zM61,6h1v1h-1zM64,0h1v1h-1zM65,0h1v1h-1zM66,0h1v1h-1zM67,0h1v1h-1zM64,1h1v1h-1zM68,1h1v1h-1zM64,2h1v1h-1zM68,2h1v1h-1zM64,3h1v1h-1zM65,3h1v1h-1zM66,3h1v1h-1zM67,3h1v1h-1zM64,4h1v1h-1zM66,4h1v1h-1zM64,5h1v1h-1zM67,5h1v1h-1zM64,6h1v1h-1zM68,6h1v1h-1zM74,0h1v1h-1zM78,0h1v1h-1zM74,1h1v1h-1zM75,1h1v1h-1zM78,1h1v1h-1zM74,2h1v1h-1zM76,2h1v1h-1zM78,2h1v1h-1zM74,3h1v1h-1zM77,3h1v1h-1zM78,3h1v1h-1zM74,4h1v1h-1zM78,4h1v1h-1zM74,5h1v1h-1zM78,5h1v1h-1zM74,6h1v1h-1zM78,6h1v1h-1zM81,0h1v1h-1zM82,0h1v1h-1zM83,0h1v1h-1zM80,1h1v1h-1zM84,1h1v1h-1zM80,2h1v1h-1zM84,2h1v1h-1zM80,3h1v1h-1zM81,3h1v1h-1zM82,3h1v1h-1zM83,3h1v1h-1zM84,3h1v1h-1zM80,4h1v1h-1zM84,4h1v1h-1zM80,5h1v1h-1zM84,5h1v1h-1zM80,6h1v1h-1zM84,6h1v1h-1zM87,0h1v1h-1zM88,0h1v1h-1zM89,0h1v1h-1zM86,1h1v1h-1zM90,1h1v1h-1zM86,2h1v1h-1zM86,3h1v1h-1zM86,4h1v1h-1zM86,5h1v1h-1zM90,5h1v1h-1zM87,6h1v1h-1zM88,6h1v1h-1zM89,6h1v1h-1zM92,0h1v1h-1zM96,0h1v1h-1zM92,1h1v1h-1zM96,1h1v1h-1zM92,2h1v1h-1zM96,2h1v1h-1zM92,3h1v1h-1zM93,3h1v1h-1zM94,3h1v1h-1zM95,3h1v1h-1zM96,3h1v1h-1zM92,4h1v1h-1zM96,4h1v1h-1zM92,5h1v1h-1zM96,5h1v1h-1zM92,6h1v1h-1zM96,6h1v1h-1zM99,0h1v1h-1zM100,0h1v1h-1zM101,0h1v1h-1zM98,1h1v1h-1zM102,1h1v1h-1zM98,2h1v1h-1zM102,2h1v1h-1zM98,3h1v1h-1zM102,3h1v1h-1zM98,4h1v1h-1zM102,4h1v1h-1zM98,5h1v1h-1zM102,5h1v1h-1zM99,6h1v1h-1zM100,6h1v1h-1zM101,6h1v1h-1zM104,0h1v1h-1zM105,0h1v1h-1zM106,0h1v1h-1zM107,0h1v1h-1zM108,0h1v1h-1zM104,1h1v1h-1zM104,2h1v1h-1zM104,3h1v1h-1zM105,3h1v1h-1zM106,3h1v1h-1zM107,3h1v1h-1zM104,4h1v1h-1zM104,5h1v1h-1zM104,6h1v1h-1zM111,0h1v1h-1zM112,0h1v1h-1zM113,0h1v1h-1zM110,1h1v1h-1zM114,1h1v1h-1zM110,2h1v1h-1zM114,2h1v1h-1zM110,3h1v1h-1zM111,3h1v1h-1zM112,3h1v1h-1zM113,3h1v1h-1zM114,3h1v1h-1zM110,4h1v1h-1zM114,4h1v1h-1zM110,5h1v1h-1zM114,5h1v1h-1zM110,6h1v1h-1zM114,6h1v1h-1zM116,0h1v1h-1zM117,0h1v1h-1zM118,0h1v1h-1zM119,0h1v1h-1zM116,1h1v1h-1zM120,1h1v1h-1zM116,2h1v1h-1zM120,2h1v1h-1zM116,3h1v1h-1zM117,3h1v1h-1zM118,3h1v1h-1zM119,3h1v1h-1zM116,4h1v1h-1zM118,4h1v1h-1zM116,5h1v1h-1zM119,5h1v1h-1zM116,6h1v1h-1zM120,6h1v1h-1zM122,0h1v1h-1zM123,0h1v1h-1zM124,0h1v1h-1zM125,0h1v1h-1zM126,0h1v1h-1zM124,1h1v1h-1zM124,2h1v1h-1zM124,3h1v1h-1zM124,4h1v1h-1zM124,5h1v1h-1zM122,6h1v1h-1zM123,6h1v1h-1zM124,6h1v1h-1zM125,6h1v1h-1zM126,6h1v1h-1zM132,0h1v1h-1zM138,0h1v1h-1zM132,1h1v1h-1zM133,1h1v1h-1zM137,1h1v1h-1zM138,1h1v1h-1zM132,2h1v1h-1zM133,2h1v1h-1zM134,2h1v1h-1zM135,2h1v1h-1zM136,2h1v1h-1zM137,2h1v1h-1zM138,2h1v1h-1zM132,3h1v1h-1zM134,3h1v1h-1zM135,3h1v1h-1zM136,3h1v1h-1zM138,3h1v1h-1zM132,4h1v1h-1zM133,4h1v1h-1zM134,4h1v1h-1zM135,4h1v1h-1zM136,4h1v1h-1zM137,4h1v1h-1zM138,4h1v1h-1zM133,5h1v1h-1zM134,5h1v1h-1zM136,5h1v1h-1zM137,5h1v1h-1zM134,6h1v1h-1zM135,6h1v1h-1zM136,6h1v1h-1z"/></svg>
+        </div>
+    </div>
+    <!-- Canvas de Efectos de Ambiente Pixel Art 32x32 -->
+    <canvas id="natexThemeEffectsCanvas" aria-hidden="true"></canvas>
+
     <!-- Banner de Notificación de Actualización Flotante -->
     <div id="updateBanner" class="update-banner hidden">
         <span class="update-banner-icon">🚀</span>
-        <span class="update-banner-text" id="updateBannerText">¡Nueva versión de NaTex disponible!</span>
+        <span class="update-banner-text" id="updateBannerText" data-i18n="update_banner_text">¡Nueva versión de NaTex disponible!</span>
         <button id="btnBannerUpdate" class="btn-primary-compact" style="padding: 4px 10px; font-size: 12px;" data-i18n="btn_banner_update">Ver / Actualizar</button>
-        <button id="btnCloseBanner" class="btn-icon-tiny" title="Cerrar">&times;</button>
+        <button id="btnCloseBanner" class="btn-icon-tiny" data-i18n-title="btn_close" title="Cerrar">&times;</button>
     </div>
 
     <header class="top-bar">
         <div class="brand">
-            <img src="/static/img/logo.jpg" alt="NaTex Logo" class="logo-img" id="brandLogo" style="cursor:pointer;" title="Ir al Inicio">
-            <div class="brand-text" id="brandText" style="cursor:pointer;" title="Ir al Inicio">
+            <img src="/static/img/logo.jpg" alt="NaTex Logo" class="logo-img" id="brandLogo" style="cursor:pointer;" data-i18n-title="title_go_home" title="Ir al Inicio">
+            <div class="brand-text" id="brandText" style="cursor:pointer;" data-i18n-title="title_go_home" title="Ir al Inicio">
                 <span class="brand-name">NaTex</span>
                 <span class="brand-sub">Studio</span>
             </div>
@@ -29,8 +79,17 @@
 
         <!-- Menú Superior Tipo Word / Desktop -->
         <nav class="menu-bar">
-            <button id="navTabHome" class="menu-tab-btn active">🏠 <span data-i18n="menu_home">Inicio</span></button>
-            <button id="navTabEditor" class="menu-tab-btn">📝 <span data-i18n="menu_editor">Editor</span></button>
+            <div class="view-mode-slider" id="viewModeSlider" role="tablist" aria-label="Vista principal">
+                <div class="view-slider-thumb" id="viewSliderThumb"></div>
+                <button id="navTabHome" class="menu-tab-btn active" data-i18n-title="title_go_home" title="Ir al Inicio">
+                    <span class="tab-icon">🏠</span>
+                    <span class="tab-label" data-i18n="menu_home">Inicio</span>
+                </button>
+                <button id="navTabEditor" class="menu-tab-btn" title="Ir al Editor LaTeX">
+                    <span class="tab-icon">📝</span>
+                    <span class="tab-label" data-i18n="menu_editor">Editor</span>
+                </button>
+            </div>
 
             <!-- Menú Archivo -->
             <div class="menu-dropdown editor-only-control">
@@ -52,6 +111,26 @@
                 </div>
             </div>
 
+            <!-- Menú Ver -->
+            <div class="menu-dropdown editor-only-control">
+                <button class="menu-btn" data-dropdown="menuView">
+                    <span>👁️ <span data-i18n="menu_view">Ver</span> ▾</span>
+                </button>
+                <div class="dropdown-content hidden" id="menuView">
+                    <button class="dropdown-item" id="menuViewOpenPdfTab"><span>↗️</span> <span data-i18n="item_open_pdf_tab">Ver PDF en Otra Pestaña</span></button>
+                    <button class="dropdown-item" id="menuViewDownloadPdf"><span>⬇️</span> <span data-i18n="item_download_pdf">Descargar PDF</span></button>
+                    <button class="dropdown-item" id="menuViewRefreshPdf"><span>🔄</span> <span data-i18n="item_refresh_pdf">Recargar Visor PDF</span></button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" id="menuViewInvertPdf"><span>◐</span> <span data-i18n="item_pdf_paper_mode">Cambiar Modo de Hoja PDF (Claro / Tema / Noche)</span></button>
+                    <button class="dropdown-item" id="menuViewZoomIn"><span>🔍</span> <span data-i18n="item_pdf_zoom_in">Acercar PDF (+)</span></button>
+                    <button class="dropdown-item" id="menuViewZoomOut"><span>🔎</span> <span data-i18n="item_pdf_zoom_out">Alejar PDF (−)</span></button>
+                    <button class="dropdown-item" id="menuViewZoomFit"><span>📐</span> <span data-i18n="item_pdf_zoom_fit">Ajustar PDF al Ancho</span></button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" id="menuViewToggleSidebar"><span>🌲</span> <span data-i18n="item_toggle_sidebar">Mostrar / Ocultar Panel de Archivos</span></button>
+                    <button class="dropdown-item" id="menuViewToggleGallery"><span>🖼️</span> <span data-i18n="item_toggle_gallery">Mostrar / Ocultar Galería de Imágenes</span></button>
+                </div>
+            </div>
+
             <!-- Menú Insertar -->
             <div class="menu-dropdown editor-only-control">
                 <button class="menu-btn" data-dropdown="menuInsert">
@@ -59,8 +138,8 @@
                 </button>
                 <div class="dropdown-content hidden" id="menuInsert">
                     <button class="dropdown-item" id="menuItemMathKeyboard"><span>📐</span> <span data-i18n="item_math">Teclado Matemático Científico...</span> <kbd>Alt+M</kbd></button>
-                    <button class="dropdown-item" id="menuItemTableBuilder"><span>📊</span> <span data-i18n="item_table_builder">Creador de Tablas...</span> <kbd>Alt+T</kbd></button>
-                    <button class="dropdown-item" id="menuItemVoiceDictate"><span>🎙️</span> <span data-i18n="item_voice">Dictáfono de Clase (Celular / Móvil)...</span></button>
+                    <button class="dropdown-item" id="menuItemTableBuilder"><span>📊</span> <span data-i18n="item_table_builder">Editor Visual de Tablas...</span> <kbd>Alt+T</kbd></button>
+                    <button class="dropdown-item" id="menuItemVoiceDictate"><span>🎙️</span> <span data-i18n="item_voice">Transcriptor de Voz Móvil...</span></button>
                     <button class="dropdown-item" id="menuItemGallery"><span>🖼️</span> <span data-i18n="item_gallery">Galería de Imágenes / Recursos</span></button>
                 </div>
             </div>
@@ -71,9 +150,9 @@
                     <span>🌐 <span data-i18n="menu_collab">Colaborar</span> ▾</span>
                 </button>
                 <div class="dropdown-content hidden" id="menuCollab">
-                    <button class="dropdown-item" id="menuItemVoiceDictateCollab"><span>🎙️</span> <span data-i18n="item_voice">Grabar Clase desde Celular...</span></button>
-                    <button class="dropdown-item" id="menuItemShare"><span>🔗</span> <span data-i18n="item_share">Compartir con un amigo (Túnel)...</span></button>
-                    <button class="dropdown-item" id="menuItemAI"><span>🤖</span> <span data-i18n="item_ai">Asistente IA Gemini</span></button>
+                    <button class="dropdown-item" id="menuItemVoiceDictateCollab"><span>🎙️</span> <span data-i18n="item_voice">Transcriptor de Voz Móvil...</span></button>
+                    <button class="dropdown-item" id="menuItemShare"><span>🔗</span> <span data-i18n="item_share">Sesión Colaborativa P2P...</span></button>
+                    <button class="dropdown-item" id="menuItemAI"><span>🤖</span> <span data-i18n="item_ai">Asistente IA NaTex</span></button>
                 </div>
             </div>
 
@@ -83,9 +162,13 @@
                     <span>⚙️ <span data-i18n="menu_settings">Ajustes</span> ▾</span>
                 </button>
                 <div class="dropdown-content hidden" id="menuSettings">
+                    <button class="dropdown-item" id="menuItemSettingsConfig"><span>⚙️</span> <span data-i18n="settings_tab_config">Configuración</span></button>
+                    <button class="dropdown-item" id="menuItemConfig"><span>🎨</span> <span data-i18n="settings_tab_customization">Customización</span></button>
+                    <button class="dropdown-item" id="menuItemSettingsAi"><span>🔑</span> <span data-i18n="settings_tab_ai">Clave IA</span></button>
+                    <div class="dropdown-divider"></div>
                     <button class="dropdown-item" id="menuItemThemeDark"><span>🌙</span> <span data-i18n="item_theme_dark">Modo Oscuro</span></button>
                     <button class="dropdown-item" id="menuItemThemeLight"><span>☀️</span> <span data-i18n="item_theme_light">Modo Claro</span></button>
-                    <button class="dropdown-item" id="menuItemConfig"><span>🎨</span> <span data-i18n="item_config">Personalización y Clave IA...</span></button>
+                    <button class="dropdown-item" id="menuItemReplaySplash"><span>✨</span> <span data-i18n="item_replay_splash">Ver Animación de Inicio</span></button>
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item" id="menuItemLangEs"><span>🇪🇸</span> Español</button>
                     <button class="dropdown-item" id="menuItemLangEn"><span>🇬🇧</span> English</button>
@@ -95,7 +178,7 @@
 
         <!-- Selector de Proyecto -->
         <div class="top-bar-center editor-only-control">
-            <span class="selector-label" data-i18n="lbl_project">Doc:</span>
+            <span class="selector-label" data-i18n="lbl_project">Proyecto:</span>
             <select id="projectSelect" class="project-select-compact"></select>
         </div>
 
@@ -104,14 +187,14 @@
             <button id="btnToggleGallery" class="btn-secondary-compact" data-i18n-title="title_gallery" title="Galería de Imágenes">
                 🖼️ <span data-i18n="btn_gallery">Galería</span>
             </button>
-            <button id="btnQuickVoice" class="btn-secondary-compact" data-i18n-title="title_quick_voice" title="Grabar clase desde celular con enlace o QR">
-                🎙️ <span data-i18n="btn_voice_short">Clase</span>
+            <button id="btnQuickVoice" class="btn-secondary-compact" data-i18n-title="title_quick_voice" title="Transcriptor de voz móvil">
+                🎙️ <span data-i18n="btn_voice_short">Voz</span>
             </button>
             <button id="btnCompile" class="btn-primary-compact" data-i18n-title="title_compile" title="Compilar documento (Ctrl + S)">
                 <span class="icon">⚡</span>
                 <span class="btn-text" data-i18n="btn_compile">Compilar</span>
             </button>
-            <button id="btnToggleAI" class="btn-accent-compact" data-i18n-title="title_ai" title="Abrir IA Gemini">🤖</button>
+            <button id="btnToggleAI" class="btn-accent-compact" data-i18n-title="title_ai" title="Abrir Asistente IA NaTex">🤖</button>
         </div>
     </header>
 
@@ -125,10 +208,10 @@
                         <span class="toggle-icon">⌵</span> <span data-i18n="sidebar_files_title">Archivos</span>
                     </span>
                     <div class="sidebar-header-actions">
-                        <button id="btnSidebarNewFile" class="btn-sidebar-icon" title="Nuevo archivo (.tex, .bib)">📄<span class="badge-plus">+</span></button>
-                        <button id="btnSidebarNewFolder" class="btn-sidebar-icon" title="Nueva carpeta">📁<span class="badge-plus">+</span></button>
-                        <button id="btnSidebarUpload" class="btn-sidebar-icon" title="Subir archivo o imagen">⬆️</button>
-                        <button id="btnCollapseSidebar" class="btn-sidebar-icon" title="Ocultar barra lateral">✕</button>
+                        <button id="btnSidebarNewFile" class="btn-sidebar-icon" data-i18n-title="sidebar_title_new_file" title="Nuevo archivo (.tex, .bib)">📄<span class="badge-plus">+</span></button>
+                        <button id="btnSidebarNewFolder" class="btn-sidebar-icon" data-i18n-title="sidebar_title_new_folder" title="Nueva carpeta">📁<span class="badge-plus">+</span></button>
+                        <button id="btnSidebarUpload" class="btn-sidebar-icon" data-i18n-title="sidebar_title_upload" title="Subir archivo o imagen">⬆️</button>
+                        <button id="btnCollapseSidebar" class="btn-sidebar-icon" data-i18n-title="sidebar_title_collapse" title="Ocultar barra lateral">✕</button>
                         <input type="file" id="sidebarFileInput" multiple accept=".tex,.bib,.png,.jpg,.jpeg,.webp,.pdf,.txt,.sty,.cls" style="display:none;">
                     </div>
                 </div>
@@ -140,7 +223,7 @@
             </div>
 
             <!-- Divisor Horizontal Redimensionable -->
-            <div class="sidebar-h-resizer" id="sidebarHResizer" title="Arrastra para ajustar tamaño">
+            <div class="sidebar-h-resizer" id="sidebarHResizer" data-i18n-title="sidebar_title_resizer" title="Arrastra para ajustar tamaño">
                 <span class="resizer-dots">⁝⁝⁝</span>
             </div>
 
@@ -151,7 +234,7 @@
                         <span class="toggle-icon">⌵</span> <span data-i18n="sidebar_outline_title">Esquema del Documento</span>
                     </span>
                     <div class="sidebar-header-actions">
-                        <span class="outline-count-badge" id="outlineCountBadge" title="Número de secciones">0</span>
+                        <span class="outline-count-badge" id="outlineCountBadge" data-i18n-title="sidebar_title_outline_count" title="Número de secciones">0</span>
                     </div>
                 </div>
                 <div class="outline-container" id="outlineContainer">
@@ -166,7 +249,7 @@
         <div class="gallery-sidebar collapsed" id="gallerySidebar">
             <div class="sidebar-header">
                 <span class="sidebar-title">🖼️ <span data-i18n="sidebar_gallery_title">Galería de Imágenes</span></span>
-                <button id="btnCollapseGallery" class="btn-icon-tiny" title="Ocultar panel">◀</button>
+                <button id="btnCollapseGallery" class="btn-icon-tiny" data-i18n-title="gallery_title_collapse" title="Ocultar panel">◀</button>
             </div>
             <div class="sidebar-dropzone" id="sidebarDropzone">
                 <div class="sidebar-drop-icon">📥</div>
@@ -185,71 +268,101 @@
         <div class="editor-pane" id="editorPane">
             <div class="pane-header">
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <button id="btnToggleSidebar" class="btn-icon-tiny" title="Mostrar/Ocultar barra lateral">☰</button>
+                    <button id="btnToggleSidebar" class="btn-icon-tiny" data-i18n-title="editor_title_toggle_sidebar" title="Mostrar/Ocultar barra lateral">☰</button>
                     <span class="pane-title" id="editorCurrentFileTitle">📝 main.tex</span>
-                    <button id="btnSyncToPdf" class="btn-synctex" title="Ir a la página del PDF donde está esta línea">📍 <span data-i18n="btn_sync_pdf">Ir a PDF</span></button>
-                    <button id="btnToggleFindBar" class="btn-synctex" title="Buscar y reemplazar en el código (Ctrl + F / Ctrl + H)">🔍 <span data-i18n="btn_find_short">Buscar</span></button>
-                    <button id="btnOpenVersionHistory" class="btn-synctex" title="Ver historial de versiones y restaurar copias (Snapshots)">🕒 <span data-i18n="btn_history_short">Historial</span></button>
+                    <button id="btnSyncToPdf" class="btn-synctex" data-i18n-title="editor_title_synctex" title="Ir a la página del PDF donde está esta línea">📍 <span data-i18n="btn_sync_pdf">Ir a PDF</span></button>
+                    <button id="btnToggleFindBar" class="btn-synctex" data-i18n-title="editor_title_find" title="Buscar y reemplazar en el código (Ctrl + F / Ctrl + H)">🔍 <span data-i18n="btn_find_short">Buscar</span></button>
+                    <button id="btnOpenVersionHistory" class="btn-synctex" data-i18n-title="editor_title_history" title="Ver historial de versiones y restaurar copias (Snapshots)">🕒 <span data-i18n="btn_history_short">Historial</span></button>
                 </div>
-                <div class="editor-status" id="editorStatus">Guardado automático ✓</div>
+                <div class="editor-status" id="editorStatus" data-i18n="status_auto_saved">Guardado automático ✓</div>
             </div>
             <!-- Barra Flotante de Búsqueda y Reemplazo (Ctrl+F / Ctrl+H) -->
             <div id="editorFindBar" class="editor-find-bar hidden">
                 <div class="find-row">
-                    <button type="button" id="btnToggleReplaceRow" class="find-icon-btn" title="Mostrar/Ocultar Reemplazar (Ctrl+H)">▸</button>
-                    <input type="text" id="findInput" class="find-input" placeholder="Buscar en el documento... (Enter / Shift+Enter)" autocomplete="off" spellcheck="false" />
+                    <button type="button" id="btnToggleReplaceRow" class="find-icon-btn" data-i18n-title="find_toggle_replace_title" title="Mostrar/Ocultar Reemplazar (Ctrl+H)">▸</button>
+                    <input type="text" id="findInput" class="find-input" data-i18n-placeholder="find_placeholder" placeholder="Buscar en el documento... (Enter / Shift+Enter)" autocomplete="off" spellcheck="false" />
                     <span id="findMatchCount" class="find-match-count">0/0</span>
-                    <button type="button" id="btnFindCase" class="find-icon-btn" title="Distinguir mayúsculas y minúsculas (Aa)">Aa</button>
-                    <button type="button" id="btnFindPrev" class="find-icon-btn" title="Anterior (Shift+Enter)">▲</button>
-                    <button type="button" id="btnFindNext" class="find-icon-btn" title="Siguiente (Enter)">▼</button>
-                    <button type="button" id="btnCloseFindBar" class="find-icon-btn" title="Cerrar (Esc)">✕</button>
+                    <button type="button" id="btnFindCase" class="find-icon-btn" data-i18n-title="find_case_title" title="Distinguir mayúsculas y minúsculas (Aa)">Aa</button>
+                    <button type="button" id="btnFindPrev" class="find-icon-btn" data-i18n-title="find_prev_title" title="Anterior (Shift+Enter)">▲</button>
+                    <button type="button" id="btnFindNext" class="find-icon-btn" data-i18n-title="find_next_title" title="Siguiente (Enter)">▼</button>
+                    <button type="button" id="btnCloseFindBar" class="find-icon-btn" data-i18n-title="find_close_title" title="Cerrar (Esc)">✕</button>
                 </div>
                 <div id="replaceRow" class="find-row hidden" style="padding-left: 28px;">
-                    <input type="text" id="replaceInput" class="find-input" placeholder="Reemplazar con..." autocomplete="off" spellcheck="false" />
-                    <button type="button" id="btnReplaceOne" class="find-action-btn" title="Reemplazar coincidencia actual">Reemplazar</button>
-                    <button type="button" id="btnReplaceAll" class="find-action-btn" title="Reemplazar todas las coincidencias">Todo</button>
+                    <input type="text" id="replaceInput" class="find-input" data-i18n-placeholder="replace_placeholder" placeholder="Reemplazar con..." autocomplete="off" spellcheck="false" />
+                    <button type="button" id="btnReplaceOne" class="find-action-btn" data-i18n="find_btn_replace" data-i18n-title="find_replace_title" title="Reemplazar coincidencia actual">Reemplazar</button>
+                    <button type="button" id="btnReplaceAll" class="find-action-btn" data-i18n="find_btn_replace_all" data-i18n-title="find_replace_all_title" title="Reemplazar todas las coincidencias">Todo</button>
                 </div>
             </div>
             <div id="bannerHostDisconnected" class="host-disconnected-banner hidden">
                 <div class="banner-content">
                     <span class="offline-dot" style="width:8px; height:8px; border-radius:50%; background:#ef4444; display:inline-block; margin-right:6px;"></span>
-                    <span id="bannerHostDisconnectedText"><strong>Desconectado del anfitrión:</strong> NaTex Studio fue cerrado por el host. Tus cambios locales no se guardarán en el servidor.</span>
+                    <span id="bannerHostDisconnectedText" data-i18n="banner_host_disconnected_text"><strong>Desconectado del anfitrión:</strong> NaTex Studio fue cerrado por el host. Tus cambios locales no se guardarán en el servidor.</span>
                 </div>
                 <div style="display:flex; gap:8px;">
-                    <button type="button" class="btn-banner-action" id="btnBannerCopyCode">📋 Copiar código</button>
-                    <button type="button" class="btn-banner-action" id="btnBannerShowModal">Ver opciones</button>
+                    <button type="button" class="btn-banner-action" id="btnBannerCopyCode">📋 <span data-i18n="btn_banner_copy_code">Copiar código</span></button>
+                    <button type="button" class="btn-banner-action" id="btnBannerShowModal" data-i18n="btn_banner_show_modal">Ver opciones</button>
                 </div>
             </div>
             <div class="editor-wrapper" id="editorWrapper">
                 <div class="line-numbers" id="lineNumbers">1</div>
                 <textarea id="codeEditor" spellcheck="false" data-i18n-placeholder="editor_placeholder" placeholder="Escribe tu código LaTeX aquí..."></textarea>
+                <div id="editorLineMeasure" class="editor-line-measure"></div>
                 <div id="editorAutocompletePopup" class="editor-autocomplete-popup hidden"></div>
             </div>
             <!-- Barra Inferior de Métricas en Vivo (Línea/Columna, Palabras, Caracteres) -->
             <div id="editorMetricsBar" class="editor-metrics-bar">
-                <span id="metricCursorPos" class="metric-item" title="Posición actual del cursor">📍 Ln 1, Col 1</span>
+                <span id="metricCursorPos" class="metric-item" data-i18n-title="metric_cursor_title" title="Posición actual del cursor">📍 Ln 1, Col 1</span>
                 <span class="metric-sep">•</span>
-                <span id="metricWordCount" class="metric-item" title="Palabras de texto (excluyendo comandos LaTeX y comentarios)">📝 0 palabras</span>
+                <span id="metricWordCount" class="metric-item" data-i18n-title="metric_words_title" title="Palabras de texto (excluyendo comandos LaTeX y comentarios)">📝 0 palabras</span>
                 <span class="metric-sep">•</span>
-                <span id="metricCharCount" class="metric-item" title="Total de caracteres del archivo">🔤 0 caracteres</span>
+                <span id="metricCharCount" class="metric-item" data-i18n-title="metric_chars_title" title="Total de caracteres del archivo">🔤 0 caracteres</span>
             </div>
         </div>
 
         <div class="resizer" id="dragResizer"></div>
 
         <div class="preview-pane" id="previewPane">
-            <div class="pane-header">
-                <span class="pane-title" data-i18n="preview_title">📄 Vista Previa (PDF)</span>
-                <div class="preview-actions">
-                    <button id="btnOpenPdfNewTab" class="btn-icon" data-i18n-title="btn_open_pdf_tab_title" title="Abrir PDF compilado en otra pestaña o ventana">↗️ <span data-i18n="btn_open_pdf_tab">Ver en Pestaña</span></button>
-                    <button id="btnDownloadPdf" class="btn-icon" data-i18n-title="btn_download_title" title="Descargar archivo PDF">⬇️ <span data-i18n="btn_download">Descargar</span></button>
-                    <button id="btnRefreshPdf" class="btn-icon" data-i18n-title="btn_refresh_pdf" title="Recargar PDF">🔄</button>
+            <div class="pane-header pdf-overleaf-toolbar">
+                <div class="pdf-toolbar-left">
+                    <button id="btnPdfRecompile" class="btn-pdf-recompile" data-i18n-title="title_compile" title="Recompilar documento (Ctrl + S)">
+                        <span class="pdf-recompile-icon">🔄</span>
+                        <span data-i18n="btn_recompile">Recompilar</span>
+                    </button>
+                    <button id="btnDownloadPdf" class="pdf-tool-btn" data-i18n-title="btn_download_title" title="Descargar archivo PDF">⬇️</button>
+                    <button id="btnOpenPdfNewTab" class="pdf-tool-btn" data-i18n-title="btn_open_pdf_tab_title" title="Abrir PDF compilado en otra pestaña o ventana">↗️</button>
+                    <button id="btnRefreshPdf" class="pdf-tool-btn" data-i18n-title="btn_refresh_pdf" title="Recargar PDF">↻</button>
+                </div>
+                <div class="pdf-toolbar-right">
+                    <button id="btnPdfInvertMode" class="pdf-tool-btn" data-i18n-title="pdf_invert_title" title="Cambiar modo de hoja PDF (Clásico / Tintado del Tema / Modo Noche)">◐</button>
+                    <div class="pdf-tool-divider"></div>
+                    <button id="btnPdfPrevPage" class="pdf-tool-btn" data-i18n-title="pdf_prev_page_title" title="Página anterior">∧</button>
+                    <button id="btnPdfNextPage" class="pdf-tool-btn" data-i18n-title="pdf_next_page_title" title="Página siguiente">∨</button>
+                    <div class="pdf-page-counter" title="Página actual / Total de páginas">
+                        <input type="text" id="pdfPageInput" class="pdf-page-input" value="1" aria-label="Página actual" />
+                        <span class="pdf-page-sep">/</span>
+                        <span id="pdfPageCount">1</span>
+                    </div>
+                    <div class="pdf-tool-divider"></div>
+                    <button id="btnPdfZoomOut" class="pdf-tool-btn" data-i18n-title="pdf_zoom_out_title" title="Alejar PDF (−)">−</button>
+                    <button id="btnPdfZoomIn" class="pdf-tool-btn" data-i18n-title="pdf_zoom_in_title" title="Acercar PDF (+)">+</button>
+                    <select id="pdfZoomSelect" class="pdf-zoom-select" data-i18n-title="pdf_zoom_select_title" title="Nivel de zoom del PDF">
+                        <option value="fit" data-i18n="pdf_zoom_fit">Ajustar</option>
+                        <option value="75">75%</option>
+                        <option value="90">90%</option>
+                        <option value="100" selected>100%</option>
+                        <option value="125">125%</option>
+                        <option value="150">150%</option>
+                        <option value="200">200%</option>
+                    </select>
                 </div>
             </div>
-            <div class="preview-content">
-                <iframe id="pdfViewer" src="about:blank"></iframe>
+            <div class="preview-content" id="previewContentBox">
+                <div id="pdfCustomViewer" class="pdf-custom-viewer hidden" data-paper-mode="classic">
+                    <div id="pdfPagesContainer" class="pdf-pages-container"></div>
+                </div>
+                <iframe id="pdfViewer" class="hidden" src="about:blank"></iframe>
                 <div id="emptyState" class="empty-state">
-                    <div class="fox-illustration">🦊</div>
+                    <div class="fox-illustration theme-mascot-icon"></div>
                     <h3 class="empty-welcome" data-i18n="empty_welcome">Bienvenido a NaTex</h3>
                     <p data-i18n="empty_compile_hint">Presiona <strong>Compilar (Ctrl + S)</strong> para generar el PDF.</p>
                 </div>
@@ -257,8 +370,8 @@
                     <div class="error-header">
                         <span data-i18n="compilation_error_title">⚠️ Error de Compilación</span>
                         <div style="display:flex; gap:8px; align-items:center;">
-                            <button id="btnJumpErrorLine" class="btn-ai-quick hidden" style="background:rgba(239,68,68,0.18); border-color:rgba(239,68,68,0.45); color:#fca5a5;">📍 Ir a la línea</button>
-                            <button id="btnAskGeminiError" class="btn-ai-quick" data-i18n="btn_ask_gemini_error">💡 Preguntar a Gemini por qué falló</button>
+                            <button id="btnJumpErrorLine" class="btn-ai-quick hidden" style="background:rgba(239,68,68,0.18); border-color:rgba(239,68,68,0.45); color:#fca5a5;" data-i18n="btn_jump_error_line">📍 Ir a la línea</button>
+                            <button id="btnAskGeminiError" class="btn-ai-quick" data-i18n="btn_ask_ai_error">💡 Preguntar a la IA por qué falló</button>
                         </div>
                     </div>
                     <pre id="errorLog"></pre>
@@ -272,12 +385,12 @@
         <div class="dashboard-container">
             <div class="dashboard-header">
                 <div>
-                    <h1 class="dashboard-greeting" data-i18n="dashboard_greeting">¡Hola, bienvenido a NaTex! 🦊</h1>
+                    <h1 class="dashboard-greeting"><span data-i18n="dashboard_greeting">¡Hola, bienvenido a NaTex!</span> <span class="theme-mascot-icon" style="width:44px;height:44px;vertical-align:middle;margin-left:8px;"></span></h1>
                     <p class="dashboard-subtitle" data-i18n="dashboard_subtitle">Continúa redactando tu documento o crea uno nuevo en segundos.</p>
                 </div>
                 <div style="display:flex; gap:10px; align-items:center;">
                     <input type="file" id="zipProjectInput" accept=".zip" style="display:none;">
-                    <button id="btnDashboardImportZip" class="btn-secondary" style="padding:10px 16px; font-size:13.5px; display:flex; align-items:center; gap:6px;" title="Importar un proyecto LaTeX en formato .zip (compatible con Overleaf)">📦 <span data-i18n="btn_import_zip">Importar .ZIP</span></button>
+                    <button id="btnDashboardImportZip" class="btn-secondary" style="padding:10px 16px; font-size:13.5px; display:flex; align-items:center; gap:6px;" data-i18n-title="title_import_zip" title="Importar un proyecto LaTeX en formato .zip (compatible con Overleaf)">📦 <span data-i18n="btn_import_zip">Importar .zip</span></button>
                     <button id="btnDashboardNewProject" class="hero-btn" style="padding:10px 20px; font-size:13.5px;">+ <span data-i18n="btn_new_project">Nuevo Proyecto</span></button>
                 </div>
             </div>
@@ -315,7 +428,7 @@
                     </div>
                     <div class="quick-card" id="quickVoiceDictate">
                         <div class="quick-card-icon">🎙️</div>
-                        <div class="quick-card-title" data-i18n="quick_voice_title">Dictáfono de Clases</div>
+                        <div class="quick-card-title" data-i18n="quick_voice_title">Transcriptor de Voz Móvil</div>
                         <div class="quick-card-desc" data-i18n="quick_voice_desc">Graba tu clase desde el celular y genera el apunte LaTeX estructurado.</div>
                     </div>
                     <div class="quick-card" id="quickOpenGallery">
@@ -336,26 +449,26 @@
                     <div class="projects-toolbar">
                         <div class="projects-search-box">
                             <span class="projects-search-icon">🔍</span>
-                            <input type="text" id="dashboardSearchInput" class="projects-search-input" placeholder="Buscar por nombre o contenido..." autocomplete="off" spellcheck="false" />
-                            <button type="button" id="btnClearDashboardSearch" class="projects-search-clear hidden" title="Limpiar búsqueda">✕</button>
+                            <input type="text" id="dashboardSearchInput" class="projects-search-input" data-i18n-placeholder="dashboard_search_placeholder" placeholder="Buscar por nombre o contenido..." autocomplete="off" spellcheck="false" />
+                            <button type="button" id="btnClearDashboardSearch" class="projects-search-clear hidden" data-i18n-title="title_clear_search" title="Limpiar búsqueda">✕</button>
                         </div>
-                        <select id="dashboardFilterDate" class="projects-filter-select" title="Filtrar por fecha de modificación">
-                            <option value="all">📅 Cualquier fecha</option>
-                            <option value="today">🕒 Hoy (24h)</option>
-                            <option value="week">📆 Últimos 7 días</option>
-                            <option value="month">🗓️ Últimos 30 días</option>
+                        <select id="dashboardFilterDate" class="projects-filter-select" data-i18n-title="title_filter_date" title="Filtrar por fecha de modificación">
+                            <option value="all" data-i18n="filter_date_all">📅 Cualquier fecha</option>
+                            <option value="today" data-i18n="filter_date_today">🕒 Hoy (24h)</option>
+                            <option value="week" data-i18n="filter_date_week">📆 Últimos 7 días</option>
+                            <option value="month" data-i18n="filter_date_month">🗓️ Últimos 30 días</option>
                         </select>
-                        <select id="dashboardFilterStatus" class="projects-filter-select" title="Filtrar por estado de compilación">
-                            <option value="all">📄 Todos</option>
-                            <option value="with_pdf">✅ Con PDF compilado</option>
-                            <option value="no_pdf">📝 Sin PDF aún</option>
+                        <select id="dashboardFilterStatus" class="projects-filter-select" data-i18n-title="title_filter_status" title="Filtrar por estado de compilación">
+                            <option value="all" data-i18n="filter_status_all">📄 Todos</option>
+                            <option value="with_pdf" data-i18n="filter_status_pdf">✅ Con PDF compilado</option>
+                            <option value="no_pdf" data-i18n="filter_status_no_pdf">📝 Sin PDF aún</option>
                         </select>
-                        <select id="dashboardSortBy" class="projects-filter-select" title="Ordenar proyectos">
-                            <option value="recent">⬇️ Más recientes</option>
-                            <option value="oldest">⬆️ Más antiguos</option>
-                            <option value="name_asc">🔤 Nombre (A - Z)</option>
-                            <option value="name_desc">🔤 Nombre (Z - A)</option>
-                            <option value="lines_desc">📏 Más extensos</option>
+                        <select id="dashboardSortBy" class="projects-filter-select" data-i18n-title="title_sort_projects" title="Ordenar proyectos">
+                            <option value="recent" data-i18n="sort_recent">⬇️ Más recientes</option>
+                            <option value="oldest" data-i18n="sort_oldest">⬆️ Más antiguos</option>
+                            <option value="name_asc" data-i18n="sort_name_asc">🔤 Nombre (A - Z)</option>
+                            <option value="name_desc" data-i18n="sort_name_desc">🔤 Nombre (Z - A)</option>
+                            <option value="lines_desc" data-i18n="sort_lines_desc">📏 Más extensos</option>
                         </select>
                     </div>
                 </div>
@@ -364,15 +477,15 @@
         </div>
     </div>
 
-    <!-- Modal Creador de Tablas -->
+    <!-- Modal Creador de Tablas (Visual Table Studio) -->
     <div id="modalTableBuilder" class="modal hidden">
         <div class="table-modal-content">
             <div class="modal-header">
                 <div class="modal-title-group">
-                    <h3 class="modal-title">📊 <span data-i18n="table_builder_title">Creador de Tablas</span></h3>
+                    <h3 class="modal-title">📊 <span data-i18n="table_builder_title">Editor Visual de Tablas</span></h3>
                     <span class="modal-subtitle" data-i18n="table_builder_subtitle">Crea tu tabla de forma visual o pega celdas copiadas directamente con Ctrl+V</span>
                 </div>
-                <button class="modal-close" id="btnCloseTableModal">&times;</button>
+                <button class="modal-close" id="btnCloseTableModal" data-i18n-title="btn_close" title="Cerrar">&times;</button>
             </div>
 
             <div class="table-builder-body">
@@ -383,8 +496,8 @@
                             <span data-i18n="lbl_rows">Filas:</span>
                             <input type="number" id="tblRowsInput" min="1" max="50" value="3" class="input-dim">
                         </label>
-                        <button id="btnTblAddRow" class="btn-dim-action" title="Agregar fila">+ Fila</button>
-                        <button id="btnTblRemoveRow" class="btn-dim-action" title="Quitar fila">- Fila</button>
+                        <button id="btnTblAddRow" class="btn-dim-action" data-i18n-title="tbl_add_row_title" title="Agregar fila"><span data-i18n="tbl_add_row">+ Fila</span></button>
+                        <button id="btnTblRemoveRow" class="btn-dim-action" data-i18n-title="tbl_remove_row_title" title="Quitar fila"><span data-i18n="tbl_remove_row">- Fila</span></button>
 
                         <span class="dim-divider">|</span>
 
@@ -392,37 +505,37 @@
                             <span data-i18n="lbl_cols">Columnas:</span>
                             <input type="number" id="tblColsInput" min="1" max="25" value="3" class="input-dim">
                         </label>
-                        <button id="btnTblAddCol" class="btn-dim-action" title="Agregar columna">+ Col</button>
-                        <button id="btnTblRemoveCol" class="btn-dim-action" title="Quitar columna">- Col</button>
+                        <button id="btnTblAddCol" class="btn-dim-action" data-i18n-title="tbl_add_col_title" title="Agregar columna"><span data-i18n="tbl_add_col">+ Col</span></button>
+                        <button id="btnTblRemoveCol" class="btn-dim-action" data-i18n-title="tbl_remove_col_title" title="Quitar columna"><span data-i18n="tbl_remove_col">- Col</span></button>
 
-                        <button id="btnTblClear" class="btn-dim-action" title="Limpiar todas las celdas">🧹 Limpiar</button>
+                        <button id="btnTblClear" class="btn-dim-action" data-i18n-title="tbl_clear_title" title="Limpiar todas las celdas">🧹 <span data-i18n="tbl_clear">Limpiar</span></button>
                     </div>
 
                     <div class="table-style-options">
-                        <label class="checkbox-label" title="Poner la primera fila en negrita \textbf">
+                        <label class="checkbox-label" data-i18n-title="tbl_chk_header_title" title="Poner la primera fila en negrita \textbf">
                             <input type="checkbox" id="tblChkHeader" checked>
                             <span data-i18n="chk_table_header">Encabezado</span>
                         </label>
-                        <label class="checkbox-label" title="Usar estilo profesional booktabs (\toprule, \midrule, \bottomrule)">
+                        <label class="checkbox-label" data-i18n-title="tbl_chk_booktabs_title" title="Usar estilo profesional booktabs (\toprule, \midrule, \bottomrule)">
                             <input type="checkbox" id="tblChkBooktabs" checked>
-                            <span>Booktabs (Pro)</span>
+                            <span data-i18n="tbl_chk_booktabs">Booktabs (Pro)</span>
                         </label>
-                        <label class="checkbox-label" title="Líneas verticales entre columnas">
+                        <label class="checkbox-label" data-i18n-title="tbl_chk_borders_title" title="Líneas verticales entre columnas">
                             <input type="checkbox" id="tblChkBorders">
-                            <span>Bordes |</span>
+                            <span data-i18n="tbl_chk_borders">Bordes |</span>
                         </label>
                         <label class="select-label">
-                            <span>Alineación:</span>
+                            <span data-i18n="tbl_align_label">Alineación:</span>
                             <select id="tblAlignSelect" class="select-compact">
-                                <option value="c" selected>Centrado (c)</option>
-                                <option value="l">Izquierda (l)</option>
-                                <option value="r">Derecha (r)</option>
+                                <option value="c" selected data-i18n="tbl_align_center">Centrado (c)</option>
+                                <option value="l" data-i18n="tbl_align_left">Izquierda (l)</option>
+                                <option value="r" data-i18n="tbl_align_right">Derecha (r)</option>
                             </select>
                         </label>
                     </div>
                 </div>
 
-                <!-- Cuadrícula Mini-Excel Interactiva -->
+                <!-- Cuadrícula Editor Visual de Tablas Interactiva -->
                 <div class="table-grid-wrapper" id="tableGridWrapper">
                     <div class="table-grid-scroll">
                         <table class="excel-grid" id="excelGrid">
@@ -433,24 +546,24 @@
 
                 <!-- Meta información: Título y Etiqueta -->
                 <div class="table-meta-inputs">
-                    <input type="text" id="tblCaptionInput" class="input-compact flex-2" placeholder="Título / Caption de la tabla (ej. Comparativa de Resultados)" value="Resultados Experimentales">
-                    <input type="text" id="tblLabelInput" class="input-compact flex-1" placeholder="Etiqueta / Label (ej. tab:resultados)" value="tab:resultados">
+                    <input type="text" id="tblCaptionInput" class="input-compact flex-2" data-i18n-placeholder="tbl_caption_placeholder" placeholder="Título / Caption de la tabla (ej. Comparativa de Resultados)" value="Resultados Experimentales">
+                    <input type="text" id="tblLabelInput" class="input-compact flex-1" data-i18n-placeholder="tbl_label_placeholder" placeholder="Etiqueta / Label (ej. tab:resultados)" value="tab:resultados">
                 </div>
 
                 <!-- Vista Previa de Código LaTeX -->
                 <div class="table-preview-section">
                     <div class="preview-header-small">
-                        <span>Código LaTeX generado:</span>
-                        <span class="preview-badge-hint">💡 Puedes pegar celdas de Excel con Ctrl+V</span>
+                        <span data-i18n="tbl_preview_header">Código LaTeX generado:</span>
+                        <span class="preview-badge-hint" data-i18n="tbl_paste_hint">💡 Puedes pegar celdas con Ctrl+V</span>
                     </div>
                     <pre class="table-code-preview" id="tblCodePreview"></pre>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button id="btnCancelTableModal" class="btn-secondary">Cancelar</button>
-                <button id="btnCopyTableCode" class="btn-secondary">📋 Copiar Código</button>
-                <button id="btnInsertTableDoc" class="btn-primary">📥 Insertar en Documento</button>
+                <button id="btnCancelTableModal" class="btn-secondary" data-i18n="btn_cancel">Cancelar</button>
+                <button id="btnCopyTableCode" class="btn-secondary">📋 <span data-i18n="btn_copy_code">Copiar Código</span></button>
+                <button id="btnInsertTableDoc" class="btn-primary">📥 <span data-i18n="btn_insert_doc">Insertar en Documento</span></button>
             </div>
         </div>
     </div>
@@ -467,23 +580,23 @@
                     <div class="math-search-wrapper-header">
                         <input type="text" id="mathSearchInput" class="math-search-input" data-i18n-placeholder="math_search_placeholder" placeholder="🔍 Buscar símbolo o fórmula..." />
                     </div>
-                    <button class="modal-close" id="btnCloseMath">&times;</button>
+                    <button class="modal-close" id="btnCloseMath" data-i18n-title="btn_close" title="Cerrar">&times;</button>
                 </div>
             </div>
 
             <!-- Barra de Herramientas Rápida Superior -->
             <div class="math-toolbar-top">
                 <div class="math-tools-left">
-                    <button class="math-tool-btn" id="btnMathClear" title="Limpiar fórmula">🗑️ <span data-i18n="math_clear">Limpiar</span></button>
-                    <button class="math-tool-btn" id="btnMathUndo" title="Deshacer">↩️</button>
-                    <button class="math-tool-btn" id="btnMathRedo" title="Rehacer">↪️</button>
+                    <button class="math-tool-btn" id="btnMathClear" data-i18n-title="math_title_clear" title="Limpiar fórmula">🗑️ <span data-i18n="math_clear">Limpiar</span></button>
+                    <button class="math-tool-btn" id="btnMathUndo" data-i18n-title="math_title_undo" title="Deshacer">↩️</button>
+                    <button class="math-tool-btn" id="btnMathRedo" data-i18n-title="math_title_redo" title="Rehacer">↪️</button>
                 </div>
                 <div class="math-tools-right">
                     <span class="math-mode-label" data-i18n="math_mode_label">Formato:</span>
                     <div class="math-mode-switch" id="mathModeSwitch">
-                        <button class="math-mode-btn active" data-mode="inline" title="Fórmula en el texto">$ ... $</button>
-                        <button class="math-mode-btn" data-mode="display" title="Ecuación centrada en bloque">\[ ... \]</button>
-                        <button class="math-mode-btn" data-mode="equation" title="Ecuación numerada">eq (#)</button>
+                        <button class="math-mode-btn active" data-mode="inline" data-i18n-title="math_title_mode_inline" title="Fórmula en el texto">$ ... $</button>
+                        <button class="math-mode-btn" data-mode="display" data-i18n-title="math_title_mode_display" title="Ecuación centrada en bloque">\[ ... \]</button>
+                        <button class="math-mode-btn" data-mode="equation" data-i18n-title="math_title_mode_equation" title="Ecuación numerada">eq (#)</button>
                     </div>
                 </div>
             </div>
@@ -564,44 +677,44 @@
         </div>
     </div>
 
-    <!-- Modal Compartir con Amigo -->
+    <!-- Modal Compartir Sesión P2P -->
     <div id="modalShare" class="modal hidden">
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
-                <h3>🔗 <span data-i18n="share_modal_title">Compartir NaTex con un Amigo</span></h3>
-                <button class="modal-close" id="btnCloseShare">&times;</button>
+                <h3>🔗 <span data-i18n="share_modal_title">Sesión Colaborativa P2P...</span></h3>
+                <button class="modal-close" id="btnCloseShare" data-i18n-title="btn_close" title="Cerrar">&times;</button>
             </div>
             <div class="modal-body">
                 <div id="shareLoading" style="text-align:center; padding:20px;">
                     <div style="font-size:28px; margin-bottom:8px;">⏳</div>
-                    <p data-i18n="share_loading">Generando enlace seguro para tu amigo...</p>
+                    <p data-i18n="share_loading">Generando enlace seguro de colaboración P2P...</p>
                 </div>
                 <div id="shareReady" class="hidden">
                     <div id="shareQrContainer" style="display: flex; justify-content: center; align-items: center; background: #ffffff; padding: 14px; border-radius: 12px; margin: 0 auto 12px auto; width: 190px; height: 190px; box-shadow: 0 4px 16px rgba(0,0,0,0.25);">
                         <div id="shareQrCode"></div>
                     </div>
-                    <label for="inputShareUrl"><strong data-i18n="share_ready_label">Enlace para tu amigo:</strong></label>
+                    <label for="inputShareUrl"><strong data-i18n="share_ready_label">Enlace de colaboración P2P:</strong></label>
                     <div style="display:flex; gap:8px; margin:8px 0 12px 0;">
                         <input type="text" id="inputShareUrl" readonly style="flex:1; padding:10px 12px; border-radius:6px; background:var(--bg-dark); color:var(--fox-orange); border:1px solid var(--border-color); font-weight:bold; font-size:13px;" />
                         <button id="btnCopyShareUrl" class="btn-primary">📋 <span data-i18n="btn_copy">Copiar</span></button>
-                        <button id="btnRestartTunnel" class="btn-secondary" title="Reiniciar y generar un nuevo enlace de compartir">🔄 <span data-i18n="btn_restart_tunnel">Reiniciar Link</span></button>
+                        <button id="btnRestartTunnel" class="btn-secondary" data-i18n-title="share_restart_title" title="Reiniciar y generar un nuevo enlace de compartir">🔄 <span data-i18n="btn_restart_tunnel">Reiniciar Link</span></button>
                     </div>
-                    <div style="background:var(--bg-card-subtle, #181824); border: 1px solid var(--border-color); border-radius:8px; padding:12px; font-size:12.5px; color:var(--text-muted); line-height:1.5;" data-i18n="share_explanation">
-                        💡 <strong>Cómo funciona:</strong> Tu amigo solo hace clic en este link o escanea el QR desde cualquier navegador (PC o celular). Podrá ver el documento, escribir con guardado automático y compilar el PDF junto a ti en tiempo real mientras tengas NaTex abierto.
+                    <div style="background:var(--bg-elevated); border: 1px solid var(--border-color); border-radius:8px; padding:12px; font-size:12.5px; color:var(--text-muted); line-height:1.5;" data-i18n="share_explanation">
+                        💡 <strong>Cómo funciona:</strong> Tu colaborador solo hace clic en este link o escanea el QR desde cualquier navegador (PC o celular). Podrá ver el documento, escribir con guardado automático y compilar el PDF junto a ti en tiempo real mientras tengas NaTex abierto.
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Drawer del Asistente Gemini -->
+    <!-- Drawer del Asistente IA NaTex -->
     <div id="aiDrawer" class="ai-drawer hidden">
         <div class="ai-header">
             <div class="ai-title" style="display:flex; align-items:center; gap:8px;">
-                <span>🦊 <span data-i18n="ai_title">IA NaTex</span></span>
+                <h3 style="display:inline-flex;align-items:center;gap:8px;"><span class="theme-mascot-icon" style="width:24px;height:24px;"></span> <span data-i18n="ai_title">Asistente IA NaTex</span></h3>
                 <span id="aiActiveProviderBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 12px; background: rgba(255,107,53,0.18); color: var(--fox-orange); font-weight: 600; border: 1px solid var(--fox-orange);">Gemini</span>
             </div>
-            <button id="btnCloseAI" class="btn-close">&times;</button>
+            <button id="btnCloseAI" class="btn-close" data-i18n-title="btn_close" title="Cerrar">&times;</button>
         </div>
         <div class="ai-quick-actions">
             <button class="pill-btn" data-i18n="ai_pill_table" data-prompt="¿Cómo hago una tabla de 3 columnas bien formateada en LaTeX? Dame el código listo.">📊 Crear Tabla</button>
@@ -624,7 +737,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>📑 <span data-i18n="templates_title">Seleccionar Plantilla</span></h3>
-                <button class="modal-close" id="btnCloseTemplates">&times;</button>
+                <button class="modal-close" id="btnCloseTemplates" data-i18n-title="btn_close" title="Cerrar">&times;</button>
             </div>
             <div class="modal-body">
                 <p class="modal-desc" data-i18n="templates_desc">Elige una plantilla para cargar en tu proyecto actual:</p>
@@ -646,7 +759,7 @@
                     <h3>🖼️ <span data-i18n="gallery_modal_title">Galería de Imágenes</span></h3>
                     <p class="modal-subtitle" style="font-size:12.5px; color:var(--text-muted); margin-top:2px;" data-i18n="gallery_modal_subtitle">Gestiona figuras, copia el código LaTeX para tu documento o renombra tus imágenes.</p>
                 </div>
-                <button class="modal-close" id="btnCloseUpload">&times;</button>
+                <button class="modal-close" id="btnCloseUpload" data-i18n-title="btn_close" title="Cerrar">&times;</button>
             </div>
             <div class="modal-body" style="padding-top: 10px;">
                 <!-- Barra de Control: Filtro de Proyecto + Botón Subir -->
@@ -676,163 +789,282 @@
         </div>
     </div>
 
-    <!-- Modal de Ajustes (Personalización, Temas, Idioma, API Key) -->
+    <!-- Modal de Ajustes con Barra Lateral (Configuración, Customización, Clave IA) -->
     <div id="modalSettings" class="modal hidden">
-        <div class="modal-content" style="max-width: 520px;">
+        <div class="modal-content settings-modal-content">
             <div class="modal-header">
-                <h3>⚙️ <span data-i18n="settings_title">Ajustes y Personalización</span></h3>
-                <button class="modal-close" id="btnCloseSettings">&times;</button>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="theme-mascot-icon" style="width:24px;height:24px;"></span>
+                    <h3><span data-i18n="settings_title">Ajustes y Personalización</span></h3>
+                </div>
+                <button class="modal-close" id="btnCloseSettings" data-i18n-title="btn_close" title="Cerrar">&times;</button>
             </div>
-            <div class="modal-body">
-                <!-- Sección Tema -->
-                <div class="settings-section">
-                    <label class="settings-label" data-i18n="theme_label">🎨 Tema de la Aplicación:</label>
-                    <div class="theme-options-grid">
-                        <div class="theme-card-option active" id="themeOptDark" data-theme="dark">
-                            <span style="font-size:20px;">🌙</span>
-                            <span data-i18n="theme_dark">Oscuro</span>
-                        </div>
-                        <div class="theme-card-option" id="themeOptLight" data-theme="light">
-                            <span style="font-size:20px;">☀️</span>
-                            <span data-i18n="theme_light">Claro</span>
-                        </div>
-                        <div class="theme-card-option" id="themeOptCustom" data-theme="custom">
-                            <span style="font-size:20px;">🎨</span>
-                            <span data-i18n="theme_custom">Personalizado</span>
-                        </div>
-                    </div>
-                    
-                    <div id="customAccentContainer" style="margin-top: 10px;">
-                        <span style="font-size:12px; color:var(--text-muted);" data-i18n="accent_color_label">Color de acento:</span>
-                        <div class="accent-colors-list">
-                            <div class="color-dot active" style="background:#FF6B35;" data-color="#FF6B35" title="Fox Orange"></div>
-                            <div class="color-dot" style="background:#3B82F6;" data-color="#3B82F6" title="Cyber Blue"></div>
-                            <div class="color-dot" style="background:#10B981;" data-color="#10B981" title="Emerald"></div>
-                            <div class="color-dot" style="background:#8B5CF6;" data-color="#8B5CF6" title="Royal Purple"></div>
-                            <div class="color-dot" style="background:#EC4899;" data-color="#EC4899" title="Rose"></div>
-                            <input type="color" id="customColorPicker" value="#FF6B35" style="width:28px; height:28px; border-radius:50%; border:none; cursor:pointer; background:none;" title="Color a medida" />
-                        </div>
-                    </div>
-                </div>
+            <div class="settings-layout-wrapper">
+                <!-- Barra Lateral de Secciones de Ajustes -->
+                <aside class="settings-sidebar-nav">
+                    <button type="button" class="settings-nav-btn active" data-settings-tab="config">
+                        <span class="settings-nav-icon">⚙️</span>
+                        <span class="settings-nav-text" data-i18n="settings_tab_config">Configuración</span>
+                    </button>
+                    <button type="button" class="settings-nav-btn" data-settings-tab="customization">
+                        <span class="settings-nav-icon">🎨</span>
+                        <span class="settings-nav-text" data-i18n="settings_tab_customization">Customización</span>
+                    </button>
+                    <button type="button" class="settings-nav-btn" data-settings-tab="ai">
+                        <span class="settings-nav-icon">🔑</span>
+                        <span class="settings-nav-text" data-i18n="settings_tab_ai">Clave IA</span>
+                    </button>
+                </aside>
 
-                <!-- Sección Idioma -->
-                <div class="settings-section">
-                    <label class="settings-label" data-i18n="language_label">🌐 Idioma / Language:</label>
-                    <div class="lang-selector-group">
-                        <button class="lang-btn active" id="btnLangEs" data-lang="es">
-                            <span>🇪🇸</span> Español
-                        </button>
-                        <button class="lang-btn" id="btnLangEn" data-lang="en">
-                            <span>🇬🇧</span> English
-                        </button>
-                    </div>
-                </div>
+                <!-- Área Principal de Contenido por Sección -->
+                <div class="settings-main-pane">
+                    <div class="settings-tab-scroll">
+                        <!-- SECCIÓN 1: CONFIGURACIÓN -->
+                        <div class="settings-tab-pane active" id="settingsPaneConfig" data-settings-pane="config">
+                            <div class="settings-pane-header">
+                                <h4 data-i18n="settings_config_heading">⚙️ Configuración General</h4>
+                                <p data-i18n="settings_config_desc">Ajusta el idioma de la interfaz, el comportamiento del editor de código y las actualizaciones del programa.</p>
+                            </div>
 
-                <!-- Sección Proveedor de Inteligencia Artificial (Multi-IA) -->
-                <div class="settings-section" style="border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 14px;">
-                    <label class="settings-label" for="selectAiProvider">🧠 <span data-i18n="ai_provider_label">Proveedor de Inteligencia Artificial:</span></label>
-                    <select id="selectAiProvider" style="width: 100%; padding: 9px 12px; border-radius: 6px; background: var(--bg-dark); color: var(--text-main); border: 1px solid var(--border-color); font-size: 13.5px; margin-bottom: 12px; cursor: pointer;">
-                        <option value="gemini" data-i18n="provider_gemini">Google Gemini</option>
-                        <option value="openai" data-i18n="provider_openai">OpenAI</option>
-                        <option value="claude" data-i18n="provider_claude">Anthropic Claude</option>
-                        <option value="nvidia" data-i18n="provider_nvidia">NVIDIA NIM</option>
-                        <option value="custom" data-i18n="provider_custom">Local / Personalizada</option>
-                    </select>
+                            <!-- Tarjeta Idioma -->
+                            <div class="settings-card-block">
+                                <label class="settings-label" data-i18n="language_label">🌐 Idioma / Language:</label>
+                                <div class="lang-selector-group">
+                                    <button class="lang-btn active" id="btnLangEs" data-lang="es">
+                                        <span>🇪🇸</span> Español
+                                    </button>
+                                    <button class="lang-btn" id="btnLangEn" data-lang="en">
+                                        <span>🇬🇧</span> English
+                                    </button>
+                                </div>
+                            </div>
 
-                    <!-- Panel Gemini -->
-                    <div id="aiPanelGemini" class="ai-provider-panel">
-                        <label class="settings-label" for="inputApiKey"><span data-i18n="gemini_key_label">Clave de API de Google Gemini:</span></label>
-                        <p class="text-muted" style="margin-bottom:8px; font-size:12px;" data-i18n="gemini_key_desc">
-                            Obtén tu clave de API en <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--fox-orange);">Google AI Studio</a>.
-                        </p>
-                        <input type="password" id="inputApiKey" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px;" />
-                    </div>
+                            <!-- Tarjeta Comportamiento del Editor (Word Wrap) -->
+                            <div class="settings-card-block">
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                                    <div style="flex: 1; min-width: 220px;">
+                                        <label class="settings-label" style="margin-bottom: 4px;">↩ <span data-i18n="settings_wrap_title">Ajuste de texto al recuadro:</span></label>
+                                        <div style="font-size: 12.5px; color: var(--text-muted);" data-i18n="settings_wrap_desc">
+                                            Ajusta las líneas largas al ancho del editor (como Overleaf) sin que se salgan.
+                                        </div>
+                                    </div>
+                                    <div style="display:inline-flex; background:var(--bg-dark); border:1px solid var(--border-color); border-radius:8px; padding:3px; gap:3px;">
+                                        <button type="button" id="btnSettingWrapYes" class="btn-wrap-opt active" style="padding: 6px 16px; font-size: 12.5px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; background: var(--fox-orange); color: white;" data-i18n="wrap_yes">Sí</button>
+                                        <button type="button" id="btnSettingWrapNo" class="btn-wrap-opt" style="padding: 6px 16px; font-size: 12.5px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; background: transparent; color: var(--text-muted);" data-i18n="wrap_no">No</button>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <!-- Panel OpenAI -->
-                    <div id="aiPanelOpenai" class="ai-provider-panel hidden">
-                        <label class="settings-label" for="inputApiKeyOpenai"><span data-i18n="openai_key_label">Clave de API de OpenAI:</span></label>
-                        <p class="text-muted" style="margin-bottom:8px; font-size:12px;">
-                            Obtén tu API key en <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--fox-orange);">OpenAI Platform</a>.
-                        </p>
-                        <input type="password" id="inputApiKeyOpenai" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px;" />
-                    </div>
+                            <!-- Tarjeta Animación de Inicio -->
+                            <div class="settings-card-block">
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                                    <div>
+                                        <label class="settings-label" style="margin-bottom: 4px;">✨ <span data-i18n="settings_splash_title">Animación de Inicio (Intro):</span></label>
+                                        <div style="font-size: 12.5px; color: var(--text-muted);" data-i18n="settings_splash_desc">
+                                            Vuelve a reproducir la animación de presentación con el tema activo.
+                                        </div>
+                                    </div>
+                                    <button type="button" id="btnSettingsReplaySplash" class="btn-secondary" style="font-size: 12.5px; padding: 7px 14px;">
+                                        ✨ <span data-i18n="item_replay_splash">Ver Animación de Inicio</span>
+                                    </button>
+                                </div>
+                            </div>
 
-                    <!-- Panel Claude -->
-                    <div id="aiPanelClaude" class="ai-provider-panel hidden">
-                        <label class="settings-label" for="inputApiKeyClaude"><span data-i18n="claude_key_label">Clave de API de Anthropic Claude:</span></label>
-                        <p class="text-muted" style="margin-bottom:8px; font-size:12px;">
-                            Obtén tu API key en <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--fox-orange);">Anthropic Console</a>.
-                        </p>
-                        <input type="password" id="inputApiKeyClaude" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px;" />
-                    </div>
-
-                    <!-- Panel NVIDIA -->
-                    <div id="aiPanelNvidia" class="ai-provider-panel hidden">
-                        <label class="settings-label" for="inputApiKeyNvidia"><span data-i18n="nvidia_key_label">Clave de API de NVIDIA NIM:</span></label>
-                        <p class="text-muted" style="margin-bottom:8px; font-size:12px;">
-                            Obtén tu API key en <a href="https://build.nvidia.com/" target="_blank" style="color:var(--fox-orange);">NVIDIA NIM Catalog</a>.
-                        </p>
-                        <input type="password" id="inputApiKeyNvidia" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px;" />
-                    </div>
-
-                    <!-- Panel Custom/Local -->
-                    <div id="aiPanelCustom" class="ai-provider-panel hidden">
-                        <label class="settings-label" for="inputCustomUrl"><span data-i18n="custom_url_label">URL Endpoint de API (Compatible OpenAI):</span></label>
-                        <input type="text" id="inputCustomUrl" placeholder="http://localhost:11434/v1/chat/completions" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px; margin-bottom:8px;" />
-                        <label class="settings-label" for="inputCustomApiKey"><span data-i18n="custom_key_label">Token o API Key (Opcional):</span></label>
-                        <input type="password" id="inputCustomApiKey" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:9px; border-radius:6px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13px;" />
-                        <p class="text-muted" style="margin-top:6px; font-size:11.5px;" data-i18n="custom_hint">Compatible con Ollama, LM Studio, vLLM y proxies locales OpenAI.</p>
-                    </div>
-
-                    <input type="hidden" id="inputAiModel" value="" />
-
-                    <!-- Advertencia Dictáfono -->
-                    <div style="margin-top: 12px; padding: 10px 12px; border-radius: 6px; background: rgba(255, 170, 0, 0.08); border-left: 3px solid #ffaa00; font-size: 12px; line-height: 1.45; color: var(--text-muted);">
-                        <strong style="color: #ffaa00; display: block; margin-bottom: 3px;">ℹ️ <span data-i18n="ai_voice_warning_title">Aviso sobre el Dictáfono:</span></strong>
-                        <span data-i18n="ai_voice_warning_desc">La función de grabar y resumir clases con micrófono requiere la API de Google Gemini (procesamiento directo de audio). Las demás APIs funcionan para el chat y asistencia de LaTeX.</span>
-                    </div>
-                </div>
-
-                <!-- Sección Actualizaciones de Software -->
-                <div class="settings-section" style="border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 14px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                        <div>
-                            <label class="settings-label" style="margin-bottom: 2px;">🚀 <span data-i18n="updates_title">Actualizaciones de NaTex:</span></label>
-                            <div id="updateStatusText" style="font-size: 12.5px; color: var(--text-muted);">
-                                <span data-i18n="updates_current_ver">Versión instalada:</span> <strong>v1.0</strong>
+                            <!-- Tarjeta Actualizaciones de Software -->
+                            <div class="settings-card-block">
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                                    <div>
+                                        <label class="settings-label" style="margin-bottom: 4px;">🚀 <span data-i18n="updates_title">Actualizaciones de NaTex:</span></label>
+                                        <div id="updateStatusText" style="font-size: 12.5px; color: var(--text-muted);">
+                                            <span data-i18n="updates_current_ver">Versión instalada:</span> <strong>v1.3</strong>
+                                        </div>
+                                    </div>
+                                    <button id="btnCheckUpdates" class="btn-secondary" style="font-size: 12.5px; padding: 7px 14px;">
+                                        🔍 <span data-i18n="btn_check_updates">Comprobar Actualizaciones</span>
+                                    </button>
+                                </div>
+                                <div id="updateResultBox" class="hidden" style="margin-top: 10px; padding: 12px; border-radius: 6px; font-size: 12.5px; border: 1px solid var(--border-color); background: var(--bg-dark);"></div>
+                                <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="chkAutoCheckUpdates" checked style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--fox-orange);">
+                                    <label for="chkAutoCheckUpdates" style="font-size: 12.5px; cursor: pointer; color: var(--text-main); user-select: none;" data-i18n="chk_auto_updates">Comprobar actualizaciones automáticamente al iniciar</label>
+                                </div>
                             </div>
                         </div>
-                        <button id="btnCheckUpdates" class="btn-secondary" style="font-size: 12px; padding: 7px 14px;">
-                            🔍 <span data-i18n="btn_check_updates">Comprobar Actualizaciones</span>
-                        </button>
-                    </div>
-                    <div id="updateResultBox" class="hidden" style="margin-top: 10px; padding: 12px; border-radius: 6px; font-size: 12.5px; border: 1px solid var(--border-color); background: var(--bg-dark);"></div>
-                    <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" id="chkAutoCheckUpdates" checked style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--fox-orange);">
-                        <label for="chkAutoCheckUpdates" style="font-size: 12.5px; cursor: pointer; color: var(--text-main); user-select: none;" data-i18n="chk_auto_updates">Comprobar actualizaciones automáticamente al iniciar</label>
-                    </div>
-                </div>
 
-                <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:10px;">
-                    <button id="btnSaveApiKey" class="btn-primary" data-i18n="btn_save_settings">Guardar Ajustes</button>
+                        <!-- SECCIÓN 2: CUSTOMIZACIÓN -->
+                        <div class="settings-tab-pane hidden" id="settingsPaneCustomization" data-settings-pane="customization">
+                            <div class="settings-pane-header">
+                                <h4 data-i18n="settings_custom_heading">🎨 Customización y Temas Pixel Art</h4>
+                                <p data-i18n="settings_custom_desc">Escoge entre los 20 temas con mascotas en Pixel Art 32×32 o diseña tu propio acento personalizado.</p>
+                            </div>
+
+                            <div class="settings-card-block" style="margin-bottom: 12px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                                    <div style="flex: 1;">
+                                        <label for="chkThemeEffects" class="settings-label" style="margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                                            <span data-i18n="settings_theme_effects_title">✨ Efectos de Ambiente</span>
+                                        </label>
+                                        <p class="text-muted" style="margin: 0; font-size: 12.5px;" data-i18n="settings_theme_effects_desc">Muestra animaciones suaves en el fondo según el tema activo (pétalos de sakura, nieve, burbujas, etc.).</p>
+                                    </div>
+                                    <div style="display: flex; align-items: center;">
+                                        <input type="checkbox" id="chkThemeEffects" checked style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--fox-orange);">
+                                    </div>
+                                </div>
+                                <div id="themeEffectsFreqRow" style="margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px; transition: opacity 0.2s ease;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="rangeThemeEffectsFreq" style="font-size: 12.5px; font-weight: 600; color: var(--text-main); cursor: pointer;" data-i18n="settings_theme_effects_freq_label">🍃 Frecuencia de caída:</label>
+                                        <span id="lblThemeEffectsFreqVal" style="font-size: 11.5px; font-weight: 700; color: var(--fox-orange); background: color-mix(in srgb, var(--fox-orange) 14%, transparent); padding: 2px 9px; border-radius: 999px;">Normal (100%)</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="font-size: 11px; color: var(--text-muted); min-width: 32px;" data-i18n="settings_freq_low">Baja</span>
+                                        <input type="range" id="rangeThemeEffectsFreq" min="20" max="200" step="10" value="100" style="flex: 1; cursor: pointer; accent-color: var(--fox-orange); height: 6px; padding: 0; border: none;" />
+                                        <span style="font-size: 11px; color: var(--text-muted); min-width: 32px; text-align: right;" data-i18n="settings_freq_high">Alta</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-card-block">
+                                <label class="settings-label" data-i18n="theme_label">🎨 Tema de la Aplicación:</label>
+                                <div class="theme-options-grid" id="themeSelectorGrid">
+                                    <div class="theme-card-option active" id="themeOptDark" data-theme="dark">
+                                        <span style="font-size:20px;">🌙</span>
+                                        <span data-i18n="theme_dark">Oscuro</span>
+                                    </div>
+                                    <div class="theme-card-option" id="themeOptLight" data-theme="light">
+                                        <span style="font-size:20px;">☀️</span>
+                                        <span data-i18n="theme_light">Claro</span>
+                                    </div>
+                                    <div class="theme-card-option" id="themeOptCustom" data-theme="custom">
+                                        <span style="font-size:20px;">🎨</span>
+                                        <span data-i18n="theme_custom">Personalizado</span>
+                                    </div>
+                                </div>
+                                
+                                <div id="customThemeColorWrapper" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                                    <span style="font-size:12.5px; font-weight:600; color:var(--text-main); display:block; margin-bottom:8px;" data-i18n="accent_color_label">Color de acento:</span>
+                                    <div class="accent-colors-list">
+                                        <div class="color-dot active" style="background:#FF6B35;" data-color="#FF6B35" title="Fox Orange"></div>
+                                        <div class="color-dot" style="background:#3B82F6;" data-color="#3B82F6" title="Cyber Blue"></div>
+                                        <div class="color-dot" style="background:#10B981;" data-color="#10B981" title="Emerald"></div>
+                                        <div class="color-dot" style="background:#8B5CF6;" data-color="#8B5CF6" title="Royal Purple"></div>
+                                        <div class="color-dot" style="background:#EC4899;" data-color="#EC4899" title="Rose"></div>
+                                        <input type="color" id="customColorPicker" value="#FF6B35" style="width:30px; height:30px; border-radius:50%; border:none; cursor:pointer; background:none;" title="Color a medida" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 3: CLAVE IA -->
+                        <div class="settings-tab-pane hidden" id="settingsPaneAi" data-settings-pane="ai">
+                            <div class="settings-pane-header">
+                                <h4 data-i18n="settings_ai_heading">🔑 Proveedores y Claves de IA</h4>
+                                <p data-i18n="settings_ai_desc">Configura tu proveedor de Inteligencia Artificial preferido para el Asistente LaTeX y el Transcriptor de Voz.</p>
+                            </div>
+
+                            <div class="settings-card-block">
+                                <label class="settings-label" for="selectAiProvider">🧠 <span data-i18n="ai_provider_label">Proveedor de Inteligencia Artificial:</span></label>
+                                <select id="selectAiProvider" style="width: 100%; padding: 10px 12px; border-radius: 8px; background: var(--bg-dark); color: var(--text-main); border: 1px solid var(--border-color); font-size: 13.5px; margin-bottom: 16px; cursor: pointer;">
+                                    <option value="gemini" data-i18n="provider_gemini">Google Gemini</option>
+                                    <option value="openai" data-i18n="provider_openai">OpenAI</option>
+                                    <option value="claude" data-i18n="provider_claude">Anthropic Claude</option>
+                                    <option value="nvidia" data-i18n="provider_nvidia">NVIDIA NIM</option>
+                                    <option value="custom" data-i18n="provider_custom">Local / Personalizada</option>
+                                </select>
+
+                                <!-- Panel Gemini -->
+                                <div id="aiPanelGemini" class="ai-provider-panel">
+                                    <label class="settings-label" for="inputApiKey"><span data-i18n="gemini_key_label">Clave de API de Google Gemini:</span></label>
+                                    <p class="text-muted" style="margin-bottom:8px; font-size:12.5px;" data-i18n="gemini_key_desc">
+                                        Obtén tu clave de API en <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--fox-orange);">Google AI Studio</a>.
+                                    </p>
+                                    <input type="password" id="inputApiKey" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:10px 12px; border-radius:8px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13.5px;" />
+                                </div>
+
+                                <!-- Panel OpenAI -->
+                                <div id="aiPanelOpenai" class="ai-provider-panel hidden">
+                                    <label class="settings-label" for="inputApiKeyOpenai"><span data-i18n="openai_key_label">Clave de API de OpenAI:</span></label>
+                                    <p class="text-muted" style="margin-bottom:8px; font-size:12.5px;" data-i18n="openai_key_desc">
+                                        Obtén tu API key en <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--fox-orange);">OpenAI Platform</a>.
+                                    </p>
+                                    <input type="password" id="inputApiKeyOpenai" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:10px 12px; border-radius:8px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13.5px;" />
+                                    <p class="text-muted" style="margin-top:8px; font-size:12px; color:#ffaa00; display:flex; align-items:center; gap:6px;">
+                                        <span>🎙️</span>
+                                        <span><em>El Dictáfono de voz a PDF solo está disponible con la API gratuita de <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--fox-orange); text-decoration:underline;">Google Gemini</a>.</em></span>
+                                    </p>
+                                </div>
+
+                                <!-- Panel Claude -->
+                                <div id="aiPanelClaude" class="ai-provider-panel hidden">
+                                    <label class="settings-label" for="inputApiKeyClaude"><span data-i18n="claude_key_label">Clave de API de Anthropic Claude:</span></label>
+                                    <p class="text-muted" style="margin-bottom:8px; font-size:12.5px;" data-i18n="claude_key_desc">
+                                        Obtén tu API key en <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--fox-orange);">Anthropic Console</a>.
+                                    </p>
+                                    <input type="password" id="inputApiKeyClaude" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:10px 12px; border-radius:8px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13.5px;" />
+                                    <p class="text-muted" style="margin-top:8px; font-size:12px; color:#ffaa00; display:flex; align-items:center; gap:6px;">
+                                        <span>🎙️</span>
+                                        <span><em>El Dictáfono de voz a PDF solo está disponible con la API gratuita de <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--fox-orange); text-decoration:underline;">Google Gemini</a>.</em></span>
+                                    </p>
+                                </div>
+
+                                <!-- Panel NVIDIA -->
+                                <div id="aiPanelNvidia" class="ai-provider-panel hidden">
+                                    <label class="settings-label" for="inputApiKeyNvidia"><span data-i18n="nvidia_key_label">Clave de API de NVIDIA NIM:</span></label>
+                                    <p class="text-muted" style="margin-bottom:8px; font-size:12.5px;" data-i18n="nvidia_key_desc">
+                                        Obtén tu API key en <a href="https://build.nvidia.com/" target="_blank" style="color:var(--fox-orange);">NVIDIA NIM Catalog</a>.
+                                    </p>
+                                    <input type="password" id="inputApiKeyNvidia" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:10px 12px; border-radius:8px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13.5px;" />
+                                    <p class="text-muted" style="margin-top:8px; font-size:12px; color:#ffaa00; display:flex; align-items:center; gap:6px;">
+                                        <span>🎙️</span>
+                                        <span><em>El Dictáfono de voz a PDF solo está disponible con la API gratuita de <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--fox-orange); text-decoration:underline;">Google Gemini</a>.</em></span>
+                                    </p>
+                                </div>
+
+                                <!-- Panel Custom/Local -->
+                                <div id="aiPanelCustom" class="ai-provider-panel hidden">
+                                    <label class="settings-label" for="inputCustomUrl"><span data-i18n="custom_url_label">URL Endpoint de API (Compatible OpenAI):</span></label>
+                                    <input type="text" id="inputCustomUrl" placeholder="http://localhost:11434/v1/chat/completions" style="width:100%; padding:10px 12px; border-radius:8px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13.5px; margin-bottom:10px;" />
+                                    <label class="settings-label" for="inputCustomApiKey"><span data-i18n="custom_key_label">Token o API Key (Opcional):</span></label>
+                                    <input type="password" id="inputCustomApiKey" data-i18n-placeholder="ai_key_placeholder" placeholder="Coloca tu clave API aquí" style="width:100%; padding:10px 12px; border-radius:8px; background:var(--bg-dark); color:var(--text-main); border:1px solid var(--border-color); font-size:13.5px;" />
+                                    <p class="text-muted" style="margin-top:6px; font-size:12px;" data-i18n="custom_hint">Compatible con Ollama, LM Studio, vLLM y proxies locales OpenAI.</p>
+                                    <p class="text-muted" style="margin-top:6px; font-size:12px; color:#ffaa00; display:flex; align-items:center; gap:6px;">
+                                        <span>🎙️</span>
+                                        <span><em>El Dictáfono de voz a PDF solo está disponible con la API gratuita de <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--fox-orange); text-decoration:underline;">Google Gemini</a>.</em></span>
+                                    </p>
+                                </div>
+
+                                <input type="hidden" id="inputAiModel" value="" />
+
+                                <!-- Advertencia Dinámica Transcriptor de Voz -->
+                                <div id="aiVoiceWarningBanner" style="margin-top: 16px; padding: 12px 14px; border-radius: 8px; background: rgba(16, 185, 129, 0.12); border-left: 3px solid var(--success, #10B981); font-size: 12.5px; line-height: 1.5; color: var(--text-main);">
+                                    <strong id="aiVoiceWarningTitle" style="color: var(--success, #10B981); display: block; margin-bottom: 4px;">✨ Compatible con todas las funciones</strong>
+                                    <span id="aiVoiceWarningDesc">Google Gemini está habilitado tanto para el <strong>Copiloto de LaTeX</strong> (chat, fórmulas, errores) como para el <strong>Dictáfono de Clases a PDF</strong>.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pie fijo para guardar ajustes -->
+                    <div class="settings-footer-bar">
+                        <button id="btnSaveApiKey" class="btn-primary" data-i18n="btn_save_settings">Guardar Ajustes</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Dictáfono de Clase (Celular / Móvil) -->
+    <!-- Modal Transcriptor de Voz Móvil -->
     <div id="modalVoiceDictate" class="modal hidden">
         <div class="modal-content" style="max-width: 530px;">
             <div class="modal-header">
-                <h3>🎙️ <span data-i18n="voice_modal_title">Dictáfono de Clases (Celular)</span></h3>
-                <button class="modal-close" id="btnCloseVoiceModal">&times;</button>
+                <h3>🎙️ <span data-i18n="voice_modal_title">Transcriptor de Voz Móvil</span></h3>
+                <button class="modal-close" id="btnCloseVoiceModal" data-i18n-title="btn_close" title="Cerrar">&times;</button>
             </div>
             <div class="modal-body">
                 <p style="font-size: 13.5px; line-height: 1.5; color: var(--text-muted); margin-bottom: 12px;" data-i18n="voice_desc">
                     Graba la clase desde tu teléfono móvil. NaTex transcribirá el audio con <strong>Google Gemini</strong> y creará un nuevo apunte LaTeX estructurado listo para compilar a PDF con:
                 </p>
 
-                <div style="background: var(--bg-card-subtle, #1a1a1e); border: 1px solid var(--border-color, #2e2e36); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 12.5px;">
+                <div style="background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12.5px;">
                     <div style="color: var(--fox-orange, #FF6B35); font-weight: 600; margin-bottom: 4px;" data-i18n="voice_sections_title">📋 Secciones generadas:</div>
                     <ul style="margin-left: 18px; color: var(--text-muted, #95959e); line-height: 1.45;">
                         <li><strong data-i18n="voice_sec_1">1. Lo que dice textual la grabación</strong> <span data-i18n="voice_sec_1_sub">(con fórmulas $...$)</span></li>
@@ -841,21 +1073,28 @@
                     </ul>
                 </div>
 
+                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.22); border-radius: 8px; padding: 9px 12px; margin-bottom: 14px; font-size: 12px; color: var(--text-muted); display: flex; align-items: flex-start; gap: 8px;">
+                    <span style="font-size: 14px;">💡</span>
+                    <div>
+                        <strong style="color: var(--text-main);">Recomendación de grabación:</strong> Ideal para clases de 15 a 60 minutos. Puedes grabar en directo con el micrófono o subir archivos (.mp3, .m4a, .wav).
+                    </div>
+                </div>
+
                 <div style="text-align: center; margin-bottom: 14px;">
                     <span style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;" data-i18n="voice_scan_instruction">📱 Escanea con la cámara de tu celular</span>
                     <div id="voiceQrContainer" style="display: flex; justify-content: center; align-items: center; background: #ffffff; padding: 14px; border-radius: 12px; margin: 10px auto; width: 195px; height: 195px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                         <div id="voiceQrCode"></div>
                     </div>
-                    <div id="voiceConnBadge" style="display: inline-block; font-size: 11.5px; padding: 4px 12px; border-radius: 12px; background: rgba(255,107,53,0.15); color: var(--fox-orange); font-weight: 600;">
+                    <div id="voiceConnBadge" style="display: inline-block; font-size: 11.5px; padding: 4px 12px; border-radius: 12px; background: rgba(255,107,53,0.15); color: var(--fox-orange); font-weight: 600;" data-i18n="voice_conn_loading">
                         Cargando conexión...
                     </div>
                 </div>
 
                 <div style="margin-bottom: 14px;">
-                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;" data-i18n="voice_direct_link_label">Enlace directo al dictáfono:</label>
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;" data-i18n="voice_direct_link_label">Enlace directo al transcriptor:</label>
                     <div style="display: flex; gap: 8px;">
                         <input type="text" id="inputVoiceUrl" readonly style="flex: 1; padding: 10px 12px; border-radius: 6px; background: var(--bg-dark, #121214); color: var(--text-main, #f0f0f2); border: 1px solid var(--border-color, #2e2e36); font-family: monospace; font-size: 13px;" />
-                        <button id="btnCopyVoiceUrl" class="btn-secondary" title="Copiar enlace">📋 <span data-i18n="btn_copy">Copiar</span></button>
+                        <button id="btnCopyVoiceUrl" class="btn-secondary" data-i18n-title="title_copy" title="Copiar enlace">📋 <span data-i18n="btn_copy">Copiar</span></button>
                     </div>
                 </div>
 
@@ -864,7 +1103,130 @@
                         🚀 <span data-i18n="btn_toggle_tunnel">Activar Túnel Cloudflare (Fuera de Wi-Fi)</span>
                     </button>
                     <button id="btnOpenVoiceTab" class="btn-primary" style="font-size: 12.5px;">
-                        🌐 <span data-i18n="btn_open_dictaphone_here">Abrir Dictáfono Aquí</span>
+                        🌐 <span data-i18n="btn_open_dictaphone_here">Abrir Transcriptor Aquí</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Diálogo Personalizado (Reemplazo Elegante de prompt()) -->
+    <div id="modalAppPrompt" class="modal hidden">
+        <div class="dialog-modal-card">
+            <h3 class="dialog-modal-title" id="appPromptTitle">📝 <span data-i18n="prompt_new_item">Nuevo Elemento</span></h3>
+            <p class="dialog-modal-desc" id="appPromptDesc" data-i18n="prompt_enter_name">Introduce el nombre:</p>
+            <input type="text" id="appPromptInput" class="dialog-modal-input" autocomplete="off" spellcheck="false" />
+            <div class="dialog-modal-actions">
+                <button type="button" class="btn-secondary" id="btnAppPromptCancel" data-i18n="btn_cancel">Cancelar</button>
+                <button type="button" class="btn-primary" id="btnAppPromptOk" data-i18n="btn_confirm">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmación Personalizada (Reemplazo Elegante de confirm()) -->
+    <div id="modalAppConfirm" class="modal hidden">
+        <div class="dialog-modal-card">
+            <h3 class="dialog-modal-title" id="appConfirmTitle">⚠️ <span data-i18n="confirm_title">Confirmación</span></h3>
+            <p class="dialog-modal-desc" id="appConfirmDesc" data-i18n="confirm_desc">¿Estás seguro de que deseas continuar?</p>
+            <div class="dialog-modal-actions">
+                <button type="button" class="btn-secondary" id="btnAppConfirmCancel" data-i18n="btn_cancel">Cancelar</button>
+                <button type="button" class="btn-primary" id="btnAppConfirmOk" style="background:var(--error, #ef4444); border-color:var(--error, #ef4444);" data-i18n="btn_confirm">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Selección de Carga de Plantilla -->
+    <div id="modalTemplateApplyChoice" class="modal hidden">
+        <div class="dialog-modal-card" style="width: 520px;">
+            <h3 class="dialog-modal-title">📑 <span id="templateChoiceModalTitle" data-i18n="template_choice_title">Cargar Plantilla</span></h3>
+            <p class="dialog-modal-desc" id="templateChoiceModalDesc" data-i18n="template_choice_desc">Elige cómo deseas incorporar esta plantilla en tu proyecto:</p>
+            
+            <div class="template-choice-options">
+                <button type="button" class="template-choice-btn" id="btnTemplateApplyReplace">
+                    <span class="template-choice-icon">🔄</span>
+                    <div>
+                        <div class="template-choice-title"><span data-i18n="template_replace_title">Reemplazar archivo actual</span> (<span id="templateTargetFileLabel">main.tex</span>)</div>
+                        <div class="template-choice-desc" data-i18n="template_replace_desc">Sustituye el contenido del archivo abierto actualmente con el código de esta plantilla.</div>
+                    </div>
+                </button>
+                <button type="button" class="template-choice-btn" id="btnTemplateApplyNew">
+                    <span class="template-choice-icon">➕</span>
+                    <div>
+                        <div class="template-choice-title"><span data-i18n="template_new_file_title">Crear como archivo nuevo</span> (<span id="templateNewFileLabel">plantilla.tex</span>)</div>
+                        <div class="template-choice-desc" data-i18n="template_new_file_desc">Crea un archivo nuevo con esta plantilla sin modificar ni borrar ninguno de tus archivos existentes.</div>
+                    </div>
+                </button>
+            </div>
+
+            <div class="dialog-modal-actions">
+                <button type="button" class="btn-secondary" id="btnTemplateChoiceCancel" data-i18n="btn_cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Historial de Versiones / Snapshots -->
+    <div id="modalVersionHistory" class="modal hidden">
+        <div class="dialog-modal-card" style="width: 780px; max-width: 95vw; max-height: 85vh; display: flex; flex-direction: column;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div>
+                    <h3 class="dialog-modal-title" style="margin:0;">🕒 <span id="historyModalTitle" data-i18n="history_modal_title">Historial de Versiones</span> (<span id="historyModalFileName" style="color:var(--fox-orange);">main.tex</span>)</h3>
+                    <p class="dialog-modal-desc" style="margin:4px 0 0 0; font-size:12px;" id="historyModalSubtitle" data-i18n="history_modal_subtitle">NaTex guarda puntos de restauración automáticamente cada vez que compilas con éxito.</p>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button type="button" class="btn-primary" id="btnCreateManualSnapshot" style="font-size:12px; padding:6px 12px;">📸 <span data-i18n="history_btn_save_now">Guardar copia ahora</span></button>
+                    <button type="button" class="modal-close" id="btnCloseVersionHistory" style="background:none; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;" data-i18n-title="btn_close" title="Cerrar">&times;</button>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns: 270px 1fr; gap:12px; flex:1; min-height: 320px; max-height: 55vh; overflow:hidden; margin-top:6px;">
+                <div id="historySnapshotsList" style="overflow-y:auto; border:1px solid var(--border-color, #2a2e3d); border-radius:8px; padding:6px; background:var(--bg-dark, #0d0f14); display:flex; flex-direction:column; gap:6px;">
+                </div>
+                <div style="display:flex; flex-direction:column; border:1px solid var(--border-color, #2a2e3d); border-radius:8px; overflow:hidden; background:var(--bg-dark, #0d0f14);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid var(--border-color, #2a2e3d); background:rgba(255,255,255,0.03);">
+                        <span id="historyPreviewHeader" style="font-size:12px; font-weight:600; color:var(--text-muted);" data-i18n="history_preview_prompt">Selecciona una versión para previsualizar</span>
+                        <button type="button" class="btn-primary hidden" id="btnRestoreSnapshot" style="font-size:12px; padding:5px 12px;">⏪ <span data-i18n="history_btn_restore">Restaurar esta versión</span></button>
+                    </div>
+                    <textarea id="historyPreviewCode" readonly spellcheck="false" style="flex:1; width:100%; background:transparent; color:var(--text-main, #e2e8f0); border:none; padding:10px 12px; font-family:'Consolas','Fira Code',monospace; font-size:12px; resize:none; outline:none;" data-i18n-placeholder="history_preview_placeholder" placeholder="El código de la versión seleccionada aparecerá aquí..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Desconexión del Anfitrión (Cloudflare / Colaboración) -->
+    <div id="modalHostDisconnected" class="modal hidden" style="z-index: 100000; backdrop-filter: blur(8px); background: rgba(0, 0, 0, 0.75);">
+        <div class="dialog-modal-card" style="width: 530px; border-color: rgba(239, 68, 68, 0.5); box-shadow: 0 10px 40px rgba(239, 68, 68, 0.25);">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                <span style="font-size:32px; line-height:1;">📡❌</span>
+                <div>
+                    <h3 class="dialog-modal-title" style="color:var(--error, #ef4444); margin:0;" id="hostDisconnectedTitle" data-i18n="host_disconnected_title">Sesión finalizada por el anfitrión</h3>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;" id="hostDisconnectedSubtitle" data-i18n="host_disconnected_subtitle">El host de NaTex cerró la aplicación o se perdió la conexión.</div>
+                </div>
+            </div>
+            
+            <p class="dialog-modal-desc" id="hostDisconnectedDesc" style="font-size:13px; line-height:1.55; margin-bottom:16px;" data-i18n="host_disconnected_desc">
+                El anfitrión ha cerrado NaTex Studio o el enlace de Cloudflare ha expirado. Tu sesión actual ha quedado desconectada. No te preocupes: puedes copiar o descargar tu código actual para no perder tus cambios.
+            </p>
+
+            <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;" data-i18n="host_disconnected_backup_label">Acciones de Respaldo:</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button type="button" class="btn-secondary" id="btnCopyOfflineCode" style="font-size: 12.5px; padding: 8px 12px; display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <span>📋</span> <span id="lblCopyOfflineCode" data-i18n="lbl_copy_offline_code">Copiar mi código</span>
+                    </button>
+                    <button type="button" class="btn-secondary" id="btnDownloadOfflineTex" style="font-size: 12.5px; padding: 8px 12px; display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <span>💾</span> <span id="lblDownloadOfflineTex" data-i18n="lbl_download_offline_tex">Descargar .tex</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="dialog-modal-actions" style="justify-content: space-between; align-items:center;">
+                <span id="hostDisconnectedStatusMsg" style="font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:6px;">
+                    <span class="offline-dot" style="width:8px; height:8px; border-radius:50%; background:var(--error, #ef4444); display:inline-block;"></span>
+                    <span data-i18n="status_disconnected">Desconectado</span>
+                </span>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn-secondary" id="btnDismissHostDisconnectedModal" data-i18n="btn_dismiss_host_modal">Cerrar aviso</button>
+                    <button type="button" class="btn-primary" id="btnRetryHostConnection" style="background: var(--fox-orange); border-color: var(--fox-orange);">
+                        🔄 <span id="lblRetryHostConnection" data-i18n="lbl_retry_host_connection">Reintentar conexión</span>
                     </button>
                 </div>
             </div>
@@ -995,13 +1357,20 @@
     </div>
 
     <script src="/static/vendor/qrcode.min.js"></script>
-    <script src="/static/js/i18n.js"></script>
     <script src="/static/js/state.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/theme_catalog.js"></script>
+    <script src="/static/js/theme_effects.js"></script>
     <script src="/static/js/sidebar.js"></script>
-    <script src="/static/js/table_builder.js"></script>
-    <script src="/static/js/gallery.js"></script>
-    <script src="/static/js/math_editor.js"></script>
     <script src="/static/js/editor.js"></script>
+    <script src="/static/js/math_editor.js"></script>
+    <script src="/static/js/gallery.js"></script>
+    <script src="/static/js/table_builder.js"></script>
+    <script src="/static/js/updater.js"></script>
+    <script src="/static/js/ai_assistant.js"></script>
+    <script src="/static/js/voice_tunnel.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/splash.js"></script>
     <script src="/static/js/app.js"></script>
 </body>
 </html>

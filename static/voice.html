@@ -471,6 +471,53 @@
         </div>
     </div>
 
+    <!-- Guía y Tutorial de Uso / Recomendaciones -->
+    <div class="card" id="cardTutorial" style="background: linear-gradient(145deg, rgba(30, 30, 36, 0.95), rgba(22, 22, 26, 0.95)); border: 1px solid rgba(255, 107, 53, 0.3);">
+        <div class="card-title" style="cursor: pointer; user-select: none; margin-bottom: 0;" onclick="toggleTutorial()">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span>💡</span>
+                <span>Tutorial de Uso y Recomendaciones</span>
+            </div>
+            <span id="tutorialToggleIcon" style="font-size: 13px; color: var(--fox-orange); transition: transform 0.25s ease;">▼</span>
+        </div>
+        <div id="tutorialContent" style="margin-top: 14px;">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 10px; font-size: 13px; line-height: 1.5; color: var(--text-muted);">
+                <div style="display: flex; gap: 10px; align-items: flex-start; background: rgba(255, 255, 255, 0.03); padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="font-size: 18px;">🔑</div>
+                    <div>
+                        <strong style="color: var(--text-main);">1. Clave de Google Gemini (Gratuita):</strong> Se obtiene en <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--fox-orange); text-decoration: underline;">Google AI Studio</a>. Se almacena localmente en tu equipo sin intermediarios.
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: flex-start; background: rgba(255, 255, 255, 0.03); padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="font-size: 18px;">🎙️</div>
+                    <div>
+                        <strong style="color: var(--text-main);">2. Grabar en vivo o Subir archivo:</strong> Puedes tocar el micrófono para grabar la clase o subir notas de voz ya existentes (formatos <code>.mp3</code>, <code>.m4a</code>, <code>.wav</code>, <code>.webm</code>, <code>.ogg</code>).
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: flex-start; background: rgba(255, 255, 255, 0.03); padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="font-size: 18px;">⏱️</div>
+                    <div>
+                        <strong style="color: var(--text-main);">3. Duración ideal (15 a 60 minutos):</strong> Optimizado para bloques de cátedra. Para clases de más de 90 minutos, se recomienda pausar y grabar en dos bloques para un procesamiento más veloz y seguro.
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: flex-start; background: rgba(255, 255, 255, 0.03); padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="font-size: 18px;">📄</div>
+                    <div>
+                        <strong style="color: var(--text-main);">4. Apunte automático y PDF:</strong> Al finalizar, NaTex genera el código LaTeX (con fórmulas en <code>$...$</code> y entornos matemáticos) y compila de inmediato el PDF con Tectonic.
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 12px; padding: 9px 12px; border-radius: var(--radius-sm); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); font-size: 12px; color: var(--success); display: flex; align-items: center; gap: 8px;">
+                <span>🔒</span>
+                <span><strong>Privacidad garantizada:</strong> El audio viaja directo desde tu equipo/celular a la API de Google Gemini. NaTex no guarda audios en servidores externos ni cobra mensualidades.</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Tarjeta de Título del Apunte -->
     <div class="card" id="cardMetadata">
         <div class="card-title">📚 Asignatura / Título de la Clase</div>
@@ -624,6 +671,15 @@
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateX(-50%) translateY(10px)';
             }, 3500);
+        }
+
+        function toggleTutorial() {
+            const content = document.getElementById('tutorialContent');
+            const icon = document.getElementById('tutorialToggleIcon');
+            if (!content) return;
+            const isHidden = content.style.display === 'none';
+            content.style.display = isHidden ? 'block' : 'none';
+            if (icon) icon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(-90deg)';
         }
 
         // Comprobar estado del servidor y clave Gemini

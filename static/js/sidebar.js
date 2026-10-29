@@ -982,8 +982,15 @@ function jumpToLine(lineNumber) {
     codeEditor.focus();
     codeEditor.setSelectionRange(charPos, charPos + lines[lineNumber - 1].length);
 
-    const lineHeight = 21;
-    const targetScroll = Math.max(0, (lineNumber - 6) * lineHeight);
+    let targetScroll = 0;
+    const lineElem = lineNumbers && lineNumbers.children && lineNumbers.children[lineNumber - 1];
+    if (lineElem && typeof lineElem.offsetTop === 'number') {
+        targetScroll = Math.max(0, lineElem.offsetTop - 115);
+    } else {
+        const lineHeight = 23;
+        targetScroll = Math.max(0, (lineNumber - 6) * lineHeight);
+    }
+
     codeEditor.scrollTo({ top: targetScroll, behavior: 'smooth' });
     if (lineNumbers) lineNumbers.scrollTop = targetScroll;
 
@@ -994,6 +1001,6 @@ function jumpToLine(lineNumber) {
 }
 
 // ==========================================================================
-// CREADOR VISUAL DE TABLAS (MINI-EXCEL)
+// EDITOR VISUAL DE TABLAS / VISUAL TABLE STUDIO
 // ==========================================================================
 

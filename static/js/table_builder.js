@@ -1,4 +1,4 @@
-// Creador de Tablas (Cuadrícula Visual + booktabs)
+// Editor Visual de Tablas / Visual Table Studio (Cuadrícula Visual + booktabs)
 function initTableBuilder() {
     const modal = document.getElementById('modalTableBuilder');
     const btnMenu = document.getElementById('menuItemTableBuilder');
@@ -66,27 +66,44 @@ function initTableBuilder() {
 
     if (btnInsert) {
         btnInsert.onclick = () => {
+            const isEn = typeof currentLanguage !== 'undefined' && currentLanguage === 'en';
             const code = generateLatexTable();
             ensureBooktabsPackage();
             insertAtCursor('\n' + code + '\n');
             modal.classList.add('hidden');
             triggerAutoSave();
             parseDocumentOutline(codeEditor.value);
+            if (typeof showToast === 'function') {
+                showToast(isEn ? 'Table inserted into document! ✓' : '¡Tabla insertada en el documento! ✓', 'success');
+            }
         };
     }
 
     if (btnCopy) {
         btnCopy.onclick = () => {
+            const isEn = typeof currentLanguage !== 'undefined' && currentLanguage === 'en';
             const code = generateLatexTable();
-            fallbackCopyText(code);
-            editorStatus.innerText = '¡Código de tabla copiado! ✓';
-            editorStatus.style.color = '#10B981';
-            setTimeout(() => { editorStatus.innerText = 'Guardado automático ✓'; }, 2000);
+            if (typeof fallbackCopyText === 'function') {
+                fallbackCopyText(code);
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(code);
+            }
+            if (typeof editorStatus !== 'undefined' && editorStatus) {
+                editorStatus.innerText = isEn ? 'Table code copied! ✓' : '¡Código de tabla copiado! ✓';
+                editorStatus.style.color = '#10B981';
+                setTimeout(() => {
+                    editorStatus.innerText = isEn ? 'Auto-saved ✓' : 'Guardado automático ✓';
+                }, 2000);
+            }
+            if (typeof showToast === 'function') {
+                showToast(isEn ? 'Table code copied! ✓' : '¡Código de tabla copiado! ✓', 'success');
+            }
         };
     }
 }
 
 function resizeTable(newRows, newCols, keepValues = true) {
+    const isEn = typeof currentLanguage !== 'undefined' && currentLanguage === 'en';
     newRows = Math.max(1, Math.min(50, newRows));
     newCols = Math.max(1, Math.min(25, newCols));
 
@@ -97,9 +114,9 @@ function resizeTable(newRows, newCols, keepValues = true) {
             if (keepValues && tableGridState.data[r] && tableGridState.data[r][c] !== undefined) {
                 row.push(tableGridState.data[r][c]);
             } else if (r === 0) {
-                row.push(`Columna ${c + 1}`);
+                row.push(isEn ? `Column ${c + 1}` : `Columna ${c + 1}`);
             } else {
-                row.push(`Dato ${r},${c + 1}`);
+                row.push(isEn ? `Data ${r},${c + 1}` : `Dato ${r},${c + 1}`);
             }
         }
         newData.push(row);
@@ -123,6 +140,7 @@ function renderTableGrid() {
     if (!table) return;
     table.innerHTML = '';
 
+    const isEn = typeof currentLanguage !== 'undefined' && currentLanguage === 'en';
     const rows = tableGridState.rows;
     const cols = tableGridState.cols;
     const hasHeader = document.getElementById('tblChkHeader')?.checked ?? true;
@@ -136,7 +154,9 @@ function renderTableGrid() {
     for (let c = 0; c < cols; c++) {
         const th = document.createElement('th');
         th.className = 'grid-col-header';
-        th.innerText = String.fromCharCode(65 + (c % 26)) + (c >= 26 ? Math.floor(c / 26) : '');
+        const colLetter = String.fromCharCode(65 + (c % 26)) + (c >= 26 ? Math.floor(c / 26) : '');
+        th.innerText = colLetter;
+        th.title = isEn ? `Column ${colLetter}` : `Columna ${colLetter}`;
         colHeaderRow.appendChild(th);
     }
     table.appendChild(colHeaderRow);
@@ -149,14 +169,18 @@ function renderTableGrid() {
         const rowHeader = document.createElement('td');
         rowHeader.className = 'grid-row-header';
         rowHeader.innerText = r + 1;
+        rowHeader.title = isEn ? `Row ${r + 1}` : `Fila ${r + 1}`;
         tr.appendChild(rowHeader);
 
         for (let c = 0; c < cols; c++) {
             const td = document.createElement('td');
             const input = document.createElement('input');
             input.type = 'text';
-            input.className = 'excel-cell-input' + (r === 0 && hasHeader ? ' is-header-cell' : '');
+            input.className = 'excel-cell-input table-cell-input' + (r === 0 && hasHeader ? ' is-header-cell' : '');
             input.value = (tableGridState.data[r] && tableGridState.data[r][c]) || '';
+            input.placeholder = (r === 0 && hasHeader)
+                ? (isEn ? `Header ${c + 1}` : `Encabezado ${c + 1}`)
+                : (isEn ? `Cell ${r + 1},${c + 1}` : `Celda ${r + 1},${c + 1}`);
 
             input.oninput = () => {
                 tableGridState.data[r][c] = input.value;
@@ -215,13 +239,15 @@ function updateTablePreview() {
 }
 
 function generateLatexTable() {
+    const isEn = typeof currentLanguage !== 'undefined' && currentLanguage === 'en';
     const rows = tableGridState.rows;
     const cols = tableGridState.cols;
     const hasHeader = document.getElementById('tblChkHeader')?.checked ?? true;
     const useBooktabs = document.getElementById('tblChkBooktabs')?.checked ?? true;
     const hasBorders = document.getElementById('tblChkBorders')?.checked ?? false;
     const align = document.getElementById('tblAlignSelect')?.value || 'c';
-    const caption = document.getElementById('tblCaptionInput')?.value?.trim() || 'Título de la Tabla';
+    const defaultCaption = isEn ? 'Table Title' : 'Título de la Tabla';
+    const caption = document.getElementById('tblCaptionInput')?.value?.trim() || defaultCaption;
     const label = document.getElementById('tblLabelInput')?.value?.trim() || 'tab:resultados';
 
     let colSpec = '';
@@ -276,6 +302,7 @@ function generateLatexTable() {
 }
 
 window.insertImageCode = function(filename) {
+    const isEn = typeof currentLanguage !== 'undefined' && currentLanguage === 'en';
     // 1. Asegurar que \usepackage{graphicx} esté en el preámbulo
     ensureGraphicxPackage();
 
@@ -283,7 +310,8 @@ window.insertImageCode = function(filename) {
     const labelClean = filename.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
 
     // 3. Generar el entorno figure completo
-    const snippet = `\n\\begin{figure}[h]\n  \\centering\n  \\includegraphics[width=0.7\\linewidth]{${filename}}\n  \\caption{Descripción de la figura}\n  \\label{fig:${labelClean}}\n\\end{figure}\n`;
+    const figDesc = isEn ? 'Figure description' : 'Descripción de la figura';
+    const snippet = `\n\\begin{figure}[h]\n  \\centering\n  \\includegraphics[width=0.7\\linewidth]{${filename}}\n  \\caption{${figDesc}}\n  \\label{fig:${labelClean}}\n\\end{figure}\n`;
     
     // 4. Insertar en la posición actual del cursor o al final
     const start = codeEditor.selectionStart !== undefined ? codeEditor.selectionStart : codeEditor.value.length;
@@ -297,14 +325,13 @@ window.insertImageCode = function(filename) {
     triggerAutoSave();
 
     // Feedback visual amigable
-    editorStatus.innerText = `¡Figura "${filename}" insertada! ✓`;
+    editorStatus.innerText = isEn ? `Figure "${filename}" inserted! ✓` : `¡Figura "${filename}" insertada! ✓`;
     editorStatus.style.color = '#FF6B35';
     setTimeout(() => {
-        editorStatus.innerText = 'Guardado automático ✓';
+        editorStatus.innerText = isEn ? 'Auto-saved ✓' : 'Guardado automático ✓';
         editorStatus.style.color = '#10B981';
     }, 2500);
 
     const mUpload = document.getElementById('modalUpload');
     if (mUpload) mUpload.classList.add('hidden');
 };
-

@@ -1,87 +1,34 @@
-\documentclass[12pt,a4paper]{article}
-\usepackage[margin=2.5cm]{geometry}
-\usepackage{xcolor}
-\usepackage{amsmath,amssymb}
+\documentclass[12pt, letterpaper]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{amsmath, amssymb}
 \usepackage{graphicx}
 \usepackage{hyperref}
-\usepackage{booktabs}
 
-% Paleta de colores caracteristica de NaTex
-\definecolor{foxorange}{RGB}{255, 107, 53}
-\definecolor{sectiongray}{RGB}{60, 60, 70}
-
-\hypersetup{
-    colorlinks=true,
-    linkcolor=foxorange,
-    urlcolor=foxorange
-}
-
-\title{
-    \vspace{-1.2cm}
-    \includegraphics[width=4.2cm]{logo_natex.png}\\[0.4cm]
-    {\Huge \bfseries \color{foxorange} Bienvenido a NaTex Studio}\\[0.2cm]
-    {\large \textbf{Version 0.2 -- Guia Rapida y Funcionalidades}}
-}
-\author{\textbf{NaTex Team} \\ Tu nuevo editor cientifico y colaborativo}
+\title{\textbf{Mi Primer Documento en NaTex}}
+\author{Usuario NaTex} 
 \date{\today}
 
 \begin{document}
 
 \maketitle
 
-\begin{abstract}
-\textbf{NaTex Studio} es un entorno integral de edicion LaTeX disenado para ofrecer maxima fluidez, rapidez y comodidad sin las complicaciones habituales de instalacion. A continuacion se detallan todas las capacidades que incluye tu instalacion, organizadas entre aquellas que funcionan de forma totalmente autonoma y local, y aquellas potenciadas por Inteligencia Artificial.
-\end{abstract}
+\section{Introducción}
+¡Bienvenido a \textbf{NaTex Studio}! Este es tu entorno de edición y compilación científica en tiempo real.
 
-\section{Atajos de Teclado Fundamentales}
-Para trabajar a maxima velocidad, utiliza estos atajos integrados:
+\subsection{Ecuaciones Matemáticas}
+Podemos incluir fórmulas matemáticas directamente con sintaxis LaTeX, como la famosa identidad de Euler:
+\begin{equation}
+e^{i\pi} + 1 = 0
+\end{equation}
+O el Teorema Fundamental del Cálculo:
+\begin{equation}
+\int_a^b f'(x)\,dx = f(b) - f(a)
+\end{equation}
 
-\begin{table}[h]
-\centering
-\begin{tabular}{@{}llp{8.5cm}@{}}
-\toprule
-\textbf{Atajo} & \textbf{Accion} & \textbf{Descripcion} \\ \midrule
-\texttt{Ctrl + S} & \textbf{Compilar} & Genera y actualiza al instante el visor PDF a la derecha. \\
-\texttt{Alt + M} & \textbf{Formulas} & Abre el Constructor y Teclado Matematico Cientifico. \\
-\texttt{Tab} & \textbf{Indentar} & Inserta 4 espacios limpios en la posicion del cursor. \\
-\texttt{Ctrl + Enter} & \textbf{Compilacion rapida} & Alternativa comoda para compilar sin despegar las manos del teclado. \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\section{Funciones Disponibles sin la API de Gemini (100\% Locales)}
-Estas herramientas estan siempre listas para usar, no requieren ninguna clave ni conexion especial y operan de forma completamente autonoma:
-
-\begin{itemize}
-    \item \textbf{Compilacion local instantanea (Tectonic):} Compila documentos a PDF de alta calidad en decimas de segundo. No necesitas instalar gigabytes de TeX Live ni configurar variables de entorno.
-    \item \textbf{Constructor y Teclado Matematico Cientifico (Alt + M):} Panel visual interactivo con previsualizacion KaTeX en tiempo real. Permite insertar algebra, calculo diferencial e integral, matrices, logica, vectores, letras griegas y fisica cuantica (notacion bra-ket):
-    \begin{equation}
-        i\hbar \frac{\partial}{\partial t}|\psi(t)\rangle = \hat{\mathbf{H}}|\psi(t)\rangle, \qquad \oint_C \vec{B} \cdot d\vec{r} = \mu_0 I_{\text{enc}}
-    \end{equation}
-    \item \textbf{Galeria de Imagenes y Recursos:} Puedes arrastrar imagenes a la barra lateral, copiar el bloque \texttt{\textbackslash begin\{figure\}} listo para pegar y renombrar archivos con actualizacion sincronizada automatica en el codigo.
-    \item \textbf{Colaboracion en Vivo (Tunel Cloudflare):} Permite compartir un enlace directo o codigo QR para que un companero edite y compile contigo en tiempo real desde cualquier lugar del mundo.
-    \item \textbf{Sincronizacion bidireccional (SyncTeX):} El boton \textit{"Ir a PDF"} ubica la posicion exacta de tu codigo directamente en la pagina correspondiente del visor.
-    \item \textbf{Plantillas preconstruidas:} Modelos listos para Informes Tecnicos, Papers Cientificos y Posters de Congresos en dos columnas.
-    \item \textbf{Personalizacion e Idiomas:} Selector de Modo Oscuro, Modo Claro, paleta de colores de acento y soporte bilingue (Espanol e Ingles).
-\end{itemize}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.3\textwidth]{logo_natex.png}
-    \caption{Logotipo oficial de NaTex Studio.}
-    \label{fig:logo_natex}
-\end{figure}
-
-\section{Funciones Disponibles con la API de Gemini (Inteligencia Artificial)}
-Al contar con la clave de Gemini activa, se desbloquean las siguientes caracteristicas avanzadas:
-
-\begin{itemize}
-    \item \textbf{Dictafono de Clases para Celular:} Escaneas el codigo QR desde tu movil para grabar la explicacion de la clase. El audio se procesa para generar de inmediato un apunte LaTeX completo y ordenado con formulas, teoremas y resumen ejecutivo.
-    \item \textbf{Diagnostico Inteligente de Errores de Compilacion:} Ante cualquier falla en el codigo LaTeX, el boton \textit{"Preguntar a Gemini por que fallo"} analiza el registro de errores y te entrega la explicacion clara y la solucion exacta lista para aplicar.
-    \item \textbf{Asistente de Redaccion y Generacion de Tablas:} Genera tablas complejas, traduce texto a notacion matematica o redacta secciones tecnicas a partir de instrucciones en lenguaje cotidiano.
-\end{itemize}
-
-\section{Empieza a escribir}
-Puedes modificar o borrar este contenido cuando desees para comenzar tu propio proyecto. Que disfrutes redactando en NaTex!
+\section{Conclusión}
+NaTex compila localmente tus documentos a máxima velocidad con Tectonic. ¡Disfruta creando tus documentos científicos!
 
 \end{document}

@@ -426,11 +426,17 @@ async function compileDocument() {
                 parseDocumentOutline(codeEditor.value);
             }
             if (editorStatus) {
-                editorStatus.innerText = 'Compilado con éxito ✓';
-                editorStatus.style.color = '#10B981';
+                if (data.has_warnings) {
+                    editorStatus.innerText = 'Compilado (con advertencias) ⚠️';
+                    editorStatus.style.color = '#F59E0B';
+                } else {
+                    editorStatus.innerText = 'Compilado con éxito ✓';
+                    editorStatus.style.color = '#10B981';
+                }
                 setTimeout(() => {
                     editorStatus.innerText = 'Guardado automático ✓';
-                }, 3000);
+                    editorStatus.style.color = '';
+                }, 3500);
             }
         } else {
             if (errorLog) errorLog.innerText = data.log || 'Error desconocido';

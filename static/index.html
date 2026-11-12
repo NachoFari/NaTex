@@ -876,7 +876,7 @@
                                     <div>
                                         <label class="settings-label" style="margin-bottom: 4px;">🚀 <span data-i18n="updates_title">Actualizaciones de NaTex:</span></label>
                                         <div id="updateStatusText" style="font-size: 12.5px; color: var(--text-muted);">
-                                            <span data-i18n="updates_current_ver">Versión instalada:</span> <strong>v1.3</strong>
+                                            <span data-i18n="updates_current_ver">Versión instalada:</span> <strong>v1.3.1</strong>
                                         </div>
                                     </div>
                                     <button id="btnCheckUpdates" class="btn-secondary" style="font-size: 12.5px; padding: 7px 14px;">
@@ -1227,129 +1227,6 @@
                     <button type="button" class="btn-secondary" id="btnDismissHostDisconnectedModal" data-i18n="btn_dismiss_host_modal">Cerrar aviso</button>
                     <button type="button" class="btn-primary" id="btnRetryHostConnection" style="background: var(--fox-orange); border-color: var(--fox-orange);">
                         🔄 <span id="lblRetryHostConnection" data-i18n="lbl_retry_host_connection">Reintentar conexión</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Diálogo Personalizado (Reemplazo Elegante de prompt()) -->
-    <div id="modalAppPrompt" class="modal hidden">
-        <div class="dialog-modal-card">
-            <h3 class="dialog-modal-title" id="appPromptTitle">📝 <span>Nuevo Elemento</span></h3>
-            <p class="dialog-modal-desc" id="appPromptDesc">Introduce el nombre:</p>
-            <input type="text" id="appPromptInput" class="dialog-modal-input" autocomplete="off" spellcheck="false" />
-            <div class="dialog-modal-actions">
-                <button type="button" class="btn-secondary" id="btnAppPromptCancel" data-i18n="btn_cancel">Cancelar</button>
-                <button type="button" class="btn-primary" id="btnAppPromptOk" data-i18n="btn_confirm">Aceptar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Confirmación Personalizada (Reemplazo Elegante de confirm()) -->
-    <div id="modalAppConfirm" class="modal hidden">
-        <div class="dialog-modal-card">
-            <h3 class="dialog-modal-title" id="appConfirmTitle">⚠️ <span>Confirmación</span></h3>
-            <p class="dialog-modal-desc" id="appConfirmDesc">¿Estás seguro de que deseas continuar?</p>
-            <div class="dialog-modal-actions">
-                <button type="button" class="btn-secondary" id="btnAppConfirmCancel" data-i18n="btn_cancel">Cancelar</button>
-                <button type="button" class="btn-primary" id="btnAppConfirmOk" style="background:var(--error, #ef4444); border-color:var(--error, #ef4444);">Aceptar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Selección de Carga de Plantilla -->
-    <div id="modalTemplateApplyChoice" class="modal hidden">
-        <div class="dialog-modal-card" style="width: 520px;">
-            <h3 class="dialog-modal-title">📑 <span id="templateChoiceModalTitle">Cargar Plantilla</span></h3>
-            <p class="dialog-modal-desc" id="templateChoiceModalDesc">Elige cómo deseas incorporar esta plantilla en tu proyecto:</p>
-            
-            <div class="template-choice-options">
-                <button type="button" class="template-choice-btn" id="btnTemplateApplyReplace">
-                    <span class="template-choice-icon">🔄</span>
-                    <div>
-                        <div class="template-choice-title">Reemplazar archivo actual (<span id="templateTargetFileLabel">main.tex</span>)</div>
-                        <div class="template-choice-desc">Sustituye el contenido del archivo abierto actualmente con el código de esta plantilla.</div>
-                    </div>
-                </button>
-                <button type="button" class="template-choice-btn" id="btnTemplateApplyNew">
-                    <span class="template-choice-icon">➕</span>
-                    <div>
-                        <div class="template-choice-title">Crear como archivo nuevo (<span id="templateNewFileLabel">plantilla.tex</span>)</div>
-                        <div class="template-choice-desc">Crea un archivo nuevo con esta plantilla sin modificar ni borrar ninguno de tus archivos existentes.</div>
-                    </div>
-                </button>
-            </div>
-
-            <div class="dialog-modal-actions">
-                <button type="button" class="btn-secondary" id="btnTemplateChoiceCancel" data-i18n="btn_cancel">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Historial de Versiones / Snapshots -->
-    <div id="modalVersionHistory" class="modal hidden">
-        <div class="dialog-modal-card" style="width: 780px; max-width: 95vw; max-height: 85vh; display: flex; flex-direction: column;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <div>
-                    <h3 class="dialog-modal-title" style="margin:0;">🕒 <span id="historyModalTitle">Historial de Versiones</span> (<span id="historyModalFileName" style="color:var(--fox-orange);">main.tex</span>)</h3>
-                    <p class="dialog-modal-desc" style="margin:4px 0 0 0; font-size:12px;" id="historyModalSubtitle">NaTex guarda puntos de restauración automáticamente cada vez que compilas con éxito.</p>
-                </div>
-                <div style="display:flex; gap:8px; align-items:center;">
-                    <button type="button" class="btn-primary" id="btnCreateManualSnapshot" style="font-size:12px; padding:6px 12px;">📸 Guardar copia ahora</button>
-                    <button type="button" class="modal-close" id="btnCloseVersionHistory" style="background:none; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">&times;</button>
-                </div>
-            </div>
-            <div style="display:grid; grid-template-columns: 270px 1fr; gap:12px; flex:1; min-height: 320px; max-height: 55vh; overflow:hidden; margin-top:6px;">
-                <div id="historySnapshotsList" style="overflow-y:auto; border:1px solid var(--border-color, #2a2e3d); border-radius:8px; padding:6px; background:var(--bg-dark, #0d0f14); display:flex; flex-direction:column; gap:6px;">
-                </div>
-                <div style="display:flex; flex-direction:column; border:1px solid var(--border-color, #2a2e3d); border-radius:8px; overflow:hidden; background:var(--bg-dark, #0d0f14);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid var(--border-color, #2a2e3d); background:rgba(255,255,255,0.03);">
-                        <span id="historyPreviewHeader" style="font-size:12px; font-weight:600; color:var(--text-muted);">Selecciona una versión para previsualizar</span>
-                        <button type="button" class="btn-primary hidden" id="btnRestoreSnapshot" style="font-size:12px; padding:5px 12px;">⏪ Restaurar esta versión</button>
-                    </div>
-                    <textarea id="historyPreviewCode" readonly spellcheck="false" style="flex:1; width:100%; background:transparent; color:var(--text-main, #e2e8f0); border:none; padding:10px 12px; font-family:'Consolas','Fira Code',monospace; font-size:12px; resize:none; outline:none;" placeholder="El código de la versión seleccionada aparecerá aquí..."></textarea>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Desconexión del Anfitrión (Cloudflare / Colaboración) -->
-    <div id="modalHostDisconnected" class="modal hidden" style="z-index: 100000; backdrop-filter: blur(8px); background: rgba(0, 0, 0, 0.75);">
-        <div class="dialog-modal-card" style="width: 530px; border-color: rgba(239, 68, 68, 0.5); box-shadow: 0 10px 40px rgba(239, 68, 68, 0.25);">
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                <span style="font-size:32px; line-height:1;">📡❌</span>
-                <div>
-                    <h3 class="dialog-modal-title" style="color:var(--error, #ef4444); margin:0;" id="hostDisconnectedTitle">Sesión finalizada por el anfitrión</h3>
-                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;" id="hostDisconnectedSubtitle">El host de NaTex cerró la aplicación o se perdió la conexión.</div>
-                </div>
-            </div>
-            
-            <p class="dialog-modal-desc" id="hostDisconnectedDesc" style="font-size:13px; line-height:1.55; margin-bottom:16px;">
-                El anfitrión ha cerrado NaTex Studio o el enlace de Cloudflare ha expirado. Tu sesión actual ha quedado desconectada. No te preocupes: puedes copiar o descargar tu código actual para no perder tus cambios.
-            </p>
-
-            <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 8px;">
-                <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Acciones de Respaldo:</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <button type="button" class="btn-secondary" id="btnCopyOfflineCode" style="font-size: 12.5px; padding: 8px 12px; display:flex; align-items:center; justify-content:center; gap:6px;">
-                        <span>📋</span> <span id="lblCopyOfflineCode">Copiar mi código</span>
-                    </button>
-                    <button type="button" class="btn-secondary" id="btnDownloadOfflineTex" style="font-size: 12.5px; padding: 8px 12px; display:flex; align-items:center; justify-content:center; gap:6px;">
-                        <span>💾</span> <span id="lblDownloadOfflineTex">Descargar .tex</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="dialog-modal-actions" style="justify-content: space-between; align-items:center;">
-                <span id="hostDisconnectedStatusMsg" style="font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:6px;">
-                    <span class="offline-dot" style="width:8px; height:8px; border-radius:50%; background:var(--error, #ef4444); display:inline-block;"></span>
-                    Desconectado
-                </span>
-                <div style="display:flex; gap:10px;">
-                    <button type="button" class="btn-secondary" id="btnDismissHostDisconnectedModal">Cerrar aviso</button>
-                    <button type="button" class="btn-primary" id="btnRetryHostConnection" style="background: var(--fox-orange); border-color: var(--fox-orange);">
-                        🔄 <span id="lblRetryHostConnection">Reintentar conexión</span>
                     </button>
                 </div>
             </div>

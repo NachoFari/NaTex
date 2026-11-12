@@ -4,9 +4,9 @@
 
 **El entorno de edición LaTeX rápido, visual, libre y colaborativo.**
 
-[![Descargar](https://img.shields.io/badge/📥_DESCARGAR-NATEX--SETUP--V1.3.0.EXE-2ea44f?style=for-the-badge)](https://github.com/NachoFari/NaTex/releases/latest/download/NaTex-Setup-v1.3.0.exe)
+[![Descargar](https://img.shields.io/badge/📥_DESCARGAR-NATEX--SETUP--V1.3.1.EXE-2ea44f?style=for-the-badge)](https://github.com/NachoFari/NaTex/releases/latest/download/NaTex-Setup-v1.3.1.exe)
 
-[![Version](https://img.shields.io/badge/version-v1.3-orange.svg)](https://github.com/NachoFari/NaTex/releases)
+[![Version](https://img.shields.io/badge/version-v1.3.1-orange.svg)](https://github.com/NachoFari/NaTex/releases)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Compiler](https://img.shields.io/badge/compiler-Tectonic-purple.svg)](https://tectonic-typesetting.github.io/)
 [![Collab](https://img.shields.io/badge/collab-TryCloudflare-brightgreen.svg)](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/)
@@ -20,7 +20,7 @@
 ## Descarga e Instalación
 
 ### Instalador de Windows (.exe)
-1. Descarga el instalador oficial: **[NaTex-Setup-v1.3.0.exe](https://github.com/NachoFari/NaTex/releases/latest/download/NaTex-Setup-v1.3.0.exe)**
+1. Descarga el instalador oficial: **[NaTex-Setup-v1.3.1.exe](https://github.com/NachoFari/NaTex/releases/latest/download/NaTex-Setup-v1.3.1.exe)**
 2. Haz doble clic para instalar (no requiere permisos de administrador).
 3. ¡Listo! Crea automáticamente un acceso directo en tu Escritorio y Menú Inicio.
 
@@ -64,6 +64,15 @@
 | [![Catálogo Temas](docs/screenshots/showcase_theme_catalog.png)](docs/screenshots/showcase_theme_catalog.png) | [![Constructor Matemático](docs/screenshots/showcase_math_keyboard.png)](docs/screenshots/showcase_math_keyboard.png) | [![Editor Tablas](docs/screenshots/showcase_table_builder.png)](docs/screenshots/showcase_table_builder.png) |
 
 </details>
+
+---
+
+## Novedades de la Versión v1.3.1 (Bug Fixes & Tolerancia Estilo Overleaf)
+
+- **Modo Tolerante a Errores (`nonstopmode` / `-Z continue-on-errors`):** NaTex ahora compila y genera el PDF de forma continua aunque existan advertencias menores o errores recuperables de tipografía (como mezclas de unidades en `babel`, `Incompatible glue units` o avisos de formato), replicando la experiencia de tolerancia de Overleaf.
+- **Filtro Inteligente de Línea de Error:** El botón `🎯 Ir a Línea X` ahora prioriza los errores críticos reales en lugar de saltar a advertencias inocuas de formato (`Overfull \hbox`).
+- **Separación Visual de Errores vs. Advertencias:** Si el documento tiene advertencias menores pero el PDF se genera con éxito, el estado del editor notifica `Compilado (con advertencias) ⚠️` sin bloquear la visualización del documento.
+- **Limpieza de Consola:** Se filtran automáticamente mensajes inocuos del sistema de fuentes (`Fontconfig error`) en Windows, manteniendo la consola de compilación limpia y focalizada en LaTeX.
 
 ---
 

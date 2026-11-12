@@ -13,7 +13,7 @@ import urllib.error
 NO_WINDOW_FLAG = subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0
 EXE_EXT = '.exe' if sys.platform == 'win32' else ''
 
-APP_VERSION = "1.3.0"
+APP_VERSION = "1.3.1"
 GITHUB_REPO = "NachoFari/NaTex"
 
 def find_available_port(start_port=5000, max_attempts=50):

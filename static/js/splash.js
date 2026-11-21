@@ -64,7 +64,7 @@ function initSplashIntro(force = false) {
 
     const brandSubEl = document.getElementById('splashBrandSub');
     if (brandSubEl) {
-        brandSubEl.innerText = isEn ? 'Studio' : 'Estudio';
+        brandSubEl.innerText = isEn ? 'NaSuite • LaTeX Environment' : 'NaSuite • Entorno LaTeX';
     }
 
     const progressFill = document.getElementById('splashProgressFill');

@@ -117,7 +117,21 @@
     animation: splashFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 }
 
+.splash-brand-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
 .splash-brand-name {
+    font-size: 46px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    color: #FFFFFF;
+    line-height: 1;
+}
+
+.splash-brand-studio {
     font-size: 46px;
     font-weight: 900;
     letter-spacing: -1.5px;
@@ -127,12 +141,13 @@
 }
 
 .splash-brand-sub {
-    font-size: 15px;
+    font-size: 13.5px;
     font-weight: 700;
-    letter-spacing: 5px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: var(--fox-orange);
     line-height: 1.1;
+    margin-top: 2px;
 }
 
 /* Barra de carga inferior estilo Riot Client (sin texto debajo) */

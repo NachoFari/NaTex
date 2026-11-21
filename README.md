@@ -6,7 +6,7 @@
 
 [![Descargar](https://img.shields.io/badge/📥_DESCARGAR-NATEX--SETUP--V1.3.1.EXE-2ea44f?style=for-the-badge)](https://github.com/NachoFari/NaTex/releases/latest/download/NaTex-Setup-v1.3.1.exe)
 
-[![NaSuite](https://img.shields.io/badge/suite-NaSuite_Ecosystem-FF6B35?style=flat)](https://github.com/NachoFari)
+[![Suite](https://img.shields.io/badge/ecosistema-NaSuite-f3f4f8.svg)](https://github.com/NachoFari)
 [![Version](https://img.shields.io/badge/version-v1.3.1-orange.svg)](https://github.com/NachoFari/NaTex/releases)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Compiler](https://img.shields.io/badge/compiler-Tectonic-purple.svg)](https://tectonic-typesetting.github.io/)

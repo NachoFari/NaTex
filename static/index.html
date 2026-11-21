@@ -88,11 +88,11 @@
             <div class="view-mode-slider" id="viewModeSlider" role="tablist" aria-label="Vista principal">
                 <div class="view-slider-thumb" id="viewSliderThumb"></div>
                 <button id="navTabHome" class="menu-tab-btn active" data-i18n-title="title_go_home" title="Ir al Inicio">
-                    <span class="tab-icon">🏠</span>
+                    <span class="tab-icon"><img class="px-icon" src="/static/assets/icons/ui/fox.png" alt=""></span>
                     <span class="tab-label" data-i18n="menu_home">Inicio</span>
                 </button>
                 <button id="navTabEditor" class="menu-tab-btn" title="Ir al Editor LaTeX">
-                    <span class="tab-icon">📝</span>
+                    <span class="tab-icon"><img class="px-icon" src="/static/assets/icons/ui/tex.png" alt=""></span>
                     <span class="tab-label" data-i18n="menu_editor">Editor</span>
                 </button>
             </div>
@@ -100,76 +100,76 @@
             <!-- Menú Archivo -->
             <div class="menu-dropdown editor-only-control">
                 <button class="menu-btn" data-dropdown="menuFile">
-                    <span>📁 <span data-i18n="menu_file">Archivo</span> ▾</span>
+                    <span><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/folder.png" alt=""> <span data-i18n="menu_file">Archivo</span> ▾</span>
                 </button>
                 <div class="dropdown-content hidden" id="menuFile">
-                    <button class="dropdown-item" id="menuItemNewProject"><span>📄</span> <span data-i18n="item_new_project">Nuevo Proyecto...</span></button>
-                    <button class="dropdown-item" id="menuItemImportZip"><span>📦</span> <span data-i18n="item_import_zip">Importar Proyecto (.zip)...</span></button>
-                    <button class="dropdown-item" id="menuItemCompile"><span>⚡</span> <span data-i18n="item_compile">Compilar Documento</span> <kbd>Ctrl+S</kbd></button>
+                    <button class="dropdown-item" id="menuItemNewProject"><span><img class="px-icon" src="/static/assets/icons/ui/file_generic.png" alt=""></span> <span data-i18n="item_new_project">Nuevo Proyecto...</span></button>
+                    <button class="dropdown-item" id="menuItemImportZip"><span><img class="px-icon" src="/static/assets/icons/ui/zip.png" alt=""></span> <span data-i18n="item_import_zip">Importar Proyecto (.zip)...</span></button>
+                    <button class="dropdown-item" id="menuItemCompile"><span><img class="px-icon" src="/static/assets/icons/ui/compile.png" alt=""></span> <span data-i18n="item_compile">Compilar Documento</span> <kbd>Ctrl+S</kbd></button>
                     <div class="dropdown-divider"></div>
-                    <button class="dropdown-item" id="menuItemTemplates"><span>📑</span> <span data-i18n="item_templates">Cargar Plantilla...</span></button>
-                    <button class="dropdown-item" id="menuItemSaveTemplate"><span>💾</span> <span data-i18n="item_save_template">Guardar como Plantilla...</span></button>
+                    <button class="dropdown-item" id="menuItemTemplates"><span><img class="px-icon" src="/static/assets/icons/ui/catalog.png" alt=""></span> <span data-i18n="item_templates">Cargar Plantilla...</span></button>
+                    <button class="dropdown-item" id="menuItemSaveTemplate"><span><img class="px-icon" src="/static/assets/icons/ui/save.png" alt=""></span> <span data-i18n="item_save_template">Guardar como Plantilla...</span></button>
                     <div class="dropdown-divider"></div>
-                    <button class="dropdown-item" id="menuItemExportZip"><span>🗜️</span> <span data-i18n="item_export_zip">Exportar Proyecto Completo (.zip)</span></button>
-                    <button class="dropdown-item" id="menuItemDownloadTex"><span>📥</span> <span data-i18n="item_download_tex">Descargar Código LaTeX (.tex)</span></button>
-                    <button class="dropdown-item" id="menuItemDownloadPdf"><span>⬇️</span> <span data-i18n="item_download_pdf">Descargar PDF</span></button>
-                    <button class="dropdown-item" id="menuItemOpenPdfTab"><span>↗️</span> <span data-i18n="item_open_pdf_tab">Ver PDF en Otra Pestaña</span></button>
+                    <button class="dropdown-item" id="menuItemExportZip"><span><img class="px-icon" src="/static/assets/icons/ui/zip.png" alt=""></span> <span data-i18n="item_export_zip">Exportar Proyecto Completo (.zip)</span></button>
+                    <button class="dropdown-item" id="menuItemDownloadTex"><span><img class="px-icon" src="/static/assets/icons/ui/tex.png" alt=""></span> <span data-i18n="item_download_tex">Descargar Código LaTeX (.tex)</span></button>
+                    <button class="dropdown-item" id="menuItemDownloadPdf"><span><img class="px-icon" src="/static/assets/icons/ui/pdf.png" alt=""></span> <span data-i18n="item_download_pdf">Descargar PDF</span></button>
+                    <button class="dropdown-item" id="menuItemOpenPdfTab"><span><img class="px-icon" src="/static/assets/icons/ui/tv_live.png" alt=""></span> <span data-i18n="item_open_pdf_tab">Ver PDF en Otra Pestaña</span></button>
                 </div>
             </div>
 
             <!-- Menú Ver -->
             <div class="menu-dropdown editor-only-control">
                 <button class="menu-btn" data-dropdown="menuView">
-                    <span>👁️ <span data-i18n="menu_view">Ver</span> ▾</span>
+                    <span><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/tv_live.png" alt=""> <span data-i18n="menu_view">Ver</span> ▾</span>
                 </button>
                 <div class="dropdown-content hidden" id="menuView">
-                    <button class="dropdown-item" id="menuViewOpenPdfTab"><span>↗️</span> <span data-i18n="item_open_pdf_tab">Ver PDF en Otra Pestaña</span></button>
-                    <button class="dropdown-item" id="menuViewDownloadPdf"><span>⬇️</span> <span data-i18n="item_download_pdf">Descargar PDF</span></button>
-                    <button class="dropdown-item" id="menuViewRefreshPdf"><span>🔄</span> <span data-i18n="item_refresh_pdf">Recargar Visor PDF</span></button>
+                    <button class="dropdown-item" id="menuViewOpenPdfTab"><span><img class="px-icon" src="/static/assets/icons/ui/tv_live.png" alt=""></span> <span data-i18n="item_open_pdf_tab">Ver PDF en Otra Pestaña</span></button>
+                    <button class="dropdown-item" id="menuViewDownloadPdf"><span><img class="px-icon" src="/static/assets/icons/ui/pdf.png" alt=""></span> <span data-i18n="item_download_pdf">Descargar PDF</span></button>
+                    <button class="dropdown-item" id="menuViewRefreshPdf"><span><img class="px-icon" src="/static/assets/icons/ui/refresh.png" alt=""></span> <span data-i18n="item_refresh_pdf">Recargar Visor PDF</span></button>
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item" id="menuViewInvertPdf"><span>◐</span> <span data-i18n="item_pdf_paper_mode">Cambiar Modo de Hoja PDF (Claro / Tema / Noche)</span></button>
-                    <button class="dropdown-item" id="menuViewZoomIn"><span>🔍</span> <span data-i18n="item_pdf_zoom_in">Acercar PDF (+)</span></button>
-                    <button class="dropdown-item" id="menuViewZoomOut"><span>🔎</span> <span data-i18n="item_pdf_zoom_out">Alejar PDF (−)</span></button>
-                    <button class="dropdown-item" id="menuViewZoomFit"><span>📐</span> <span data-i18n="item_pdf_zoom_fit">Ajustar PDF al Ancho</span></button>
+                    <button class="dropdown-item" id="menuViewZoomIn"><span><img class="px-icon" src="/static/assets/icons/ui/zoom_in.png" alt=""></span> <span data-i18n="item_pdf_zoom_in">Acercar PDF (+)</span></button>
+                    <button class="dropdown-item" id="menuViewZoomOut"><span><img class="px-icon" src="/static/assets/icons/ui/zoom_out.png" alt=""></span> <span data-i18n="item_pdf_zoom_out">Alejar PDF (−)</span></button>
+                    <button class="dropdown-item" id="menuViewZoomFit"><span><img class="px-icon" src="/static/assets/icons/ui/calc.png" alt=""></span> <span data-i18n="item_pdf_zoom_fit">Ajustar PDF al Ancho</span></button>
                     <div class="dropdown-divider"></div>
-                    <button class="dropdown-item" id="menuViewToggleSidebar"><span>🌲</span> <span data-i18n="item_toggle_sidebar">Mostrar / Ocultar Panel de Archivos</span></button>
-                    <button class="dropdown-item" id="menuViewToggleGallery"><span>🖼️</span> <span data-i18n="item_toggle_gallery">Mostrar / Ocultar Galería de Imágenes</span></button>
+                    <button class="dropdown-item" id="menuViewToggleSidebar"><span><img class="px-icon" src="/static/assets/icons/ui/sidebar.png" alt=""></span> <span data-i18n="item_toggle_sidebar">Mostrar / Ocultar Panel de Archivos</span></button>
+                    <button class="dropdown-item" id="menuViewToggleGallery"><span><img class="px-icon" src="/static/assets/icons/ui/camera.png" alt=""></span> <span data-i18n="item_toggle_gallery">Mostrar / Ocultar Galería de Imágenes</span></button>
                 </div>
             </div>
 
             <!-- Menú Insertar -->
             <div class="menu-dropdown editor-only-control">
                 <button class="menu-btn" data-dropdown="menuInsert">
-                    <span>✏️ <span data-i18n="menu_insert">Insertar</span> ▾</span>
+                    <span><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/edit.png" alt=""> <span data-i18n="menu_insert">Insertar</span> ▾</span>
                 </button>
                 <div class="dropdown-content hidden" id="menuInsert">
-                    <button class="dropdown-item" id="menuItemMathKeyboard"><span>📐</span> <span data-i18n="item_math">Teclado Matemático Científico...</span> <kbd>Alt+M</kbd></button>
-                    <button class="dropdown-item" id="menuItemTableBuilder"><span>📊</span> <span data-i18n="item_table_builder">Editor Visual de Tablas...</span> <kbd>Alt+T</kbd></button>
+                    <button class="dropdown-item" id="menuItemMathKeyboard"><span><img class="px-icon" src="/static/assets/icons/ui/math.png" alt=""></span> <span data-i18n="item_math">Teclado Matemático Científico...</span> <kbd>Alt+M</kbd></button>
+                    <button class="dropdown-item" id="menuItemTableBuilder"><span><img class="px-icon" src="/static/assets/icons/ui/table.png" alt=""></span> <span data-i18n="item_table_builder">Editor Visual de Tablas...</span> <kbd>Alt+T</kbd></button>
                     <button class="dropdown-item" id="menuItemVoiceDictate"><span>🎙️</span> <span data-i18n="item_voice">Transcriptor de Voz Móvil...</span></button>
-                    <button class="dropdown-item" id="menuItemGallery"><span>🖼️</span> <span data-i18n="item_gallery">Galería de Imágenes / Recursos</span></button>
+                    <button class="dropdown-item" id="menuItemGallery"><span><img class="px-icon" src="/static/assets/icons/ui/camera.png" alt=""></span> <span data-i18n="item_gallery">Galería de Imágenes / Recursos</span></button>
                 </div>
             </div>
 
             <!-- Menú Colaborar -->
             <div class="menu-dropdown editor-only-control">
                 <button class="menu-btn" data-dropdown="menuCollab">
-                    <span>🌐 <span data-i18n="menu_collab">Colaborar</span> ▾</span>
+                    <span><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/tv_live.png" alt=""> <span data-i18n="menu_collab">Colaborar</span> ▾</span>
                 </button>
                 <div class="dropdown-content hidden" id="menuCollab">
                     <button class="dropdown-item" id="menuItemVoiceDictateCollab"><span>🎙️</span> <span data-i18n="item_voice">Transcriptor de Voz Móvil...</span></button>
-                    <button class="dropdown-item" id="menuItemShare"><span>🔗</span> <span data-i18n="item_share">Sesión Colaborativa P2P...</span></button>
-                    <button class="dropdown-item" id="menuItemAI"><span>🤖</span> <span data-i18n="item_ai">Asistente IA NaTex</span></button>
+                    <button class="dropdown-item" id="menuItemShare"><span><img class="px-icon" src="/static/assets/icons/ui/usb.png" alt=""></span> <span data-i18n="item_share">Sesión Colaborativa P2P...</span></button>
+                    <button class="dropdown-item" id="menuItemAI"><span><img class="px-icon" src="/static/assets/icons/ui/ai.png" alt=""></span> <span data-i18n="item_ai">Asistente IA NaTex</span></button>
                 </div>
             </div>
 
             <!-- Menú Ajustes -->
             <div class="menu-dropdown">
                 <button class="menu-btn" data-dropdown="menuSettings">
-                    <span>⚙️ <span data-i18n="menu_settings">Ajustes</span> ▾</span>
+                    <span><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/settings.png" alt=""> <span data-i18n="menu_settings">Ajustes</span> ▾</span>
                 </button>
                 <div class="dropdown-content hidden" id="menuSettings">
-                    <button class="dropdown-item" id="menuItemSettingsConfig"><span>⚙️</span> <span data-i18n="settings_tab_config">Configuración</span></button>
-                    <button class="dropdown-item" id="menuItemConfig"><span>🎨</span> <span data-i18n="settings_tab_customization">Customización</span></button>
+                    <button class="dropdown-item" id="menuItemSettingsConfig"><span><img class="px-icon" src="/static/assets/icons/ui/settings.png" alt=""></span> <span data-i18n="settings_tab_config">Configuración</span></button>
+                    <button class="dropdown-item" id="menuItemConfig"><span><img class="px-icon" src="/static/assets/icons/ui/palette.png" alt=""></span> <span data-i18n="settings_tab_customization">Customización</span></button>
                     <button class="dropdown-item" id="menuItemSettingsAi"><span>🔑</span> <span data-i18n="settings_tab_ai">Clave IA</span></button>
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item" id="menuItemThemeDark"><span>🌙</span> <span data-i18n="item_theme_dark">Modo Oscuro</span></button>
@@ -191,16 +191,16 @@
         <!-- Acciones Rápidas Destacadas a la Derecha -->
         <div class="toolbar-actions-compact editor-only-control">
             <button id="btnToggleGallery" class="btn-secondary-compact" data-i18n-title="title_gallery" title="Galería de Imágenes">
-                🖼️ <span data-i18n="btn_gallery">Galería</span>
+                <img class="px-icon" src="/static/assets/icons/ui/camera.png" alt=""> <span data-i18n="btn_gallery">Galería</span>
             </button>
             <button id="btnQuickVoice" class="btn-secondary-compact" data-i18n-title="title_quick_voice" title="Transcriptor de voz móvil">
                 🎙️ <span data-i18n="btn_voice_short">Voz</span>
             </button>
             <button id="btnCompile" class="btn-primary-compact" data-i18n-title="title_compile" title="Compilar documento (Ctrl + S)">
-                <span class="icon">⚡</span>
+                <span class="icon"><img class="px-icon" src="/static/assets/icons/ui/compile.png" alt=""></span>
                 <span class="btn-text" data-i18n="btn_compile">Compilar</span>
             </button>
-            <button id="btnToggleAI" class="btn-accent-compact" data-i18n-title="title_ai" title="Abrir Asistente IA NaTex">🤖</button>
+            <button id="btnToggleAI" class="btn-accent-compact" data-i18n-title="title_ai" title="Abrir Asistente IA NaTex"><img class="px-icon" src="/static/assets/icons/ui/ai.png" alt="IA"></button>
         </div>
     </header>
 
@@ -214,9 +214,9 @@
                         <span class="toggle-icon">⌵</span> <span data-i18n="sidebar_files_title">Archivos</span>
                     </span>
                     <div class="sidebar-header-actions">
-                        <button id="btnSidebarNewFile" class="btn-sidebar-icon" data-i18n-title="sidebar_title_new_file" title="Nuevo archivo (.tex, .bib)">📄<span class="badge-plus">+</span></button>
-                        <button id="btnSidebarNewFolder" class="btn-sidebar-icon" data-i18n-title="sidebar_title_new_folder" title="Nueva carpeta">📁<span class="badge-plus">+</span></button>
-                        <button id="btnSidebarUpload" class="btn-sidebar-icon" data-i18n-title="sidebar_title_upload" title="Subir archivo o imagen">⬆️</button>
+                        <button id="btnSidebarNewFile" class="btn-sidebar-icon" data-i18n-title="sidebar_title_new_file" title="Nuevo archivo (.tex, .bib)"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/file_generic.png" alt=""><span class="badge-plus">+</span></button>
+                        <button id="btnSidebarNewFolder" class="btn-sidebar-icon" data-i18n-title="sidebar_title_new_folder" title="Nueva carpeta"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/folder.png" alt=""><span class="badge-plus">+</span></button>
+                        <button id="btnSidebarUpload" class="btn-sidebar-icon" data-i18n-title="sidebar_title_upload" title="Subir archivo o imagen"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/upload.png" alt=""></button>
                         <button id="btnCollapseSidebar" class="btn-sidebar-icon" data-i18n-title="sidebar_title_collapse" title="Ocultar barra lateral">✕</button>
                         <input type="file" id="sidebarFileInput" multiple accept=".tex,.bib,.png,.jpg,.jpeg,.webp,.pdf,.txt,.sty,.cls" style="display:none;">
                     </div>
@@ -254,11 +254,11 @@
         <!-- Barra Lateral de Imágenes (Coexiste con Project Sidebar) -->
         <div class="gallery-sidebar collapsed" id="gallerySidebar">
             <div class="sidebar-header">
-                <span class="sidebar-title">🖼️ <span data-i18n="sidebar_gallery_title">Galería de Imágenes</span></span>
+                <span class="sidebar-title"><img class="px-icon" src="/static/assets/icons/ui/camera.png" alt=""> <span data-i18n="sidebar_gallery_title">Galería de Imágenes</span></span>
                 <button id="btnCollapseGallery" class="btn-icon-tiny" data-i18n-title="gallery_title_collapse" title="Ocultar panel">◀</button>
             </div>
             <div class="sidebar-dropzone" id="sidebarDropzone">
-                <div class="sidebar-drop-icon">📥</div>
+                <div class="sidebar-drop-icon"><img class="px-icon px-icon-lg" src="/static/assets/icons/ui/upload.png" alt=""></div>
                 <span class="sidebar-drop-text" data-i18n="sidebar_drop_text">Arrastra imágenes aquí o</span>
                 <button class="btn-sidebar-upload" id="btnGallerySidebarUpload">+ <span data-i18n="btn_upload">Subir</span></button>
                 <input type="file" id="gallerySidebarFileInput" accept="image/*" style="display:none;">
@@ -274,10 +274,10 @@
         <div class="editor-pane" id="editorPane">
             <div class="pane-header">
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <button id="btnToggleSidebar" class="btn-icon-tiny" data-i18n-title="editor_title_toggle_sidebar" title="Mostrar/Ocultar barra lateral">☰</button>
-                    <span class="pane-title" id="editorCurrentFileTitle">📝 main.tex</span>
+                    <button id="btnToggleSidebar" class="btn-icon-tiny" data-i18n-title="editor_title_toggle_sidebar" title="Mostrar/Ocultar barra lateral"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/sidebar.png" alt="☰"></button>
+                    <span class="pane-title" id="editorCurrentFileTitle"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/tex.png" alt=""> main.tex</span>
                     <button id="btnSyncToPdf" class="btn-synctex" data-i18n-title="editor_title_synctex" title="Ir a la página del PDF donde está esta línea">📍 <span data-i18n="btn_sync_pdf">Ir a PDF</span></button>
-                    <button id="btnToggleFindBar" class="btn-synctex" data-i18n-title="editor_title_find" title="Buscar y reemplazar en el código (Ctrl + F / Ctrl + H)">🔍 <span data-i18n="btn_find_short">Buscar</span></button>
+                    <button id="btnToggleFindBar" class="btn-synctex" data-i18n-title="editor_title_find" title="Buscar y reemplazar en el código (Ctrl + F / Ctrl + H)"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/zoom_in.png" alt=""> <span data-i18n="btn_find_short">Buscar</span></button>
                     <button id="btnOpenVersionHistory" class="btn-synctex" data-i18n-title="editor_title_history" title="Ver historial de versiones y restaurar copias (Snapshots)">🕒 <span data-i18n="btn_history_short">Historial</span></button>
                 </div>
                 <div class="editor-status" id="editorStatus" data-i18n="status_auto_saved">Guardado automático ✓</div>
@@ -305,7 +305,7 @@
                     <span id="bannerHostDisconnectedText" data-i18n="banner_host_disconnected_text"><strong>Desconectado del anfitrión:</strong> NaTex Studio fue cerrado por el host. Tus cambios locales no se guardarán en el servidor.</span>
                 </div>
                 <div style="display:flex; gap:8px;">
-                    <button type="button" class="btn-banner-action" id="btnBannerCopyCode">📋 <span data-i18n="btn_banner_copy_code">Copiar código</span></button>
+                    <button type="button" class="btn-banner-action" id="btnBannerCopyCode"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/copy.png" alt=""> <span data-i18n="btn_banner_copy_code">Copiar código</span></button>
                     <button type="button" class="btn-banner-action" id="btnBannerShowModal" data-i18n="btn_banner_show_modal">Ver opciones</button>
                 </div>
             </div>
@@ -331,12 +331,12 @@
             <div class="pane-header pdf-overleaf-toolbar">
                 <div class="pdf-toolbar-left">
                     <button id="btnPdfRecompile" class="btn-pdf-recompile" data-i18n-title="title_compile" title="Recompilar documento (Ctrl + S)">
-                        <span class="pdf-recompile-icon">🔄</span>
+                        <span class="pdf-recompile-icon"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/refresh.png" alt=""></span>
                         <span data-i18n="btn_recompile">Recompilar</span>
                     </button>
-                    <button id="btnDownloadPdf" class="pdf-tool-btn" data-i18n-title="btn_download_title" title="Descargar archivo PDF">⬇️</button>
-                    <button id="btnOpenPdfNewTab" class="pdf-tool-btn" data-i18n-title="btn_open_pdf_tab_title" title="Abrir PDF compilado en otra pestaña o ventana">↗️</button>
-                    <button id="btnRefreshPdf" class="pdf-tool-btn" data-i18n-title="btn_refresh_pdf" title="Recargar PDF">↻</button>
+                    <button id="btnDownloadPdf" class="pdf-tool-btn" data-i18n-title="btn_download_title" title="Descargar archivo PDF"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/download.png" alt="⬇"></button>
+                    <button id="btnOpenPdfNewTab" class="pdf-tool-btn" data-i18n-title="btn_open_pdf_tab_title" title="Abrir PDF compilado en otra pestaña o ventana"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/tv_live.png" alt="↗"></button>
+                    <button id="btnRefreshPdf" class="pdf-tool-btn" data-i18n-title="btn_refresh_pdf" title="Recargar PDF"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/refresh.png" alt="↻"></button>
                 </div>
                 <div class="pdf-toolbar-right">
                     <button id="btnPdfInvertMode" class="pdf-tool-btn" data-i18n-title="pdf_invert_title" title="Cambiar modo de hoja PDF (Clásico / Tintado del Tema / Modo Noche)">◐</button>
@@ -349,8 +349,8 @@
                         <span id="pdfPageCount">1</span>
                     </div>
                     <div class="pdf-tool-divider"></div>
-                    <button id="btnPdfZoomOut" class="pdf-tool-btn" data-i18n-title="pdf_zoom_out_title" title="Alejar PDF (−)">−</button>
-                    <button id="btnPdfZoomIn" class="pdf-tool-btn" data-i18n-title="pdf_zoom_in_title" title="Acercar PDF (+)">+</button>
+                    <button id="btnPdfZoomOut" class="pdf-tool-btn" data-i18n-title="pdf_zoom_out_title" title="Alejar PDF (−)"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/zoom_out.png" alt="−"></button>
+                    <button id="btnPdfZoomIn" class="pdf-tool-btn" data-i18n-title="pdf_zoom_in_title" title="Acercar PDF (+)"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/zoom_in.png" alt="+"></button>
                     <select id="pdfZoomSelect" class="pdf-zoom-select" data-i18n-title="pdf_zoom_select_title" title="Nivel de zoom del PDF">
                         <option value="fit" data-i18n="pdf_zoom_fit">Ajustar</option>
                         <option value="75">75%</option>
@@ -396,7 +396,7 @@
                 </div>
                 <div style="display:flex; gap:10px; align-items:center;">
                     <input type="file" id="zipProjectInput" accept=".zip" style="display:none;">
-                    <button id="btnDashboardImportZip" class="btn-secondary" style="padding:10px 16px; font-size:13.5px; display:flex; align-items:center; gap:6px;" data-i18n-title="title_import_zip" title="Importar un proyecto LaTeX en formato .zip (compatible con Overleaf)">📦 <span data-i18n="btn_import_zip">Importar .zip</span></button>
+                    <button id="btnDashboardImportZip" class="btn-secondary" style="padding:10px 16px; font-size:13.5px; display:flex; align-items:center; gap:6px;" data-i18n-title="title_import_zip" title="Importar un proyecto LaTeX en formato .zip (compatible con Overleaf)"><img class="px-icon" src="/static/assets/icons/ui/zip.png" alt=""> <span data-i18n="btn_import_zip">Importar .zip</span></button>
                     <button id="btnDashboardNewProject" class="hero-btn" style="padding:10px 20px; font-size:13.5px;">+ <span data-i18n="btn_new_project">Nuevo Proyecto</span></button>
                 </div>
             </div>
@@ -409,26 +409,26 @@
                     <div class="hero-preview" id="heroProjectPreview">\documentclass{article}...</div>
                     <div class="hero-stats">
                         <span class="hero-stat-item">🕒 <span id="heroProjectMtime">-</span></span>
-                        <span class="hero-stat-item">📄 <span id="heroProjectLines">0</span> <span data-i18n="stat_lines">líneas</span></span>
-                        <span class="hero-stat-item">🖼️ <span id="heroProjectFiles">0</span> <span data-i18n="stat_files">archivos</span></span>
+                        <span class="hero-stat-item"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/tex.png" alt=""> <span id="heroProjectLines">0</span> <span data-i18n="stat_lines">líneas</span></span>
+                        <span class="hero-stat-item"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/folder.png" alt=""> <span id="heroProjectFiles">0</span> <span data-i18n="stat_files">archivos</span></span>
                     </div>
                 </div>
                 <button class="hero-btn" id="btnHeroContinue">
-                    <span>🚀</span> <span data-i18n="btn_hero_continue">Continuar Editando</span>
+                    <img class="px-icon" src="/static/assets/icons/ui/compile.png" alt=""> <span data-i18n="btn_hero_continue">Continuar Editando</span>
                 </button>
             </div>
 
             <!-- Acciones Rápidas -->
             <div>
-                <h3 class="section-title">⚡ <span data-i18n="title_quick_actions">Comenzar</span></h3>
+                <h3 class="section-title"><img class="px-icon px-icon-md" src="/static/assets/icons/ui/compile.png" alt=""> <span data-i18n="title_quick_actions">Comenzar</span></h3>
                 <div class="quick-actions-grid">
                     <div class="quick-card" id="quickBlankProject">
-                        <div class="quick-card-icon">📄</div>
+                        <div class="quick-card-icon"><img class="px-icon px-icon-lg" src="/static/assets/icons/ui/file_generic.png" alt=""></div>
                         <div class="quick-card-title" data-i18n="quick_blank_title">Proyecto en Blanco</div>
                         <div class="quick-card-desc" data-i18n="quick_blank_desc">Crea un documento LaTeX limpio desde cero sin plantillas previas.</div>
                     </div>
                     <div class="quick-card" id="quickFromTemplate">
-                        <div class="quick-card-icon">📑</div>
+                        <div class="quick-card-icon"><img class="px-icon px-icon-lg" src="/static/assets/icons/ui/catalog.png" alt=""></div>
                         <div class="quick-card-title" data-i18n="quick_template_title">Desde una Plantilla</div>
                         <div class="quick-card-desc" data-i18n="quick_template_desc">Comienza con formatos listos de Tesis, Informes, Posters o Papers.</div>
                     </div>
@@ -438,7 +438,7 @@
                         <div class="quick-card-desc" data-i18n="quick_voice_desc">Graba tu clase desde el celular y genera el apunte LaTeX estructurado.</div>
                     </div>
                     <div class="quick-card" id="quickOpenGallery">
-                        <div class="quick-card-icon">🖼️</div>
+                        <div class="quick-card-icon"><img class="px-icon px-icon-lg" src="/static/assets/icons/ui/camera.png" alt=""></div>
                         <div class="quick-card-title" data-i18n="quick_gallery_title">Galería de Imágenes</div>
                         <div class="quick-card-desc" data-i18n="quick_gallery_desc">Gestiona figuras, gráficos y recursos de tus documentos.</div>
                     </div>
@@ -449,12 +449,12 @@
             <div>
                 <div class="projects-section-header">
                     <h3 class="section-title" style="margin-bottom:0;">
-                        📁 <span data-i18n="title_recent_projects">Tus Proyectos</span>
+                        <img class="px-icon px-icon-md" src="/static/assets/icons/ui/folder.png" alt=""> <span data-i18n="title_recent_projects">Tus Proyectos</span>
                         <span id="dashboardProjectsCountBadge" class="projects-count-badge">0</span>
                     </h3>
                     <div class="projects-toolbar">
                         <div class="projects-search-box">
-                            <span class="projects-search-icon">🔍</span>
+                            <span class="projects-search-icon"><img class="px-icon px-icon-sm" src="/static/assets/icons/ui/zoom_in.png" alt=""></span>
                             <input type="text" id="dashboardSearchInput" class="projects-search-input" data-i18n-placeholder="dashboard_search_placeholder" placeholder="Buscar por nombre o contenido..." autocomplete="off" spellcheck="false" />
                             <button type="button" id="btnClearDashboardSearch" class="projects-search-clear hidden" data-i18n-title="title_clear_search" title="Limpiar búsqueda">✕</button>
                         </div>

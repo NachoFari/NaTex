@@ -1,5 +1,8 @@
 // NaTex Studio - Updater Module
-function isStrictlyNewerVersion(latestTag, installedTag = 'v1.0') {
+const NATEX_CURRENT_VERSION = 'v1.3.2';
+const NASUITE_DOWNLOAD_URL = 'https://github.com/NachoFari/NaSuite/releases/latest/download/NaSuite-Setup-v1.0.0.exe';
+
+function isStrictlyNewerVersion(latestTag, installedTag = NATEX_CURRENT_VERSION) {
     const parseParts = (str) => String(str || '').replace(/^v/i, '').split('.').map(n => parseInt(n, 10) || 0);
     const l = parseParts(latestTag);
     const c = parseParts(installedTag);
@@ -13,8 +16,25 @@ function isStrictlyNewerVersion(latestTag, installedTag = 'v1.0') {
     return false;
 }
 
-function isNewerVersion(latestTag, installedTag = 'v1.0') {
+function isNewerVersion(latestTag, installedTag = NATEX_CURRENT_VERSION) {
     return isStrictlyNewerVersion(latestTag, installedTag);
+}
+
+function openWhatsNewModal() {
+    const modal = document.getElementById('modalWhatsNew');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+function closeWhatsNewModal() {
+    const modal = document.getElementById('modalWhatsNew');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    try {
+        localStorage.setItem('natex_whats_new_seen_version', NATEX_CURRENT_VERSION);
+    } catch (_) {}
 }
 
 async function checkForUpdates(manual = false) {
@@ -46,7 +66,7 @@ async function checkForUpdates(manual = false) {
             return data;
         }
 
-        const reallyHasUpdate = Boolean(data.has_update && isNewerVersion(data.latest_version, 'v1.0'));
+        const reallyHasUpdate = Boolean(data.has_update && isNewerVersion(data.latest_version, NATEX_CURRENT_VERSION));
 
         if (reallyHasUpdate) {
             if (manual && resultBox) {
@@ -65,6 +85,9 @@ async function checkForUpdates(manual = false) {
                 html += `
                     <a href="${data.releases_page || 'https://github.com/NachoFari/NaTex/releases'}" target="_blank" class="btn-secondary" style="font-size:12px; padding:6px 12px; text-decoration:none; display:inline-flex; align-items:center;">
                         📦 ${isEn ? 'Download Installer' : 'Descargar Instalador'}
+                    </a>
+                    <a href="${NASUITE_DOWNLOAD_URL}" target="_blank" class="btn-secondary" style="font-size:12px; padding:6px 12px; text-decoration:none; display:inline-flex; align-items:center; border-color:rgba(255,107,53,0.5);">
+                        🦊 ${isEn ? 'Download NaSuite Launcher' : 'Descargar NaSuite Launcher'}
                     </a>
                 </div>`;
                 resultBox.innerHTML = html;
@@ -96,9 +119,15 @@ async function checkForUpdates(manual = false) {
             }
         } else if (manual && resultBox) {
             resultBox.innerHTML = `
-                <div style="color:#10B981; display:flex; align-items:center; gap:6px;">
+                <div style="color:#10B981; display:flex; align-items:center; gap:6px; margin-bottom:10px;">
                     <span>✅</span>
-                    <span>${isEn ? 'You have the latest version (v1.0).' : '¡Tienes la versión más reciente (v1.0)!'}</span>
+                    <span>${isEn ? `You have the latest version (${NATEX_CURRENT_VERSION}).` : `¡Tienes la versión más reciente (${NATEX_CURRENT_VERSION})!`}</span>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; padding-top:8px; border-top:1px solid var(--border-color);">
+                    <span style="font-size:12px; color:var(--text-muted);">🦊 ${isEn ? 'Manage & update all NaSuite apps with NaSuite Launcher:' : 'Gestiona y actualiza toda la suite con NaSuite Launcher:'}</span>
+                    <a href="${NASUITE_DOWNLOAD_URL}" target="_blank" class="btn-primary" style="font-size:12px; padding:5px 12px; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+                        📥 ${isEn ? 'Download NaSuite (.exe)' : 'Descargar NaSuite (.exe)'}
+                    </a>
                 </div>
             `;
         }
@@ -121,6 +150,32 @@ function initUpdateChecker() {
         btnCheck.onclick = () => checkForUpdates(true);
     }
 
+    const menuItemWhatsNew = document.getElementById('menuItemWhatsNew');
+    if (menuItemWhatsNew) {
+        menuItemWhatsNew.onclick = () => openWhatsNewModal();
+    }
+    const btnOpenWhatsNewSettings = document.getElementById('btnOpenWhatsNewSettings');
+    if (btnOpenWhatsNewSettings) {
+        btnOpenWhatsNewSettings.onclick = () => openWhatsNewModal();
+    }
+    const btnCloseWhatsNewX = document.getElementById('btnCloseWhatsNewX');
+    if (btnCloseWhatsNewX) {
+        btnCloseWhatsNewX.onclick = () => closeWhatsNewModal();
+    }
+    const btnDismissWhatsNew = document.getElementById('btnDismissWhatsNew');
+    if (btnDismissWhatsNew) {
+        btnDismissWhatsNew.onclick = () => closeWhatsNewModal();
+    }
+
+    // Mostrar automáticamente la pantalla What's New una vez tras actualizar a v1.3.2
+    setTimeout(() => {
+        try {
+            if (localStorage.getItem('natex_whats_new_seen_version') !== NATEX_CURRENT_VERSION) {
+                openWhatsNewModal();
+            }
+        } catch (_) {}
+    }, 3200);
+
     // Verificación automática en segundo plano al arrancar si está activada
     setTimeout(async () => {
         try {
@@ -128,7 +183,7 @@ function initUpdateChecker() {
             if (!isAuto) return;
             const res = await fetch('/api/system/check_update');
             const data = await res.json();
-            if (data.success && data.has_update && isNewerVersion(data.latest_version, 'v1.0')) {
+            if (data.success && data.has_update && isNewerVersion(data.latest_version, NATEX_CURRENT_VERSION)) {
                 showUpdateBanner(data);
             }
         } catch (_) {}

@@ -1039,31 +1039,3 @@ button {
     border-color: #fed7aa !important;
 }
 
-/* Pixel Art UI Icons (32x32 crisp-edges) */
-.px-icon {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    vertical-align: middle;
-    flex-shrink: 0;
-    object-fit: contain;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-}
-
-.px-icon-sm {
-    width: 14px;
-    height: 14px;
-}
-
-.px-icon-md {
-    width: 18px;
-    height: 18px;
-}
-
-.px-icon-lg {
-    width: 28px;
-    height: 28px;
-}
-
-

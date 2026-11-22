@@ -1,6 +1,8 @@
 ﻿<div align="center">
 
-# 🦊 NaTex Studio
+<img src="static/img/logo_128.png" width="96" height="96" alt="NaTex Studio" />
+
+# NaTex Studio
 
 **NaSuite • El entorno de edición LaTeX rápido, visual, libre y colaborativo.**
 
